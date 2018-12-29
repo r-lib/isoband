@@ -4,7 +4,7 @@ using namespace Rcpp;
 
 #include <iostream>
 #include <vector>
-#include <utility> // for pair
+#include <unordered_map>
 using namespace std;
 
 
@@ -22,6 +22,15 @@ struct grid_point {
   
   grid_point(double r_in = 0, double c_in = 0, point_type type_in = grid) : r(r_in), c(c_in), type(type_in) {}
   grid_point(const grid_point &p) : r(p.r), c(p.c), type(p.type) {}
+};
+
+// hash function for grid_point
+struct grid_point_hasher {
+  size_t operator()(const grid_point& p) const
+  {
+    // maybe not the best way to combine data for hashing, but should work
+    return hash<int>()(1000000*p.r + 10*p.c + p.type); 
+  }
 };
 
 struct point {
@@ -63,7 +72,8 @@ private:
   poly_connect tmp_poly_connect[8];
   int tmp_poly_size; // current number of elements in tmp_poly
   
-  vector<vector<vector<poly_connect> > > polygons;
+  typedef unordered_map<grid_point, poly_connect, grid_point_hasher> gridmap;
+  gridmap polygon_grid;
   
   // internal member functions
   void poly_start(int r, int c, point_type type) { // start a new elementary polygon
@@ -101,19 +111,19 @@ private:
       
       // now merge with existing polygons if needed
       const grid_point &p = tmp_poly[i];
-      if (!polygons[p.r][p.c][p.type].empty) { // point has been used before, need to merge polygons
-        if (tmp_poly_connect[i].next == polygons[p.r][p.c][p.type].prev) {
-          if (tmp_poly_connect[i].prev == polygons[p.r][p.c][p.type].next) {
+      if (!polygon_grid[p].empty) { // point has been used before, need to merge polygons
+        if (tmp_poly_connect[i].next == polygon_grid[p].prev) {
+          if (tmp_poly_connect[i].prev == polygon_grid[p].next) {
             // if both prev and next cancel, point can be deleted
             tmp_poly_connect[i].empty = true;
           } else {
             // otherwise, merge in "next" direction
-            tmp_poly_connect[i].next = polygons[p.r][p.c][p.type].next;
+            tmp_poly_connect[i].next = polygon_grid[p].next;
             tmp_poly_connect[i].empty = false;
           }
-        } else if (tmp_poly_connect[i].prev == polygons[p.r][p.c][p.type].next) {
+        } else if (tmp_poly_connect[i].prev == polygon_grid[p].next) {
           // opposite is true, merge in "prev" direction
-          tmp_poly_connect[i].prev = polygons[p.r][p.c][p.type].prev;
+          tmp_poly_connect[i].prev = polygon_grid[p].prev;
           tmp_poly_connect[i].empty = false;
         } else {
           // should never get here
@@ -127,7 +137,7 @@ private:
     // then we copy the connections into the polygon matrix
     for (int i = 0; i < tmp_poly_size; i++) {
       const grid_point &p = tmp_poly[i];
-      polygons[p.r][p.c][p.type] = tmp_poly_connect[i];
+      polygon_grid[p] = tmp_poly_connect[i];
       cout << p << tmp_poly_connect[i] << endl;
     }
     
@@ -136,14 +146,8 @@ private:
   }
   
   void print_polygons_state() {
-    for (int r = 0; r < nrow; r++) {
-      for (int c = 0; c < ncol; c++) {
-        for (int type = 0; type < 5; type++) {
-          if (!polygons[r][c][type].empty) {
-            cout << c << " " << r << " " << type << ": " << polygons[r][c][type] << endl;
-          }
-        }
-      }
+    for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
+      cout << it->first << ":" << it->second << endl;
     }
     cout << endl;
   }
@@ -180,18 +184,12 @@ public:
     
     if (grid_x.size() != ncol) {stop("Number of x coordinates must match number of columns in density matrix.");}
     if (grid_y.size() != nrow) {stop("Number of y coordinates must match number of rows in density matrix.");}
-    
-    // set up matrix of polygon points
-    polygons.resize(nrow);
-    for (auto it = polygons.begin(); it != polygons.end(); it++) {
-      (*it).resize(ncol);
-      for (auto jt = (*it).begin(); jt != (*it).end(); jt++) {
-        (*jt).resize(5); // five different point types defined in point_type enum
-      }
-    }
   }
   
   void make_contour_bands() {
+    // clear polygon grid
+    polygon_grid.clear();
+    
     // setup matrix of ternarized cell representations
     IntegerVector v(nrow*ncol);
     IntegerVector::iterator iv = v.begin();
@@ -276,30 +274,28 @@ public:
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for the polygon lines
 
-    for (int r = 0; r < nrow; r++) {
-      for (int c = 0; c < ncol; c++) {
-        for (int type = 0; type < 5; type++) {
-          if (!polygons[r][c][type].empty && !polygons[r][c][type].collected) { // skip any grid points that are empty or already collected
-            // we have found a new polygon line; process it
-            cur_id++;
-            
-            grid_point start = grid_point(r, c, static_cast<point_type>(type));
-            grid_point cur = start;
-            int i = 0;
-            do {
-              i++;
-              point p = calc_point_coords(cur);
-              x_out.push_back(p.x);
-              y_out.push_back(p.y);
-              id.push_back(cur_id);
-
-              // record that we have processed this point              
-              polygons[cur.r][cur.c][cur.type].collected = true;
-              // advance to next point in polygon
-              cur = polygons[cur.r][cur.c][cur.type].next;
-            } while (!(cur == start) && i < 10000); // keep going until we reach the start point again
-          }
-        }
+    // iterate over all locations in the polygon grid
+    for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
+      if (!(it->second).empty && !(it->second).collected) { // skip any grid points that are already collected
+        // we have found a new polygon line; process it
+        cur_id++;
+        
+        const grid_point &start = it->first;
+        grid_point cur = start;
+        
+        int i = 0; // counter to detect infinite loops; can eventually be removed
+        do {
+          i++;
+          point p = calc_point_coords(cur);
+          x_out.push_back(p.x);
+          y_out.push_back(p.y);
+          id.push_back(cur_id);
+          
+          // record that we have processed this point              
+          polygon_grid[cur].collected = true;
+          // advance to next point in polygon
+          cur = polygon_grid[cur].next;
+        } while (!(cur == start) && i < 10000); // keep going until we reach the start point again
       }
     }
     return DataFrame::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
