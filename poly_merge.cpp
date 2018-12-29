@@ -108,7 +108,7 @@ private:
   // they overlap in exactly one point. this needs to be handled appropriately and cannot in the current framework.
   
   void poly_merge() { // merge current elementary polygon to prior polygons
-    cout << "before merging:" << endl;
+    //cout << "before merging:" << endl;
     
     bool to_delete[] = {false, false, false, false, false, false, false, false};
     
@@ -120,7 +120,7 @@ private:
       tmp_poly_connect[i].next = tmp_poly[(i+1<tmp_poly_size) ? i+1 : 0];
       tmp_poly_connect[i].prev = tmp_poly[(i-1>=0) ? i-1 : tmp_poly_size-1];
       
-      cout << tmp_poly[i] << ": " << tmp_poly_connect[i] << endl;
+      //cout << tmp_poly[i] << ": " << tmp_poly_connect[i] << endl;
       
       // now merge with existing polygons if needed
       const grid_point &p = tmp_poly[i];
@@ -171,7 +171,7 @@ private:
       }
     }
     
-    cout << "after merging:" << endl;
+    //cout << "after merging:" << endl;
     
     // then we copy the connections into the polygon matrix
     for (int i = 0; i < tmp_poly_size; i++) {
@@ -182,11 +182,11 @@ private:
       } else {            // otherwise, copy
         polygon_grid[p] = tmp_poly_connect[i];
       }
-      cout << p << ": " << tmp_poly_connect[i] << endl;
+      //cout << p << ": " << tmp_poly_connect[i] << endl;
     }
     
-    cout << "new grid:" << endl;
-    print_polygons_state();
+    //cout << "new grid:" << endl;
+    //print_polygons_state();
   }
   
   void print_polygons_state() {
@@ -581,6 +581,11 @@ m <- matrix(c(1, 1, 1, 1, 1, 1,
 
 
 df <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, .5, 1.5)
+grid.newpage()
+grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
+
+m <- volcano
+df <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120, 150)
 grid.newpage()
 grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
 */                         
