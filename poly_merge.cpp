@@ -7,6 +7,12 @@ using namespace Rcpp;
 #include <unordered_map>
 using namespace std;
 
+struct point {
+  double x, y; // x and y coordinates
+  
+  point(double x_in, double y_in) : x(x_in), y(y_in) {}
+};
+
 
 enum point_type {
   grid,  // point on the original data grid
@@ -33,32 +39,26 @@ struct grid_point_hasher {
   }
 };
 
-struct point {
-  double x, y; // x and y coordinates
-  
-  point(double x_in, double y_in) : x(x_in), y(y_in) {}
-};
-
 bool operator==(const grid_point &p1, const grid_point &p2) {
   return (p1.r == p2.r) && (p1.c == p2.c) && (p1.type == p2.type);
 }
 
 ostream & operator<<(ostream &out, const grid_point &p) {
-  out << "(" << p.c << ", " << p.r << ", " << p.type << ") ";
+  out << "(" << p.c << ", " << p.r << ", " << p.type << ")";
   return out;
 }
 
 struct poly_connect {
-  grid_point prev, next;
-  bool empty; // has this connection been defined yet?
+  grid_point prev, next; // previous and next points in polygon
+  grid_point prev2, next2; // alternative previous and next, when two separate polygons have vertices on the same grid point
+  
   bool collected; // has this connection been collected into a final polygon?
   
-  poly_connect() : empty(true), collected(false) {};
+  poly_connect() : collected(false) {};
 };
 
 ostream & operator<<(ostream &out, const poly_connect &pc) {
-  if (pc.empty) {out << "empty";}
-  else {out << "prev: " << pc.prev << "; next: " << pc.next << " ";}
+  out << "prev: " << pc.prev << "; next: " << pc.next << " ";
   return out;
 }
 
@@ -98,33 +98,32 @@ private:
   void poly_merge() { // merge current elementary polygon to prior polygons
     cout << "before merging:" << endl;
     
+    bool to_delete[] = {false, false, false, false, false, false, false, false};
+    
     // first, we figure out the right connections for current polygon
     for (int i = 0; i < tmp_poly_size; i++) {
       // create defined state in tmp_poly_connect[]
       // for each point, find previous and next point in polygon
-      tmp_poly_connect[i].empty = false;
       tmp_poly_connect[i].collected = false;
       tmp_poly_connect[i].next = tmp_poly[(i+1<tmp_poly_size) ? i+1 : 0];
       tmp_poly_connect[i].prev = tmp_poly[(i-1>=0) ? i-1 : tmp_poly_size-1];
       
-      cout << tmp_poly[i] << tmp_poly_connect[i] << endl;
+      cout << tmp_poly[i] << ": " << tmp_poly_connect[i] << endl;
       
       // now merge with existing polygons if needed
       const grid_point &p = tmp_poly[i];
-      if (!polygon_grid[p].empty) { // point has been used before, need to merge polygons
+      if (polygon_grid.count(p) > 0) { // point has been used before, need to merge polygons
         if (tmp_poly_connect[i].next == polygon_grid[p].prev) {
           if (tmp_poly_connect[i].prev == polygon_grid[p].next) {
             // if both prev and next cancel, point can be deleted
-            tmp_poly_connect[i].empty = true;
+            to_delete[i] = true;
           } else {
             // otherwise, merge in "next" direction
             tmp_poly_connect[i].next = polygon_grid[p].next;
-            tmp_poly_connect[i].empty = false;
           }
         } else if (tmp_poly_connect[i].prev == polygon_grid[p].next) {
           // opposite is true, merge in "prev" direction
           tmp_poly_connect[i].prev = polygon_grid[p].prev;
-          tmp_poly_connect[i].empty = false;
         } else {
           // should never get here
           cerr << "Something is wrong in polygon merging; vertices overlap but edges do not." << endl;
@@ -138,12 +137,12 @@ private:
     for (int i = 0; i < tmp_poly_size; i++) {
       const grid_point &p = tmp_poly[i];
       
-      if (tmp_poly_connect[i].empty) {// delete empty points
+      if (to_delete[i]) { // delete point if needed
         polygon_grid.erase(p);
-      } else {
+      } else {            // otherwise, copy
         polygon_grid[p] = tmp_poly_connect[i];
       }
-      cout << p << tmp_poly_connect[i] << endl;
+      cout << p << ": " << tmp_poly_connect[i] << endl;
     }
     
     cout << "new grid:" << endl;
@@ -152,7 +151,7 @@ private:
   
   void print_polygons_state() {
     for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
-      cout << it->first << ":" << it->second << endl;
+      cout << it->first << ": " << it->second << endl;
     }
     cout << endl;
   }
@@ -281,7 +280,7 @@ public:
 
     // iterate over all locations in the polygon grid
     for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
-      if (!(it->second).empty && !(it->second).collected) { // skip any grid points that are already collected
+      if (!(it->second).collected) { // skip any grid points that are already collected
         // we have found a new polygon line; process it
         cur_id++;
         
