@@ -52,13 +52,17 @@ struct poly_connect {
   grid_point prev, next; // previous and next points in polygon
   grid_point prev2, next2; // alternative previous and next, when two separate polygons have vertices on the same grid point
   
-  bool collected; // has this connection been collected into a final polygon?
-  
-  poly_connect() : collected(false) {};
+  bool altpoint;  // does this connection hold an alternative point?
+  bool collected, collected2; // has this connection been collected into a final polygon?
+
+  poly_connect() : altpoint(false), collected(false), collected2(false) {};
 };
 
 ostream & operator<<(ostream &out, const poly_connect &pc) {
   out << "prev: " << pc.prev << "; next: " << pc.next << " ";
+  if (pc.altpoint) {
+    out << "AP prev: " << pc.prev2 << "; next2: " << pc.next2 << " ";
+  }
   return out;
 }
 
@@ -74,6 +78,14 @@ private:
   
   typedef unordered_map<grid_point, poly_connect, grid_point_hasher> gridmap;
   gridmap polygon_grid;
+  
+  void reset_grid() {
+    polygon_grid.clear();
+    
+    for (int i=0; i<8; i++) {
+      tmp_poly_connect[i] = poly_connect();
+    }
+  }
   
   // internal member functions
   void poly_start(int r, int c, point_type type) { // start a new elementary polygon
@@ -104,7 +116,7 @@ private:
     for (int i = 0; i < tmp_poly_size; i++) {
       // create defined state in tmp_poly_connect[]
       // for each point, find previous and next point in polygon
-      tmp_poly_connect[i].collected = false;
+      tmp_poly_connect[i].altpoint = false;
       tmp_poly_connect[i].next = tmp_poly[(i+1<tmp_poly_size) ? i+1 : 0];
       tmp_poly_connect[i].prev = tmp_poly[(i-1>=0) ? i-1 : tmp_poly_size-1];
       
@@ -113,20 +125,48 @@ private:
       // now merge with existing polygons if needed
       const grid_point &p = tmp_poly[i];
       if (polygon_grid.count(p) > 0) { // point has been used before, need to merge polygons
-        if (tmp_poly_connect[i].next == polygon_grid[p].prev) {
-          if (tmp_poly_connect[i].prev == polygon_grid[p].next) {
-            // if both prev and next cancel, point can be deleted
+        if (!polygon_grid[p].altpoint) {
+          // basic scenario, no alternative point at this location
+          int score = 2 * (tmp_poly_connect[i].next == polygon_grid[p].prev) + (tmp_poly_connect[i].prev == polygon_grid[p].next);
+          switch (score) {
+          case 3: // 11
+            // both prev and next cancel, point can be deleted
             to_delete[i] = true;
-          } else {
-            // otherwise, merge in "next" direction
+            break;
+          case 2: // 10
+            // merge in "next" direction
             tmp_poly_connect[i].next = polygon_grid[p].next;
+            break;
+          case 1: // 01
+            // merge in "prev" direction
+            tmp_poly_connect[i].prev = polygon_grid[p].prev;
+            break;
+          default: // 00
+            // if we get here, we have two polygon vertices sharing the same grid location
+            // in an unmergable configuration; need to store both
+            tmp_poly_connect[i].prev2 = polygon_grid[p].prev;
+            tmp_poly_connect[i].next2 = polygon_grid[p].next;
+            tmp_poly_connect[i].altpoint = true;
           }
-        } else if (tmp_poly_connect[i].prev == polygon_grid[p].next) {
-          // opposite is true, merge in "prev" direction
-          tmp_poly_connect[i].prev = polygon_grid[p].prev;
         } else {
-          // should never get here
-          cerr << "Something is wrong in polygon merging; vertices overlap but edges do not." << endl;
+          // case with alternative point at this location
+          int score = 
+            8 * (tmp_poly_connect[i].next == polygon_grid[p].prev2) + 4 * (tmp_poly_connect[i].prev == polygon_grid[p].next2) +
+            2 * (tmp_poly_connect[i].next == polygon_grid[p].prev) + (tmp_poly_connect[i].prev == polygon_grid[p].next);
+          switch (score) {
+          case 9: // 1001
+            // three=way merge
+            tmp_poly_connect[i].next = polygon_grid[p].next2;
+            tmp_poly_connect[i].prev = polygon_grid[p].prev;
+            break;
+          case 6: // 0110
+            // three=way merge
+            tmp_poly_connect[i].next = polygon_grid[p].next;
+            tmp_poly_connect[i].prev = polygon_grid[p].prev2;
+            break;
+          default:
+            cerr << "undefined merging configuration:" << score << endl;
+          }
         }
       }
     }
@@ -191,8 +231,8 @@ public:
   }
   
   void make_contour_bands() {
-    // clear polygon grid
-    polygon_grid.clear();
+    // clear polygon grid and associated internal variables
+    reset_grid(); 
     
     // setup matrix of ternarized cell representations
     IntegerVector v(nrow*ncol);
@@ -224,7 +264,7 @@ public:
         case 0: break;
         case 80: break;
           
-          // single triangle
+        // single triangle
         case 1: // 0001
           poly_start(r, c, vintersect_lo);
           poly_add(r+1, c, hintersect_lo);
@@ -249,8 +289,32 @@ public:
           poly_add(r, c, hintersect_lo);
           poly_merge();
           break;
+        case 79: // 2221
+          poly_start(r, c, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
+        case 77: // 2212
+          poly_start(r, c+1, vintersect_hi);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 71: // 2122
+          poly_start(r, c, hintersect_hi);
+          poly_add(r, c+1, grid);
+          poly_add(r, c+1, vintersect_hi);
+          poly_merge();
+          break;
+        case 53: // 1222
+          poly_start(r, c, vintersect_hi);
+          poly_add(r, c, grid);
+          poly_add(r, c, hintersect_hi);
+          poly_merge();
+          break;
           
-          // single square
+        // single square
         case 40: // 1111
           poly_start(r, c, grid);
           poly_add(r, c+1, grid);
@@ -260,12 +324,196 @@ public:
           break;
         
         // single pentagon
+        case 49: // 1211
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
+        case 67: // 2111
+          poly_start(r+1, c, grid);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, grid);
+          poly_add(r+1, c+1, grid);
+          poly_merge();
+          break;
+        case 41: // 1112
+          poly_start(r, c, grid);
+          poly_add(r, c+1, grid);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 43: // 1121
+          poly_start(r, c, grid);
+          poly_add(r, c+1, grid);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
+        case 31: // 1011
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
         case 13: // 0111
           poly_start(r+1, c, grid);
           poly_add(r, c, vintersect_lo);
           poly_add(r, c, hintersect_lo);
           poly_add(r, c+1, grid);
           poly_add(r+1, c+1, grid);
+          poly_merge();
+          break;
+        case 39: // 1110
+          poly_start(r, c, grid);
+          poly_add(r, c+1, grid);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+        case 37: // 1101
+          poly_start(r, c, grid);
+          poly_add(r, c+1, grid);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
+        case 45: // 1200
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+        case 15: // 0120
+          poly_start(r, c+1, grid);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 5: // 0012
+          poly_start(r, c, vintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 55: // 2001
+          poly_start(r+1, c, grid);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 35: // 1022
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 65: // 2102
+          poly_start(r, c+1, grid);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 75: // 2210
+          poly_start(r, c, vintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+        case 25: // 0221
+          poly_start(r+1, c, grid);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 29: // 1002
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 63: // 2100
+          poly_start(r, c+1, grid);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 21: // 0210
+          poly_start(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_merge();
+          break;
+        case 7: // 0021
+          poly_start(r+1, c, grid);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 51: // 1220
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+        case 17: // 0122
+          poly_start(r, c+1, grid);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 59: // 2012
+          poly_start(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_merge();
+          break;
+        case 73: // 2201
+          poly_start(r+1, c, grid);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
           poly_merge();
           break;
         }
@@ -287,9 +535,14 @@ public:
         const grid_point &start = it->first;
         grid_point cur = start;
         
-        int i = 0; // counter to detect infinite loops; can eventually be removed
         do {
-          i++;
+          if (polygon_grid[cur].altpoint) {
+            // not sure if this case could ever occur; for now, just error out
+            // (otherwise we risk an infinite loop)
+            cerr << "Found ambiguous point in polygon grid. Cannot collect coordinates." << endl;
+            break;
+          }
+          
           point p = calc_point_coords(cur);
           x_out.push_back(p.x);
           y_out.push_back(p.y);
@@ -299,7 +552,7 @@ public:
           polygon_grid[cur].collected = true;
           // advance to next point in polygon
           cur = polygon_grid[cur].next;
-        } while (!(cur == start) && i < 10000); // keep going until we reach the start point again
+        } while (!(cur == start)); // keep going until we reach the start point again
       }
     }
     return DataFrame::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
@@ -316,9 +569,10 @@ DataFrame merged_contour_bands(const NumericVector &x, const NumericVector &y, c
 
 
 /***R
+library(grid)
 m <- matrix(c(0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 0), 4, 4, byrow = TRUE)
 
-m2 <- matrix(c(1, 1, 1, 1, 1, 1, 
+m <- matrix(c(1, 1, 1, 1, 1, 1, 
               1, 1, 1, 1, 1, 1,
               1, 1, 0, 0, 1, 1,
               1, 1, 0, 0, 1, 1,
@@ -327,7 +581,7 @@ m2 <- matrix(c(1, 1, 1, 1, 1, 1,
 
 
 df <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, .5, 1.5)
-grid::grid.newpage()
-grid::grid.path(df$x, df$y, df$id)
+grid.newpage()
+grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
 */                         
                              
