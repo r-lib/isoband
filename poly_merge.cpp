@@ -137,7 +137,12 @@ private:
     // then we copy the connections into the polygon matrix
     for (int i = 0; i < tmp_poly_size; i++) {
       const grid_point &p = tmp_poly[i];
-      polygon_grid[p] = tmp_poly_connect[i];
+      
+      if (tmp_poly_connect[i].empty) {// delete empty points
+        polygon_grid.erase(p);
+      } else {
+        polygon_grid[p] = tmp_poly_connect[i];
+      }
       cout << p << tmp_poly_connect[i] << endl;
     }
     
