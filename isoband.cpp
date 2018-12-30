@@ -121,9 +121,6 @@ protected:
     tmp_poly_size++;
   }
   
-  // one edge case I hadn't considered: two polygons that touch diagonally, so that
-  // they overlap in exactly one point. this needs to be handled appropriately and cannot in the current framework.
-  
   void poly_merge() { // merge current elementary polygon to prior polygons
     //cout << "before merging:" << endl;
     
@@ -1206,7 +1203,7 @@ public:
     }
   }
   
-  virtual DataFrame collect() {
+  virtual List collect() {
     // make polygons
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for the polygon lines
@@ -1253,13 +1250,327 @@ public:
         }
       } while (!(cur == start)); // keep going until we reach the start point again
     }
-    return DataFrame::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
+    return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
+  }
+};
+
+
+class isoliner : public isobander {
+protected:
+
+  void line_start(int r, int c, point_type type) { // start a new line segment
+    tmp_poly[0].r = r;
+    tmp_poly[0].c = c;
+    tmp_poly[0].type = type;
+    
+    tmp_poly_size = 1;
+  }
+  
+  void line_add(int r, int c, point_type type) { // add point to line
+    tmp_poly[tmp_poly_size].r = r;
+    tmp_poly[tmp_poly_size].c = c;
+    tmp_poly[tmp_poly_size].type = type;
+    
+    tmp_poly_size++;
+  }
+  
+  void line_merge() { // merge current elementary polygon to prior polygons
+    /*
+    
+    //cout << "before merging:" << endl;
+    
+    bool to_delete[] = {false, false, false, false, false, false, false, false};
+    
+    // first, we figure out the right connections for current polygon
+    for (int i = 0; i < tmp_poly_size; i++) {
+      // create defined state in tmp_point_connect[]
+      // for each point, find previous and next point in polygon
+      tmp_point_connect[i].altpoint = false;
+      tmp_point_connect[i].next = tmp_poly[(i+1<tmp_poly_size) ? i+1 : 0];
+      tmp_point_connect[i].prev = tmp_poly[(i-1>=0) ? i-1 : tmp_poly_size-1];
+      
+      //cout << tmp_poly[i] << ": " << tmp_point_connect[i] << endl;
+      
+      // now merge with existing polygons if needed
+      const grid_point &p = tmp_poly[i];
+      if (polygon_grid.count(p) > 0) { // point has been used before, need to merge polygons
+        if (!polygon_grid[p].altpoint) {
+          // basic scenario, no alternative point at this location
+          int score = 2 * (tmp_point_connect[i].next == polygon_grid[p].prev) + (tmp_point_connect[i].prev == polygon_grid[p].next);
+          switch (score) {
+          case 3: // 11
+            // both prev and next cancel, point can be deleted
+            to_delete[i] = true;
+            break;
+          case 2: // 10
+            // merge in "next" direction
+            tmp_point_connect[i].next = polygon_grid[p].next;
+            break;
+          case 1: // 01
+            // merge in "prev" direction
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
+            break;
+          default: // 00
+            // if we get here, we have two polygon vertices sharing the same grid location
+            // in an unmergable configuration; need to store both
+            tmp_point_connect[i].prev2 = polygon_grid[p].prev;
+          tmp_point_connect[i].next2 = polygon_grid[p].next;
+          tmp_point_connect[i].altpoint = true;
+          }
+        } else {
+          // case with alternative point at this location
+          int score = 
+            8 * (tmp_point_connect[i].next == polygon_grid[p].prev2) + 4 * (tmp_point_connect[i].prev == polygon_grid[p].next2) +
+            2 * (tmp_point_connect[i].next == polygon_grid[p].prev) + (tmp_point_connect[i].prev == polygon_grid[p].next);
+          switch (score) {
+          case 9: // 1001
+            // three-way merge
+            tmp_point_connect[i].next = polygon_grid[p].next2;
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
+            break;
+          case 6: // 0110
+            // three-way merge
+            tmp_point_connect[i].next = polygon_grid[p].next;
+            tmp_point_connect[i].prev = polygon_grid[p].prev2;
+            break;
+          case 8: // 1000
+            // two-way merge with alt point only
+            // set up merged alt point
+            tmp_point_connect[i].next2 = polygon_grid[p].next2;
+            tmp_point_connect[i].prev2 = tmp_point_connect[i].prev;
+            // copy over existing point as is
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
+            tmp_point_connect[i].next = polygon_grid[p].next;
+            tmp_point_connect[i].altpoint = true;
+            break;
+          case 4: // 0100
+            // two-way merge with alt point only
+            // set up merged alt point
+            tmp_point_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_point_connect[i].next2 = tmp_point_connect[i].next;
+            // copy over existing point as is
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
+            tmp_point_connect[i].next = polygon_grid[p].next;
+            tmp_point_connect[i].altpoint = true;
+            break;
+          case 2: // 0010
+            // two-way merge with original point only
+            // merge point
+            tmp_point_connect[i].next = polygon_grid[p].next;
+            // copy over existing alt point as is
+            tmp_point_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_point_connect[i].next2 = polygon_grid[p].next2;
+            tmp_point_connect[i].altpoint = true;
+            break;
+          case 1: // 0100
+            // two-way merge with original point only
+            // merge point
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
+            // copy over existing alt point as is
+            tmp_point_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_point_connect[i].next2 = polygon_grid[p].next2;
+            tmp_point_connect[i].altpoint = true;
+            break;
+          default:
+            cerr << "undefined merging configuration:" << score << endl;
+          }
+        }
+      }
+    }
+    
+    //cout << "after merging:" << endl;
+    
+    // then we copy the connections into the polygon matrix
+    for (int i = 0; i < tmp_poly_size; i++) {
+      const grid_point &p = tmp_poly[i];
+      
+      if (to_delete[i]) { // delete point if needed
+        polygon_grid.erase(p);
+      } else {            // otherwise, copy
+        polygon_grid[p] = tmp_point_connect[i];
+      }
+      //cout << p << ": " << tmp_point_connect[i] << endl;
+    }
+    
+    //cout << "new grid:" << endl;
+    //print_polygons_state();
+     */
+  }
+  
+public:
+  isoliner(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value) :
+    isobander(x, y, z, value, 1.1*value) {}
+
+  virtual void calculate_contour() {
+    // clear polygon grid and associated internal variables
+    reset_grid(); 
+    
+    // setup matrix of ternarized cell representations
+    LogicalMatrix binarized(nrow, ncol, static_cast<LogicalVector>(grid_z >= vlo).begin());
+    IntegerMatrix cells(nrow - 1, ncol - 1);
+    
+    for (int r = 0; r < nrow-1; r++) {
+      for (int c = 0; c < ncol-1; c++) {
+        int index = 8*binarized(r, c) + 4*binarized(r, c + 1) + 2*binarized(r+1, c+1) + 1*binarized(r + 1, c);
+        
+        // two-segment saddles
+        if (index == 5 && (central_value(r, c) >= vlo)) {
+          index = 10;
+        } else if (index == 10 && (central_value(r, c) >= vlo)) {
+          index = 5;
+        }
+        
+        cells(r, c) = index;
+      }
+    }
+    
+    for (int r = 0; r < nrow-1; r++) {
+      for (int c = 0; c < ncol-1; c++) {
+       switch(cells(r, c)) {
+        case 0: break;
+        case 1:
+          line_start(r, c, vintersect_lo);
+          line_add(r+1, c, hintersect_lo);
+          line_merge();
+          break;
+        case 2:
+          line_start(r, c+1, vintersect_lo);
+          line_add(r+1, c, hintersect_lo);
+          line_merge();
+          break;
+        case 3:
+          line_start(r, c, vintersect_lo);
+          line_add(r, c+1, vintersect_lo);
+          line_merge();
+          break;
+        case 4:
+          line_start(r, c, hintersect_lo);
+          line_add(r, c+1, vintersect_lo);
+          line_merge();
+          break;
+        case 5:
+          // like case 2
+          line_start(r, c+1, vintersect_lo);
+          line_add(r+1, c, hintersect_lo);
+          line_merge();
+          // like case 7
+          line_start(r, c, hintersect_lo);
+          line_add(r, c, vintersect_lo);
+          line_merge();
+          break;          
+        case 6:
+          line_start(r, c, hintersect_lo);
+          line_add(r+1, c, hintersect_lo);
+          line_merge();
+          break;
+        case 7:
+          line_start(r, c, hintersect_lo);
+          line_add(r, c, vintersect_lo);
+          line_merge();
+          break;
+        case 8:
+          line_start(r, c, hintersect_lo);
+          line_add(r, c, vintersect_lo);
+          line_merge();
+          break;
+        case 9:
+          line_start(r, c, hintersect_lo);
+          line_add(r+1, c, hintersect_lo);
+          line_merge();
+          break;
+        case 10:
+          // like case 1
+          line_start(r, c, vintersect_lo);
+          line_add(r+1, c, hintersect_lo);
+          line_merge();
+          // like case 4 
+          line_start(r, c, hintersect_lo);
+          line_add(r, c+1, vintersect_lo);
+          line_merge();
+          break;
+        case 11:
+          line_start(r, c, hintersect_lo);
+          line_add(r, c+1, vintersect_lo);
+          line_merge();
+          break;
+        case 12:
+          line_start(r, c, vintersect_lo);
+          line_add(r, c+1, vintersect_lo);
+          line_merge();
+          break;
+        case 13:
+          line_start(r, c+1, vintersect_lo);
+          line_add(r+1, c, hintersect_lo);
+          line_merge();
+          break;
+        case 14:
+          line_start(r, c, vintersect_lo);
+          line_add(r+1, c, hintersect_lo);
+          line_merge();
+          break;
+        default: break; // catch everything, just in case
+        }
+      }
+    }
+  }
+  
+  virtual List collect() {
+    // make polygons
+    vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
+    /*
+    int cur_id = 0;           // id counter for the polygon lines
+    
+    
+    // iterate over all locations in the polygon grid
+    for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
+      if (((it->second).collected && !(it->second).altpoint) || 
+          ((it->second).collected && (it->second).collected2 && (it->second).altpoint)) {
+        continue; // skip any grid points that are already fully collected
+      }
+      
+      // we have found a new polygon line; process it
+      cur_id++;
+      
+      grid_point start = it->first;
+      grid_point cur = start;
+      grid_point prev = (it->second).prev;
+      // if this point has an alternatve and it hasn't been collected yet then we start there
+      if ((it->second).altpoint && !(it->second).collected2) prev = (it->second).prev2;
+      
+      do {
+        point p = calc_point_coords(cur);
+        x_out.push_back(p.x);
+        y_out.push_back(p.y);
+        id.push_back(cur_id);
+        
+        // record that we have processed this point and proceed to next              
+        if (polygon_grid[cur].altpoint && polygon_grid[cur].prev2 == prev) {
+          // if an alternative point exists and its previous point in the polygon
+          // corresponds to the recorded previous point, then that's the point
+          // we're working with here
+          
+          // mark current point as collected and advance
+          polygon_grid[cur].collected2 = true;
+          grid_point newcur = polygon_grid[cur].next2;
+          prev = cur;
+          cur = newcur;
+        } else {
+          // mark current point as collected and advance
+          polygon_grid[cur].collected = true;
+          grid_point newcur = polygon_grid[cur].next;
+          prev = cur;
+          cur = newcur;
+        }
+      } while (!(cur == start)); // keep going until we reach the start point again
+    }
+     */
+    return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
   }
 };
 
 
 // [[Rcpp::export]]
-DataFrame isoband(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low, double value_high) {
+List isoband(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low, double value_high) {
   isobander ib(x, y, z, value_low, value_high);
   ib.calculate_contour();
   return ib.collect();
