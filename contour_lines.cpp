@@ -1,5 +1,6 @@
 // This file implements the 2D isoline and isoband algorithms described
-// here: https://en.wikipedia.org/wiki/Marching_squares 
+// here: https://en.wikipedia.org/wiki/Marching_squares
+// Line segments and polygons are not merged.
 // Written by Claus O. Wilke
 
 #include <Rcpp.h>

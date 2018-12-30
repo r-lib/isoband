@@ -1,3 +1,8 @@
+// This file implements the 2D isoline and isoband algorithms described
+// here: https://en.wikipedia.org/wiki/Marching_squares 
+// Includes merging of line segments and polygons.
+// Written by Claus O. Wilke                                                                      
+
 // [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -7,13 +12,14 @@ using namespace Rcpp;
 #include <unordered_map>
 using namespace std;
 
+// point in output x-y space
 struct point {
   double x, y; // x and y coordinates
   
   point(double x_in, double y_in) : x(x_in), y(y_in) {}
 };
 
-
+// point in abstract grid space
 enum point_type {
   grid,  // point on the original data grid
   hintersect_lo, // intersection with horizontal edge, low value
@@ -26,7 +32,9 @@ struct grid_point {
   int r, c; // row and column
   point_type type; // point type
   
-  grid_point(double r_in = 0, double c_in = 0, point_type type_in = grid) : r(r_in), c(c_in), type(type_in) {}
+  // default constructor; negative values indicate non-existing point off grid
+  grid_point(double r_in = -1, double c_in = -1, point_type type_in = grid) : r(r_in), c(c_in), type(type_in) {}
+  // copy constructor
   grid_point(const grid_point &p) : r(p.r), c(p.c), type(p.type) {}
 };
 
@@ -34,8 +42,11 @@ struct grid_point {
 struct grid_point_hasher {
   size_t operator()(const grid_point& p) const
   {
-    // maybe not the best way to combine data for hashing, but should work
-    return hash<int>()(1000000*p.r + 10*p.c + p.type); 
+    // this should work up to about 100,000,000 rows/columns
+    return hash<long long>()(
+      (static_cast<long long>(p.r) << 30) ^
+        (static_cast<long long>(p.c) << 3) ^ 
+          static_cast<long long>(p.type)); 
   }
 };
 
@@ -48,17 +59,18 @@ ostream & operator<<(ostream &out, const grid_point &p) {
   return out;
 }
 
-struct poly_connect {
+// connection between points in grid space
+struct point_connect {
   grid_point prev, next; // previous and next points in polygon
   grid_point prev2, next2; // alternative previous and next, when two separate polygons have vertices on the same grid point
   
   bool altpoint;  // does this connection hold an alternative point?
   bool collected, collected2; // has this connection been collected into a final polygon?
 
-  poly_connect() : altpoint(false), collected(false), collected2(false) {};
+  point_connect() : altpoint(false), collected(false), collected2(false) {};
 };
 
-ostream & operator<<(ostream &out, const poly_connect &pc) {
+ostream & operator<<(ostream &out, const point_connect &pc) {
   out << "prev: " << pc.prev << "; next: " << pc.next << " ";
   if (pc.altpoint) {
     out << "AP prev: " << pc.prev2 << "; next2: " << pc.next2 << " ";
@@ -66,24 +78,24 @@ ostream & operator<<(ostream &out, const poly_connect &pc) {
   return out;
 }
 
-class poly_bands {
-private:
+class isobander {
+protected:
   int nrow, ncol; // numbers of rows and columns
   const NumericVector &grid_x,&grid_y;
   const NumericMatrix &grid_z;
   double vlo, vhi; // low and high cutoff values
-  grid_point tmp_poly[8]; // no elementary polygon has more than 8 vertices
-  poly_connect tmp_poly_connect[8];
+  grid_point tmp_poly[8]; // temp storage for elementary polygons; none has more than 8 vertices
+  point_connect tmp_point_connect[8];
   int tmp_poly_size; // current number of elements in tmp_poly
   
-  typedef unordered_map<grid_point, poly_connect, grid_point_hasher> gridmap;
+  typedef unordered_map<grid_point, point_connect, grid_point_hasher> gridmap;
   gridmap polygon_grid;
   
   void reset_grid() {
     polygon_grid.clear();
     
     for (int i=0; i<8; i++) {
-      tmp_poly_connect[i] = poly_connect();
+      tmp_point_connect[i] = point_connect();
     }
   }
   
@@ -119,20 +131,20 @@ private:
     
     // first, we figure out the right connections for current polygon
     for (int i = 0; i < tmp_poly_size; i++) {
-      // create defined state in tmp_poly_connect[]
+      // create defined state in tmp_point_connect[]
       // for each point, find previous and next point in polygon
-      tmp_poly_connect[i].altpoint = false;
-      tmp_poly_connect[i].next = tmp_poly[(i+1<tmp_poly_size) ? i+1 : 0];
-      tmp_poly_connect[i].prev = tmp_poly[(i-1>=0) ? i-1 : tmp_poly_size-1];
+      tmp_point_connect[i].altpoint = false;
+      tmp_point_connect[i].next = tmp_poly[(i+1<tmp_poly_size) ? i+1 : 0];
+      tmp_point_connect[i].prev = tmp_poly[(i-1>=0) ? i-1 : tmp_poly_size-1];
       
-      //cout << tmp_poly[i] << ": " << tmp_poly_connect[i] << endl;
+      //cout << tmp_poly[i] << ": " << tmp_point_connect[i] << endl;
       
       // now merge with existing polygons if needed
       const grid_point &p = tmp_poly[i];
       if (polygon_grid.count(p) > 0) { // point has been used before, need to merge polygons
         if (!polygon_grid[p].altpoint) {
           // basic scenario, no alternative point at this location
-          int score = 2 * (tmp_poly_connect[i].next == polygon_grid[p].prev) + (tmp_poly_connect[i].prev == polygon_grid[p].next);
+          int score = 2 * (tmp_point_connect[i].next == polygon_grid[p].prev) + (tmp_point_connect[i].prev == polygon_grid[p].next);
           switch (score) {
           case 3: // 11
             // both prev and next cancel, point can be deleted
@@ -140,72 +152,72 @@ private:
             break;
           case 2: // 10
             // merge in "next" direction
-            tmp_poly_connect[i].next = polygon_grid[p].next;
+            tmp_point_connect[i].next = polygon_grid[p].next;
             break;
           case 1: // 01
             // merge in "prev" direction
-            tmp_poly_connect[i].prev = polygon_grid[p].prev;
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
             break;
           default: // 00
             // if we get here, we have two polygon vertices sharing the same grid location
             // in an unmergable configuration; need to store both
-            tmp_poly_connect[i].prev2 = polygon_grid[p].prev;
-            tmp_poly_connect[i].next2 = polygon_grid[p].next;
-            tmp_poly_connect[i].altpoint = true;
+            tmp_point_connect[i].prev2 = polygon_grid[p].prev;
+            tmp_point_connect[i].next2 = polygon_grid[p].next;
+            tmp_point_connect[i].altpoint = true;
           }
         } else {
           // case with alternative point at this location
           int score = 
-            8 * (tmp_poly_connect[i].next == polygon_grid[p].prev2) + 4 * (tmp_poly_connect[i].prev == polygon_grid[p].next2) +
-            2 * (tmp_poly_connect[i].next == polygon_grid[p].prev) + (tmp_poly_connect[i].prev == polygon_grid[p].next);
+            8 * (tmp_point_connect[i].next == polygon_grid[p].prev2) + 4 * (tmp_point_connect[i].prev == polygon_grid[p].next2) +
+            2 * (tmp_point_connect[i].next == polygon_grid[p].prev) + (tmp_point_connect[i].prev == polygon_grid[p].next);
           switch (score) {
           case 9: // 1001
             // three-way merge
-            tmp_poly_connect[i].next = polygon_grid[p].next2;
-            tmp_poly_connect[i].prev = polygon_grid[p].prev;
+            tmp_point_connect[i].next = polygon_grid[p].next2;
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
             break;
           case 6: // 0110
             // three-way merge
-            tmp_poly_connect[i].next = polygon_grid[p].next;
-            tmp_poly_connect[i].prev = polygon_grid[p].prev2;
+            tmp_point_connect[i].next = polygon_grid[p].next;
+            tmp_point_connect[i].prev = polygon_grid[p].prev2;
             break;
           case 8: // 1000
             // two-way merge with alt point only
             // set up merged alt point
-            tmp_poly_connect[i].next2 = polygon_grid[p].next2;
-            tmp_poly_connect[i].prev2 = tmp_poly_connect[i].prev;
+            tmp_point_connect[i].next2 = polygon_grid[p].next2;
+            tmp_point_connect[i].prev2 = tmp_point_connect[i].prev;
             // copy over existing point as is
-            tmp_poly_connect[i].prev = polygon_grid[p].prev;
-            tmp_poly_connect[i].next = polygon_grid[p].next;
-            tmp_poly_connect[i].altpoint = true;
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
+            tmp_point_connect[i].next = polygon_grid[p].next;
+            tmp_point_connect[i].altpoint = true;
             break;
           case 4: // 0100
             // two-way merge with alt point only
             // set up merged alt point
-            tmp_poly_connect[i].prev2 = polygon_grid[p].prev2;
-            tmp_poly_connect[i].next2 = tmp_poly_connect[i].next;
+            tmp_point_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_point_connect[i].next2 = tmp_point_connect[i].next;
             // copy over existing point as is
-            tmp_poly_connect[i].prev = polygon_grid[p].prev;
-            tmp_poly_connect[i].next = polygon_grid[p].next;
-            tmp_poly_connect[i].altpoint = true;
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
+            tmp_point_connect[i].next = polygon_grid[p].next;
+            tmp_point_connect[i].altpoint = true;
             break;
           case 2: // 0010
             // two-way merge with original point only
             // merge point
-            tmp_poly_connect[i].next = polygon_grid[p].next;
+            tmp_point_connect[i].next = polygon_grid[p].next;
             // copy over existing alt point as is
-            tmp_poly_connect[i].prev2 = polygon_grid[p].prev2;
-            tmp_poly_connect[i].next2 = polygon_grid[p].next2;
-            tmp_poly_connect[i].altpoint = true;
+            tmp_point_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_point_connect[i].next2 = polygon_grid[p].next2;
+            tmp_point_connect[i].altpoint = true;
             break;
           case 1: // 0100
             // two-way merge with original point only
             // merge point
-            tmp_poly_connect[i].prev = polygon_grid[p].prev;
+            tmp_point_connect[i].prev = polygon_grid[p].prev;
             // copy over existing alt point as is
-            tmp_poly_connect[i].prev2 = polygon_grid[p].prev2;
-            tmp_poly_connect[i].next2 = polygon_grid[p].next2;
-            tmp_poly_connect[i].altpoint = true;
+            tmp_point_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_point_connect[i].next2 = polygon_grid[p].next2;
+            tmp_point_connect[i].altpoint = true;
             break;
           default:
             cerr << "undefined merging configuration:" << score << endl;
@@ -223,9 +235,9 @@ private:
       if (to_delete[i]) { // delete point if needed
         polygon_grid.erase(p);
       } else {            // otherwise, copy
-        polygon_grid[p] = tmp_poly_connect[i];
+        polygon_grid[p] = tmp_point_connect[i];
       }
-      //cout << p << ": " << tmp_poly_connect[i] << endl;
+      //cout << p << ": " << tmp_point_connect[i] << endl;
     }
     
     //cout << "new grid:" << endl;
@@ -263,7 +275,7 @@ private:
   }
 
 public:
-  poly_bands(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low, double value_high) :
+  isobander(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low, double value_high) :
     grid_x(x), grid_y(y), grid_z(z), vlo(value_low), vhi(value_high)
   {
     nrow = grid_z.nrow();
@@ -273,7 +285,9 @@ public:
     if (grid_y.size() != nrow) {stop("Number of y coordinates must match number of rows in density matrix.");}
   }
   
-  void make_contour_bands() {
+  virtual ~isobander() {}
+  
+  virtual void calculate_contour() {
     // clear polygon grid and associated internal variables
     reset_grid(); 
     
@@ -907,330 +921,292 @@ public:
             }
           }
           break;
-      /*
-       
-          // 7-sided saddle
-    case 69: // 2120
+
+        // 7-sided saddle
+        case 69: // 2120
           {
-          double vc = central_value(r, c, m);
-          if (vc >= vhi) {
-          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
+            double vc = central_value(r, c);
+            if (vc >= vhi) {
+              poly_start(r, c+1, grid);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r, c, hintersect_hi);
+              poly_merge();
+              poly_start(r, c, vintersect_hi);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r, c, vintersect_lo);
+              poly_merge();
+            } else {
+              poly_start(r, c+1, grid);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r, c, hintersect_hi);
+              poly_merge();
+            }
           }
           break;
-    case 61: // 2021
+        case 61: // 2021
           {
-          double vc = central_value(r, c, m);
-          if (vc >= vhi) {
-          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
+            double vc = central_value(r, c);
+              if (vc >= vhi) {
+                poly_start(r+1, c, grid);
+                poly_add(r, c, vintersect_hi);
+                poly_add(r+1, c, hintersect_hi);
+                poly_merge();
+                poly_start(r, c+1, vintersect_hi);
+                poly_add(r, c, hintersect_hi);
+                poly_add(r, c, hintersect_lo);
+                poly_add(r, c+1, vintersect_lo);
+                poly_merge();
+              } else {
+                poly_start(r+1, c, grid);
+                poly_add(r, c, vintersect_hi);
+                poly_add(r, c, hintersect_hi);
+                poly_add(r, c, hintersect_lo);
+                poly_add(r, c+1, vintersect_lo);
+                poly_add(r, c+1, vintersect_hi);
+                poly_add(r+1, c, hintersect_hi);
+                poly_merge();
+              }
+            }
+          break;
+        case 47: // 1202
+          {
+            double vc = central_value(r, c);
+            if (vc >= vhi) {
+              poly_start(r, c, grid);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_merge();
+              poly_start(r+1, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_merge();
+            } else {
+              poly_start(r, c, grid);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_merge();
+            }
           }
           break;
-    case 47: // 1202
+        case 23: // 0212
           {
-          double vc = central_value(r, c, m);
-          if (vc >= vhi) {
-          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
+            double vc = central_value(r, c);
+            if (vc >= vhi) {
+              poly_start(r+1, c+1, grid);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_merge();
+              poly_start(r, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_merge();
+            } else {
+              poly_start(r+1, c+1, grid);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_merge();
+            }
           }
           break;
-    case 23: // 0212
+        case 11: // 0102
           {
-          double vc = central_value(r, c, m);
-          if (vc >= vhi) {
-          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
+            double vc = central_value(r, c);
+            if (vc < vlo) {
+              poly_start(r, c+1, grid);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_merge();
+              poly_start(r, c, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_merge();
+            } else {
+              poly_start(r, c+1, grid);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_merge();
+            }
           }
           break;
-    case 11: // 0102
+        case 19: // 0201
           {
-          double vc = central_value(r, c, m);
-          if (vc < vlo) {
-          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
+            double vc = central_value(r, c);
+            if (vc < vlo) {
+              poly_start(r+1, c, grid);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_merge();
+              poly_start(r, c+1, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_merge();
+            } else {
+              poly_start(r+1, c, grid);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_merge();
+            }
           }
           break;
-    case 19: // 0201
+        case 33: // 1020
           {
-          double vc = central_value(r, c, m);
-          if (vc < vlo) {
-          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
+            double vc = central_value(r, c);
+            if (vc < vlo) {
+              poly_start(r, c, grid);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c, vintersect_lo);
+              poly_merge();
+              poly_start(r+1, c, hintersect_lo);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r+1, c, hintersect_hi);
+              poly_merge();
+            } else {
+              poly_start(r, c, grid);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r, c, vintersect_lo);
+              poly_merge();
+            }
           }
           break;
-    case 33: // 1020
+        case 57: // 2010
           {
-          double vc = central_value(r, c, m);
-          if (vc < vlo) {
-          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
-          }
-          break;
-    case 57: // 2010
-          {
-          double vc = central_value(r, c, m);
-          if (vc < vlo) {
-          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
+            double vc = central_value(r, c);
+            if (vc < vlo) {
+              poly_start(r+1, c+1, grid);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r, c+1, vintersect_lo);
+              poly_merge();
+              poly_start(r, c, hintersect_lo);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r, c, hintersect_hi);
+              poly_merge();
+            } else {
+              poly_start(r+1, c+1, grid);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c+1, vintersect_lo);
+              poly_merge();
+            }
           }
           break;
           
-          // 8-sided saddle
- case 60: // 2020
- {
-          double vc = central_value(r, c, m);
+        // 8-sided saddle
+      case 60: // 2020
+        {
+          double vc = central_value(r, c);
           if (vc < vlo) {
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
+            poly_start(r, c, vintersect_hi);
+            poly_add(r, c, hintersect_hi);
+            poly_add(r, c, hintersect_lo);
+            poly_add(r, c, vintersect_lo);
+            poly_merge();
+            poly_start(r, c+1, vintersect_hi);
+            poly_add(r+1, c, hintersect_hi);
+            poly_add(r+1, c, hintersect_lo);
+            poly_add(r, c+1, vintersect_lo);
+            poly_merge();
           } else if (vc >= vhi) {
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
+            poly_start(r, c, vintersect_hi);
+            poly_add(r+1, c, hintersect_hi);
+            poly_add(r+1, c, hintersect_lo);
+            poly_add(r, c, vintersect_lo);
+            poly_merge();
+            poly_start(r, c+1, vintersect_hi);
+            poly_add(r, c, hintersect_hi);
+            poly_add(r, c, hintersect_lo);
+            poly_add(r, c+1, vintersect_lo);
+            poly_merge();
           } else {
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
+            poly_start(r, c, vintersect_hi);
+            poly_add(r, c, hintersect_hi);
+            poly_add(r, c, hintersect_lo);
+            poly_add(r, c+1, vintersect_lo);
+            poly_add(r, c+1, vintersect_hi);
+            poly_add(r+1, c, hintersect_hi);
+            poly_add(r+1, c, hintersect_lo);
+            poly_add(r, c, vintersect_lo);
+            poly_merge();
           }
         }
-          break;
-      case 20: // 0202
+        break;
+        case 20: // 0202
           {
-          double vc = central_value(r, c, m);
-          if (vc < vlo) {
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else if (vc >= vhi) {
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          } else {
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
-          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
-          cur_id++;
-          }
+            double vc = central_value(r, c);
+            if (vc < vlo) {
+              poly_start(r, c, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_merge();
+              poly_start(r, c+1, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_merge();
+            } else if (vc >= vhi) {
+              poly_start(r, c, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_merge();
+              poly_start(r, c+1, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_merge();
+            } else {
+              poly_start(r, c, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_merge();
+            }
           }
           break;
-          
-          
-           */
         }
       }
     }
   }
   
-  DataFrame collect_polygons() {
+  virtual DataFrame collect() {
     // make polygons
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for the polygon lines
@@ -1283,10 +1259,10 @@ public:
 
 
 // [[Rcpp::export]]
-DataFrame merged_contour_bands(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low, double value_high) {
-  poly_bands p(x, y, z, value_low, value_high);
-  p.make_contour_bands();
-  return p.collect_polygons();
+DataFrame isoband(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low, double value_high) {
+  isobander ib(x, y, z, value_low, value_high);
+  ib.calculate_contour();
+  return ib.collect();
 }
 
 
@@ -1302,13 +1278,13 @@ m <- matrix(c(1, 1, 1, 1, 1, 1,
               1, 1, 1, 1, 1, 1), 6, 6, byrow = TRUE)
 
 
-df <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, .5, 1.5)
+df <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, .5, 1.5)
 grid.newpage()
 grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
 
 m <- volcano
-df1 <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120, 140)
-df2 <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 150, 152)
+df1 <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120, 140)
+df2 <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 150, 152)
 
 grid.newpage()
 grid.path(df1$x, df1$y, df1$id, gp = gpar(fill = "lightblue"))
@@ -1316,7 +1292,7 @@ grid.path(df2$x, df2$y, df2$id, gp = gpar(fill = "tomato"))
 
 microbenchmark::microbenchmark(
   grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 120),
-  merged_contour_bands(1:ncol(volcano), 1:nrow(volcano), volcano, 120, 140)
+  isoband(1:ncol(volcano), 1:nrow(volcano), volcano, 120, 140)
 )
 
 */                         
