@@ -155,14 +155,52 @@ private:
             2 * (tmp_poly_connect[i].next == polygon_grid[p].prev) + (tmp_poly_connect[i].prev == polygon_grid[p].next);
           switch (score) {
           case 9: // 1001
-            // three=way merge
+            // three-way merge
             tmp_poly_connect[i].next = polygon_grid[p].next2;
             tmp_poly_connect[i].prev = polygon_grid[p].prev;
             break;
           case 6: // 0110
-            // three=way merge
+            // three-way merge
             tmp_poly_connect[i].next = polygon_grid[p].next;
             tmp_poly_connect[i].prev = polygon_grid[p].prev2;
+            break;
+          case 8: // 1000
+            // two-way merge with alt point only
+            // set up merged alt point
+            tmp_poly_connect[i].next2 = polygon_grid[p].next2;
+            tmp_poly_connect[i].prev2 = tmp_poly_connect[i].prev;
+            // copy over existing point as is
+            tmp_poly_connect[i].prev = polygon_grid[p].prev;
+            tmp_poly_connect[i].next = polygon_grid[p].next;
+            tmp_poly_connect[i].altpoint = true;
+            break;
+          case 4: // 0100
+            // two-way merge with alt point only
+            // set up merged alt point
+            tmp_poly_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_poly_connect[i].next2 = tmp_poly_connect[i].next;
+            // copy over existing point as is
+            tmp_poly_connect[i].prev = polygon_grid[p].prev;
+            tmp_poly_connect[i].next = polygon_grid[p].next;
+            tmp_poly_connect[i].altpoint = true;
+            break;
+          case 2: // 0010
+            // two-way merge with original point only
+            // merge point
+            tmp_poly_connect[i].next = polygon_grid[p].next;
+            // copy over existing alt point as is
+            tmp_poly_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_poly_connect[i].next2 = polygon_grid[p].next2;
+            tmp_poly_connect[i].altpoint = true;
+            break;
+          case 1: // 0100
+            // two-way merge with original point only
+            // merge point
+            tmp_poly_connect[i].prev = polygon_grid[p].prev;
+            // copy over existing alt point as is
+            tmp_poly_connect[i].prev2 = polygon_grid[p].prev2;
+            tmp_poly_connect[i].next2 = polygon_grid[p].next2;
+            tmp_poly_connect[i].altpoint = true;
             break;
           default:
             cerr << "undefined merging configuration:" << score << endl;
@@ -314,6 +352,150 @@ public:
           poly_merge();
           break;
           
+          // single trapezoid
+        case 78: // 2220
+          poly_start(r, c, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+        case 74: // 2202
+          poly_start(r+1, c, hintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 62: // 2022
+          poly_start(r, c+1, vintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_merge();
+          break;
+        case 26: // 0222
+          poly_start(r, c, hintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 2: // 0002
+          poly_start(r, c, vintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 6: // 0020
+          poly_start(r+1, c, hintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 18: // 0200
+          poly_start(r, c+1, vintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_merge();
+          break;
+        case 54: // 2000
+          poly_start(r, c, hintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_merge();
+          break;
+          
+          // single rectangle
+        case 4: // 0011
+          poly_start(r, c, vintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
+        case 12: // 0110
+          poly_start(r, c, hintersect_lo);
+          poly_add(r, c+1, grid);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 36: // 1100
+          poly_start(r, c, grid);
+          poly_add(r, c+1, grid);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+        case 28: // 1001
+          poly_start(r, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r+1, c, grid);
+          poly_add(r, c, grid);
+          poly_merge();
+          break;
+        case 76: // 2211
+          poly_start(r, c, vintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
+        case 68: // 2112
+          poly_start(r, c, hintersect_hi);
+          poly_add(r, c+1, grid);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 44: // 1122
+          poly_start(r, c, grid);
+          poly_add(r, c+1, grid);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 52: // 1221
+          poly_start(r, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, grid);
+          poly_add(r, c, grid);
+          poly_merge();
+          break;
+        case 72: // 2200
+          poly_start(r, c, vintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+        case 56: // 2002
+          poly_start(r, c, hintersect_hi);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 8: // 0022
+          poly_start(r, c, vintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 24: // 0220
+          poly_start(r, c, hintersect_lo);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_lo);
+          poly_merge();
+          break;
+
         // single square
         case 40: // 1111
           poly_start(r, c, grid);
@@ -516,6 +698,117 @@ public:
           poly_add(r+1, c, hintersect_lo);
           poly_merge();
           break;
+          
+          // single hexagon
+        case 22: // 0211
+          poly_start(r+1, c, grid);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c+1, grid);
+          poly_merge();
+          break;
+        case 66: // 2110
+          poly_start(r, c+1, grid);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_merge();
+          break;
+        case 38: // 1102
+          poly_start(r, c, grid);
+          poly_add(r, c+1, grid);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 34: // 1021
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
+        case 58: // 2011
+          poly_start(r+1, c, grid);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c+1, grid);
+          poly_merge();
+          break;
+        case 14: // 0112
+          poly_start(r, c+1, grid);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 42: // 1120
+          poly_start(r, c, grid);
+          poly_add(r, c+1, grid);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+        case 46: // 1201
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r+1, c, grid);
+          poly_merge();
+          break;
+        case 64: // 2101
+          poly_start(r+1, c, grid);
+          poly_add(r, c, vintersect_hi);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, grid);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 16: // 0121
+          poly_start(r, c+1, grid);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r+1, c, grid);
+          poly_add(r, c, vintersect_lo);
+          poly_add(r, c, hintersect_lo);
+          poly_merge();
+          break;
+        case 32: // 1012
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_lo);
+          poly_add(r, c+1, vintersect_lo);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_hi);
+          poly_add(r, c, vintersect_hi);
+          poly_merge();
+          break;
+        case 48: // 1210
+          poly_start(r, c, grid);
+          poly_add(r, c, hintersect_hi);
+          poly_add(r, c+1, vintersect_hi);
+          poly_add(r+1, c+1, grid);
+          poly_add(r+1, c, hintersect_lo);
+          poly_add(r, c, vintersect_lo);
+          poly_merge();
+          break;
+
         }
       }
     }
@@ -598,8 +891,17 @@ grid.newpage()
 grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
 
 m <- volcano
-df <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120, 150)
+df1 <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120, 140)
+df2 <- merged_contour_bands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 150, 152)
+
 grid.newpage()
-grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
+grid.path(df1$x, df1$y, df1$id, gp = gpar(fill = "lightblue"))
+grid.path(df2$x, df2$y, df2$id, gp = gpar(fill = "tomato"))
+
+microbenchmark::microbenchmark(
+  grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 120),
+  merged_contour_bands(1:ncol(volcano), 1:nrow(volcano), volcano, 120, 140)
+)
+
 */                         
                              
