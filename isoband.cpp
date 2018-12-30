@@ -1268,7 +1268,17 @@ DataFrame isoband(const NumericVector &x, const NumericVector &y, const NumericM
 
 /***R
 library(grid)
+
+plot_isoband_grid <- function(m, vlo, vhi) {
+  df <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vlo, vhi)
+  g <- expand.grid(x = (1:ncol(m))/(ncol(m)+1), y = (nrow(m):1)/(nrow(m)+1))
+  grid.newpage()
+  grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
+  grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
+}
+
 m <- matrix(c(0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 0), 4, 4, byrow = TRUE)
+plot_isoband_grid(m, .5, 1.5)
 
 m <- matrix(c(1, 1, 1, 1, 1, 1, 
               1, 1, 1, 1, 1, 1,
@@ -1277,10 +1287,7 @@ m <- matrix(c(1, 1, 1, 1, 1, 1,
               1, 1, 1, 1, 1, 1,
               1, 1, 1, 1, 1, 1), 6, 6, byrow = TRUE)
 
-
-df <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, .5, 1.5)
-grid.newpage()
-grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
+plot_isoband_grid(m, .5, 1.5)
 
 m <- volcano
 df1 <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120, 140)
