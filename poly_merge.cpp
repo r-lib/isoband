@@ -88,6 +88,11 @@ private:
   }
   
   // internal member functions
+  
+  double central_value(int r, int c) {// calculates the central value of a given cell
+    return (grid_z(r, c) + grid_z(r, c + 1) + grid_z(r + 1, c) + grid_z(r + 1, c + 1))/4;
+  }
+  
   void poly_start(int r, int c, point_type type) { // start a new elementary polygon
     tmp_poly[0].r = r;
     tmp_poly[0].c = c;
@@ -809,6 +814,417 @@ public:
           poly_merge();
           break;
 
+        // 6-sided saddle
+        case 10: // 0101
+          {
+            double vc = central_value(r, c);
+            if (vc < vlo) {
+              poly_start(r+1, c, grid);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_merge();
+              poly_start(r, c+1, grid);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_merge();
+            } else {
+              poly_start(r+1, c, grid);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c+1, grid);
+              poly_add(r, c+1, vintersect_lo);
+              poly_add(r+1, c, hintersect_lo);
+              poly_merge();
+            }
+          }
+          break;
+        case 30: // 1010
+          {
+            double vc = central_value(r, c);
+            if (vc < vlo) {
+              poly_start(r, c, grid);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_merge();
+              poly_start(r+1, c+1, grid);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r, c+1, vintersect_lo);
+              poly_merge();
+            } else {
+              poly_start(r, c, grid);
+              poly_add(r, c, vintersect_lo);
+              poly_add(r, c+1, hintersect_lo);
+              poly_add(r+1, c+1, grid);
+              poly_add(r+1, c, hintersect_lo);
+              poly_add(r, c, vintersect_lo);
+              poly_merge();
+            }
+          }
+          break;
+        case 70: // 2121
+          {
+            double vc = central_value(r, c);
+            if (vc >= vhi) {
+              poly_start(r+1, c, grid);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r+1, c, hintersect_hi);
+              poly_merge();
+              poly_start(r, c+1, grid);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r, c, hintersect_hi);
+              poly_merge();
+            } else {
+              poly_start(r+1, c, grid);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c+1, grid);
+              poly_add(r, c+1, vintersect_hi);
+              poly_add(r+1, c, hintersect_hi);
+              poly_merge();
+            }
+          }
+          break;
+        case 50: // 1212
+          {
+            double vc = central_value(r, c);
+            if (vc >= vhi) {
+              poly_start(r, c, grid);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_merge();
+              poly_start(r+1, c+1, grid);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
+              poly_merge();
+            } else {
+              poly_start(r, c, grid);
+              poly_add(r, c, vintersect_hi);
+              poly_add(r, c+1, hintersect_hi);
+              poly_add(r+1, c+1, grid);
+              poly_add(r+1, c, hintersect_hi);
+              poly_add(r, c, vintersect_hi);
+              poly_merge();
+            }
+          }
+          break;
+      /*
+       
+          // 7-sided saddle
+    case 69: // 2120
+          {
+          double vc = central_value(r, c, m);
+          if (vc >= vhi) {
+          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+    case 61: // 2021
+          {
+          double vc = central_value(r, c, m);
+          if (vc >= vhi) {
+          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+    case 47: // 1202
+          {
+          double vc = central_value(r, c, m);
+          if (vc >= vhi) {
+          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+    case 23: // 0212
+          {
+          double vc = central_value(r, c, m);
+          if (vc >= vhi) {
+          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+    case 11: // 0102
+          {
+          double vc = central_value(r, c, m);
+          if (vc < vlo) {
+          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(top_right(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+    case 19: // 0201
+          {
+          double vc = central_value(r, c, m);
+          if (vc < vlo) {
+          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+    case 33: // 1020
+          {
+          double vc = central_value(r, c, m);
+          if (vc < vlo) {
+          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+    case 57: // 2010
+          {
+          double vc = central_value(r, c, m);
+          if (vc < vlo) {
+          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(bottom_right(r, c, x, y), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+          
+          // 8-sided saddle
+ case 60: // 2020
+ {
+          double vc = central_value(r, c, m);
+          if (vc < vlo) {
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else if (vc >= vhi) {
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+        }
+          break;
+      case 20: // 0202
+          {
+          double vc = central_value(r, c, m);
+          if (vc < vlo) {
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else if (vc >= vhi) {
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          } else {
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_top(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_right(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_bottom(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
+          push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
+          cur_id++;
+          }
+          }
+          break;
+          
+          
+           */
         }
       }
     }
