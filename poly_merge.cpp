@@ -249,9 +249,9 @@ public:
       for (int c = 0; c < ncol-1; c++) {
         int index = 27*ternarized(r, c) + 9*ternarized(r, c + 1) + 3*ternarized(r + 1, c + 1) + ternarized(r + 1, c);
         cells(r, c) = index;
-        cout << index << " ";
+        //cout << index << " ";
       }
-      cout << endl;
+      //cout << endl;
     }
     
     // all polygons must be drawn clockwise for proper merging
@@ -528,32 +528,45 @@ public:
 
     // iterate over all locations in the polygon grid
     for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
-      if (!(it->second).collected) { // skip any grid points that are already collected
-        // we have found a new polygon line; process it
-        cur_id++;
-        
-        const grid_point &start = it->first;
-        grid_point cur = start;
-        
-        do {
-          if (polygon_grid[cur].altpoint) {
-            // not sure if this case could ever occur; for now, just error out
-            // (otherwise we risk an infinite loop)
-            cerr << "Found ambiguous point in polygon grid. Cannot collect coordinates." << endl;
-            break;
-          }
-          
-          point p = calc_point_coords(cur);
-          x_out.push_back(p.x);
-          y_out.push_back(p.y);
-          id.push_back(cur_id);
-          
-          // record that we have processed this point              
-          polygon_grid[cur].collected = true;
-          // advance to next point in polygon
-          cur = polygon_grid[cur].next;
-        } while (!(cur == start)); // keep going until we reach the start point again
+      if (((it->second).collected && !(it->second).altpoint) || 
+          ((it->second).collected && (it->second).collected2 && (it->second).altpoint)) {
+        continue; // skip any grid points that are already fully collected
       }
+      
+      // we have found a new polygon line; process it
+      cur_id++;
+        
+      grid_point start = it->first;
+      grid_point cur = start;
+      grid_point prev = (it->second).prev;
+      // if this point has an alternatve and it hasn't been collected yet then we start there
+      if ((it->second).altpoint && !(it->second).collected2) prev = (it->second).prev2;
+        
+      do {
+        point p = calc_point_coords(cur);
+        x_out.push_back(p.x);
+        y_out.push_back(p.y);
+        id.push_back(cur_id);
+        
+        // record that we have processed this point and proceed to next              
+        if (polygon_grid[cur].altpoint && polygon_grid[cur].prev2 == prev) {
+          // if an alternative point exists and its previous point in the polygon
+          // corresponds to the recorded previous point, then that's the point
+          // we're working with here
+          
+          // mark current point as collected and advance
+          polygon_grid[cur].collected2 = true;
+          grid_point newcur = polygon_grid[cur].next2;
+          prev = cur;
+          cur = newcur;
+        } else {
+          // mark current point as collected and advance
+          polygon_grid[cur].collected = true;
+          grid_point newcur = polygon_grid[cur].next;
+          prev = cur;
+          cur = newcur;
+        }
+      } while (!(cur == start)); // keep going until we reach the start point again
     }
     return DataFrame::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
   }
