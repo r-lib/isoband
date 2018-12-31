@@ -312,6 +312,7 @@ public:
     // all polygons must be drawn clockwise for proper merging
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
+        cout << r << " " << c << " " << cells(r, c) << endl;
         switch(cells(r, c)) {
         // doing cases out of order, sorted by type, is easier to keep track of
         
@@ -855,8 +856,8 @@ public:
             double vc = central_value(r, c);
             if (vc < vlo) {
               poly_start(r, c, grid);
-              poly_add(r, c, vintersect_lo);
               poly_add(r, c, hintersect_lo);
+              poly_add(r, c, vintersect_lo);
               poly_merge();
               poly_start(r+1, c+1, grid);
               poly_add(r+1, c, hintersect_lo);
@@ -864,8 +865,8 @@ public:
               poly_merge();
             } else {
               poly_start(r, c, grid);
-              poly_add(r, c, vintersect_lo);
-              poly_add(r, c+1, hintersect_lo);
+              poly_add(r, c, hintersect_lo);
+              poly_add(r, c+1, vintersect_lo);
               poly_add(r+1, c+1, grid);
               poly_add(r+1, c, hintersect_lo);
               poly_add(r, c, vintersect_lo);
@@ -910,8 +911,8 @@ public:
               poly_merge();
             } else {
               poly_start(r, c, grid);
-              poly_add(r, c, vintersect_hi);
-              poly_add(r, c+1, hintersect_hi);
+              poly_add(r, c, hintersect_hi);
+              poly_add(r, c+1, vintersect_hi);
               poly_add(r+1, c+1, grid);
               poly_add(r+1, c, hintersect_hi);
               poly_add(r, c, vintersect_hi);
@@ -1625,10 +1626,10 @@ microbenchmark::microbenchmark(
   isoband(1:ncol(volcano), 1:nrow(volcano), volcano, 120, 140)
 )
 
- 
-# this does not currently work; need to investigate
-m <- matrix(c(0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0), 4, 4, byrow = TRUE)
-isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 0.5, 1.5)
- 
+microbenchmark::microbenchmark(
+ grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = c(120, 140)),
+ {isoline(1:ncol(volcano), 1:nrow(volcano), volcano, 120); isoline(1:ncol(volcano), 1:nrow(volcano), volcano, 140)},
+ isoband(1:ncol(volcano), 1:nrow(volcano), volcano, 120, 140)
+ )
 */                         
                              
