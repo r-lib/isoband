@@ -10,6 +10,7 @@ using namespace Rcpp;
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+
 using namespace std;
 
 // point in output x-y space
@@ -1329,34 +1330,30 @@ protected:
           break;
         case 10: // 1010 
           {
-            cout << "case 10" << endl;
-            //break;
             polygon_grid[tmp_poly[0]].next = tmp_poly[1];
             polygon_grid[tmp_poly[1]].next = tmp_poly[0];
 
             // need to reverse connections
             grid_point cur = tmp_poly[1];
             do {
-              grid_point tmp = polygon_grid[cur].next;
-              polygon_grid[cur].next = polygon_grid[cur].prev;
-              polygon_grid[cur].prev = tmp;
+              grid_point tmp = polygon_grid[cur].prev;
+              polygon_grid[cur].prev = polygon_grid[cur].next;
+              polygon_grid[cur].next = tmp;
               cur = tmp;
             } while (!(cur == grid_point()));
           }
           break;
         case 5: // 0101
           {
-            cout << "case 5" << endl;
-            break;
             polygon_grid[tmp_poly[0]].prev = tmp_poly[1];
             polygon_grid[tmp_poly[1]].prev = tmp_poly[0];
           
             // need to reverse connections
             grid_point cur = tmp_poly[0];
             do {
-              grid_point tmp = polygon_grid[cur].prev;
-              polygon_grid[cur].prev = polygon_grid[cur].next;
-              polygon_grid[cur].next = tmp;
+              grid_point tmp = polygon_grid[cur].next;
+              polygon_grid[cur].next = polygon_grid[cur].prev;
+              polygon_grid[cur].prev = tmp;
               cur = tmp;
             } while (!(cur == grid_point()));
           }
@@ -1495,7 +1492,7 @@ public:
     // make line segments
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for individual line segments
-    
+
     // iterate over all locations in the polygon grid
     for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
       //cout << it->first << " " << (it->second).collected << endl;
@@ -1534,7 +1531,7 @@ public:
         polygon_grid[cur].collected = true;
         cur = polygon_grid[cur].next;
         i++;
-      } while (!(cur == start || cur == grid_point() || i > 10000)); // keep going until we reach the start point again
+      } while (!(cur == start || cur == grid_point() || i > 100000)); // keep going until we reach the start point again
       // if we're back to start, need to output that point one more time
       if (cur == start) {
         point p = calc_point_coords(cur);
@@ -1587,10 +1584,9 @@ grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
 grid.polyline(df2$x, df2$y, df2$id)
 
 m <- volcano
-df2 <- isoline((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120)
-grid.newpage()
-grid.polyline(df2$x, df2$y, df2$id)
-  
+df2 <- isoline((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 150)
+ggplot(as.data.frame(df2), aes(x, y, group = id)) + geom_path()
+
 */
 
 /*** #R
