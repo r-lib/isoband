@@ -1309,6 +1309,8 @@ protected:
       }
       break;
     case 3: // two-way merge
+      cout << "two-way merge not implemented" << endl;
+      break; // two-way merge doesn't work yet
       if (polygon_grid[tmp_poly[0]].next == grid_point()) {
         polygon_grid[tmp_poly[0]].next = tmp_poly[1];
         if (polygon_grid[tmp_poly[1]].prev == grid_point()) {
