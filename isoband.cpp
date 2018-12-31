@@ -273,7 +273,7 @@ protected:
   }
 
 public:
-  isobander(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low, double value_high) :
+  isobander(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low = 0, double value_high = 0) :
     grid_x(x), grid_y(y), grid_z(z), vlo(value_low), vhi(value_high)
   {
     nrow = grid_z.nrow();
@@ -284,6 +284,11 @@ public:
   }
   
   virtual ~isobander() {}
+  
+  void set_value(double value_low, double value_high) {
+    vlo = value_low;
+    vhi = value_high;
+  }
   
   virtual void calculate_contour() {
     // clear polygon grid and associated internal variables
@@ -312,7 +317,7 @@ public:
     // all polygons must be drawn clockwise for proper merging
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
-        cout << r << " " << c << " " << cells(r, c) << endl;
+        //cout << r << " " << c << " " << cells(r, c) << endl;
         switch(cells(r, c)) {
         // doing cases out of order, sorted by type, is easier to keep track of
         
@@ -1373,9 +1378,13 @@ protected:
   }
   
 public:
-  isoliner(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value) :
-    isobander(x, y, z, value, 1.1*value) {}
+  isoliner(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value = 0) :
+    isobander(x, y, z, value, 0) {}
 
+  void set_value(double value) {
+    vlo = value;
+  }
+  
   virtual void calculate_contour() {
     // clear polygon grid and associated internal variables
     reset_grid(); 
@@ -1547,22 +1556,45 @@ public:
 
 
 // [[Rcpp::export]]
-List isoband(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low, double value_high) {
-  isobander ib(x, y, z, value_low, value_high);
+List isobands(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, const NumericVector &value_low, const NumericVector &value_high) {
+  isobander ib(x, y, z);
+  
+  if (value_low.size() != value_high.size()) {
+    stop("Vectors of low and high values must have the same number of elements.");
+  }
+
   ib.calculate_contour();
-  return ib.collect();
+  List out;
+  
+  auto ilo = value_low.begin();
+  for (auto ihi = value_high.begin(); ihi != value_high.end(); ) {
+    ib.set_value(*ilo, *ihi);
+    ib.calculate_contour();
+    out.push_back(ib.collect());
+    ilo++; ihi++;
+  }
+  
+  return out;
 }
 
 // [[Rcpp::export]]
-List isoline(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value) {
-  isoliner il(x, y, z, value);
-  il.calculate_contour();
-  return il.collect();
+List isolines(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, const NumericVector &value) {
+  isoliner il(x, y, z);
+  
+  List out;
+  
+  for (auto it = value.begin(); it != value.end(); it++) {
+    il.set_value(*it);
+    il.calculate_contour();
+    out.push_back(il.collect());
+  }
+  
+  return out;
 }
 
 
 
-/***R
+/***  //R
 library(grid)
 m <- matrix(c(0, 1, 0,
               0, 1, 0,
@@ -1585,8 +1617,11 @@ grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
 grid.polyline(df2$x, df2$y, df2$id)
 
 m <- volcano
-df2 <- isoline((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 150)
-ggplot(as.data.frame(df2), aes(x, y, group = id)) + geom_path()
+df2 <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(120, 150))
+ggplot(data.frame(), aes(x, y, group = id)) + 
+ geom_path(data = as.data.frame(df2[[1]])) +
+ geom_path(data = as.data.frame(df2[[2]]))
+ 
 
 */
 
@@ -1614,12 +1649,11 @@ m <- matrix(c(1, 1, 1, 1, 1, 1,
 plot_isoband_grid(m, .5, 1.5)
 
 m <- volcano
-df1 <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120, 140)
-df2 <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 150, 152)
+b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(120, 150), c(140, 152))
 
 grid.newpage()
-grid.path(df1$x, df1$y, df1$id, gp = gpar(fill = "lightblue"))
-grid.path(df2$x, df2$y, df2$id, gp = gpar(fill = "tomato"))
+grid.path(b[[1]]$x, b[[1]]$y, b[[1]]$id, gp = gpar(fill = "lightblue"))
+grid.path(b[[2]]$x, b[[2]]$y, b[[2]]$id, gp = gpar(fill = "tomato"))
 
 microbenchmark::microbenchmark(
   grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 120),
@@ -1627,9 +1661,9 @@ microbenchmark::microbenchmark(
 )
 
 microbenchmark::microbenchmark(
- grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = c(120, 140)),
- {isoline(1:ncol(volcano), 1:nrow(volcano), volcano, 120); isoline(1:ncol(volcano), 1:nrow(volcano), volcano, 140)},
- isoband(1:ncol(volcano), 1:nrow(volcano), volcano, 120, 140)
+ grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 10*(10:18)),
+ isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(10:18)),
+ isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(9:17), 10*(10:18))
  )
 */                         
                              
