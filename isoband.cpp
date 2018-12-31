@@ -1351,74 +1351,6 @@ protected:
       cout << "unknown merge state" << endl;
     }
     
-    /*
-    bool reverse_merge = false;
-    
-    // first, we see if we the first point matches an existing line segment
-    if (polygon_grid.count(tmp_poly[0]) > 0) {
-      // yes, this defines merging direction
-      if (polygon_grid[tmp_poly[0]].next == grid_point()) {
-        polygon_grid[tmp_poly[0]].next = tmp_poly[1];
-      } else if (polygon_grid[tmp_poly[0]].prev == grid_point()) {
-        polygon_grid[tmp_poly[0]].prev = tmp_poly[1];
-        reverse_merge = true;
-      } else {
-        // should never go here
-        cerr << "cannot merge line segment at interior of existing line segment" << endl;
-      }
-    } else {
-      // starting a new line segment
-      polygon_grid[tmp_poly[0]].next = tmp_poly[1];
-    }
-    
-    // now we see if the second point matches an existing line segment
-    if (polygon_grid.count(tmp_poly[1]) > 0) {
-      if (reverse_merge) {
-        if (polygon_grid[tmp_poly[1]].prev == grid_point()) {
-          polygon_grid[tmp_poly[1]].prev = tmp_poly[0];
-        } else {
-          if (polygon_grid[tmp_poly[1]].next == grid_point()) {
-            polygon_grid[tmp_poly[1]].next = tmp_poly[0];
-            
-            // reverse connections
-            grid_point cur = tmp_poly[1];
-            do {
-              grid_point tmp = polygon_grid[cur].prev;
-              polygon_grid[cur].prev = polygon_grid[cur].next;
-              polygon_grid[cur].next = tmp;
-              cur = tmp;
-            } while (!(cur == grid_point()));
-          } else {
-            // should never go here
-            cerr << "cannot merge line segment at interior of existing line segment" << endl;
-          }
-        }
-      } else {
-        if (polygon_grid[tmp_poly[1]].next == grid_point()) {
-          polygon_grid[tmp_poly[1]].next = tmp_poly[0];
-        } else {
-          if (polygon_grid[tmp_poly[1]].prev == grid_point()) {
-            polygon_grid[tmp_poly[1]].prev = tmp_poly[0];
-            
-            // reverse connections
-            grid_point cur = tmp_poly[1];
-            do {
-              grid_point tmp = polygon_grid[cur].next;
-              polygon_grid[cur].next = polygon_grid[cur].prev;
-              polygon_grid[cur].prev = tmp;
-              cur = tmp;
-            } while (!(cur == grid_point()));
-          } else {
-            // should never go here
-            cerr << "cannot merge line segment at interior of existing line segment" << endl;
-          }
-        }
-      }
-    } else {
-      // finishing line segment here
-      polygon_grid[tmp_poly[1]].prev = tmp_poly[0];
-    }
-     */
     cout << "new grid:" << endl;
     print_polygons_state();
      
@@ -1622,12 +1554,13 @@ m <- matrix(c(0, 0, 0, 0, 0, 0,
               0, 0, 0, 1, 0, 0,
               0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
 m <- matrix(c(0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0), 4, 4, byrow = TRUE)
+m <- volcano
 # this does not currently work; need to investigate
 #df1 <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 0.5, 1.5)
-df2 <- isoline((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 0.5)
+df2 <- isoline((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 120)
 g <- expand.grid(x = (1:ncol(m))/(ncol(m)+1), y = (nrow(m):1)/(nrow(m)+1))
 grid.newpage()
-grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
+#grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
 #grid.path(df1$x, df1$y, df1$id, gp = gpar(fill = "lightblue", col = NA))
 grid.polyline(df2$x, df2$y, df2$id)
 */
