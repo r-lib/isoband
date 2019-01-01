@@ -5,9 +5,9 @@
 
 using namespace Rcpp;
 
-// isobands
-List isobands(const NumericVector& x, const NumericVector& y, const NumericMatrix& z, const NumericVector& value_low, const NumericVector& value_high);
-RcppExport SEXP _isoband_isobands(SEXP xSEXP, SEXP ySEXP, SEXP zSEXP, SEXP value_lowSEXP, SEXP value_highSEXP) {
+// isobands_impl
+List isobands_impl(const NumericVector& x, const NumericVector& y, const NumericMatrix& z, const NumericVector& value_low, const NumericVector& value_high);
+RcppExport SEXP _isoband_isobands_impl(SEXP xSEXP, SEXP ySEXP, SEXP zSEXP, SEXP value_lowSEXP, SEXP value_highSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,13 +16,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericMatrix& >::type z(zSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type value_low(value_lowSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type value_high(value_highSEXP);
-    rcpp_result_gen = Rcpp::wrap(isobands(x, y, z, value_low, value_high));
+    rcpp_result_gen = Rcpp::wrap(isobands_impl(x, y, z, value_low, value_high));
     return rcpp_result_gen;
 END_RCPP
 }
-// isolines
-List isolines(const NumericVector& x, const NumericVector& y, const NumericMatrix& z, const NumericVector& value);
-RcppExport SEXP _isoband_isolines(SEXP xSEXP, SEXP ySEXP, SEXP zSEXP, SEXP valueSEXP) {
+// isolines_impl
+List isolines_impl(const NumericVector& x, const NumericVector& y, const NumericMatrix& z, const NumericVector& value);
+RcppExport SEXP _isoband_isolines_impl(SEXP xSEXP, SEXP ySEXP, SEXP zSEXP, SEXP valueSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,14 +30,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type y(ySEXP);
     Rcpp::traits::input_parameter< const NumericMatrix& >::type z(zSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type value(valueSEXP);
-    rcpp_result_gen = Rcpp::wrap(isolines(x, y, z, value));
+    rcpp_result_gen = Rcpp::wrap(isolines_impl(x, y, z, value));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_isoband_isobands", (DL_FUNC) &_isoband_isobands, 5},
-    {"_isoband_isolines", (DL_FUNC) &_isoband_isolines, 4},
+    {"_isoband_isobands_impl", (DL_FUNC) &_isoband_isobands_impl, 5},
+    {"_isoband_isolines_impl", (DL_FUNC) &_isoband_isolines_impl, 4},
     {NULL, NULL, 0}
 };
 

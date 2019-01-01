@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "75%"
 )
 ```
 # isoband
@@ -27,7 +27,7 @@ devtools::install_github("clauswilke/isoband")
 ## Example
 
 Simple isobanding examples:
-```{r basic-examples, out.width="75%", fig.asp = 1}
+```{r basic-examples, fig.asp = 1}
 library(isoband)
 library(grid)
 
@@ -59,7 +59,7 @@ plot_iso(m, 0.5, 1.5)
 ```
 
 Isobanding the volcano dataset:
-```{r volcano, out.width="75%", fig.asp = 1}
+```{r volcano, fig.asp = 1}
 m <- volcano
 b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(80, 120, 150), c(110, 140, 152))
 l <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(110, 120, 140, 150, 152))
