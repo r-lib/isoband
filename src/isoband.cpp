@@ -1,7 +1,7 @@
 // This file implements the 2D isoline and isoband algorithms described
-// here: https://en.wikipedia.org/wiki/Marching_squares 
+// here: https://en.wikipedia.org/wiki/Marching_squares
 // Includes merging of line segments and polygons.
-// Written by Claus O. Wilke                                                                      
+// Written by Claus O. Wilke
 
 // [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
@@ -16,7 +16,7 @@ using namespace std;
 // point in output x-y space
 struct point {
   double x, y; // x and y coordinates
-  
+
   point(double x_in, double y_in) : x(x_in), y(y_in) {}
 };
 
@@ -32,7 +32,7 @@ enum point_type {
 struct grid_point {
   int r, c; // row and column
   point_type type; // point type
-  
+
   // default constructor; negative values indicate non-existing point off grid
   grid_point(double r_in = -1, double c_in = -1, point_type type_in = grid) : r(r_in), c(c_in), type(type_in) {}
   // copy constructor
@@ -46,8 +46,8 @@ struct grid_point_hasher {
     // this should work up to about 100,000,000 rows/columns
     return hash<long long>()(
       (static_cast<long long>(p.r) << 30) ^
-        (static_cast<long long>(p.c) << 3) ^ 
-          static_cast<long long>(p.type)); 
+        (static_cast<long long>(p.c) << 3) ^
+          static_cast<long long>(p.type));
   }
 };
 
@@ -64,7 +64,7 @@ ostream & operator<<(ostream &out, const grid_point &p) {
 struct point_connect {
   grid_point prev, next; // previous and next points in polygon
   grid_point prev2, next2; // alternative previous and next, when two separate polygons have vertices on the same grid point
-  
+
   bool altpoint;  // does this connection hold an alternative point?
   bool collected, collected2; // has this connection been collected into a final polygon?
 
@@ -88,45 +88,45 @@ protected:
   grid_point tmp_poly[8]; // temp storage for elementary polygons; none has more than 8 vertices
   point_connect tmp_point_connect[8];
   int tmp_poly_size; // current number of elements in tmp_poly
-  
+
   typedef unordered_map<grid_point, point_connect, grid_point_hasher> gridmap;
   gridmap polygon_grid;
-  
+
   void reset_grid() {
     polygon_grid.clear();
-    
+
     for (int i=0; i<8; i++) {
       tmp_point_connect[i] = point_connect();
     }
   }
-  
+
   // internal member functions
-  
+
   double central_value(int r, int c) {// calculates the central value of a given cell
     return (grid_z(r, c) + grid_z(r, c + 1) + grid_z(r + 1, c) + grid_z(r + 1, c + 1))/4;
   }
-  
+
   void poly_start(int r, int c, point_type type) { // start a new elementary polygon
     tmp_poly[0].r = r;
     tmp_poly[0].c = c;
     tmp_poly[0].type = type;
-    
+
     tmp_poly_size = 1;
   }
-  
+
   void poly_add(int r, int c, point_type type) { // add point to elementary polygon
     tmp_poly[tmp_poly_size].r = r;
     tmp_poly[tmp_poly_size].c = c;
     tmp_poly[tmp_poly_size].type = type;
-    
+
     tmp_poly_size++;
   }
-  
+
   void poly_merge() { // merge current elementary polygon to prior polygons
     //cout << "before merging:" << endl;
-    
+
     bool to_delete[] = {false, false, false, false, false, false, false, false};
-    
+
     // first, we figure out the right connections for current polygon
     for (int i = 0; i < tmp_poly_size; i++) {
       // create defined state in tmp_point_connect[]
@@ -134,9 +134,9 @@ protected:
       tmp_point_connect[i].altpoint = false;
       tmp_point_connect[i].next = tmp_poly[(i+1<tmp_poly_size) ? i+1 : 0];
       tmp_point_connect[i].prev = tmp_poly[(i-1>=0) ? i-1 : tmp_poly_size-1];
-      
+
       //cout << tmp_poly[i] << ": " << tmp_point_connect[i] << endl;
-      
+
       // now merge with existing polygons if needed
       const grid_point &p = tmp_poly[i];
       if (polygon_grid.count(p) > 0) { // point has been used before, need to merge polygons
@@ -165,7 +165,7 @@ protected:
           }
         } else {
           // case with alternative point at this location
-          int score = 
+          int score =
             8 * (tmp_point_connect[i].next == polygon_grid[p].prev2) + 4 * (tmp_point_connect[i].prev == polygon_grid[p].next2) +
             2 * (tmp_point_connect[i].next == polygon_grid[p].prev) + (tmp_point_connect[i].prev == polygon_grid[p].next);
           switch (score) {
@@ -223,13 +223,13 @@ protected:
         }
       }
     }
-    
+
     //cout << "after merging:" << endl;
-    
+
     // then we copy the connections into the polygon matrix
     for (int i = 0; i < tmp_poly_size; i++) {
       const grid_point &p = tmp_poly[i];
-      
+
       if (to_delete[i]) { // delete point if needed
         polygon_grid.erase(p);
       } else {            // otherwise, copy
@@ -237,25 +237,25 @@ protected:
       }
       //cout << p << ": " << tmp_point_connect[i] << endl;
     }
-    
+
     //cout << "new grid:" << endl;
     //print_polygons_state();
   }
-  
+
   void print_polygons_state() {
     for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
       cout << it->first << ": " << it->second << endl;
     }
     cout << endl;
   }
-  
+
   // linear interpolation of boundary intersections
   double interpolate(double x0, double x1, double z0, double z1, double value) {
     double d = (value - z0) / (z1 - z0);
     double x = x0 + d * (x1 - x0);
     return x;
   }
-  
+
   // calculate output coordinates for a given grid point
   point calc_point_coords(const grid_point &p) {
     switch(p.type) {
@@ -278,22 +278,22 @@ public:
   {
     nrow = grid_z.nrow();
     ncol = grid_z.ncol();
-    
+
     if (grid_x.size() != ncol) {stop("Number of x coordinates must match number of columns in density matrix.");}
     if (grid_y.size() != nrow) {stop("Number of y coordinates must match number of rows in density matrix.");}
   }
-  
+
   virtual ~isobander() {}
-  
+
   void set_value(double value_low, double value_high) {
     vlo = value_low;
     vhi = value_high;
   }
-  
+
   virtual void calculate_contour() {
     // clear polygon grid and associated internal variables
-    reset_grid(); 
-    
+    reset_grid();
+
     // setup matrix of ternarized cell representations
     IntegerVector v(nrow*ncol);
     IntegerVector::iterator iv = v.begin();
@@ -301,10 +301,10 @@ public:
       *iv = (*it >= vlo && *it < vhi) + 2*(*it >= vhi);
       iv++;
     }
-    
+
     IntegerMatrix ternarized(nrow, ncol, v.begin());
     IntegerMatrix cells(nrow - 1, ncol - 1);
-    
+
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         int index = 27*ternarized(r, c) + 9*ternarized(r, c + 1) + 3*ternarized(r + 1, c + 1) + ternarized(r + 1, c);
@@ -313,18 +313,18 @@ public:
       }
       //cout << endl;
     }
-    
+
     // all polygons must be drawn clockwise for proper merging
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         //cout << r << " " << c << " " << cells(r, c) << endl;
         switch(cells(r, c)) {
         // doing cases out of order, sorted by type, is easier to keep track of
-        
+
         // no contour
         case 0: break;
         case 80: break;
-          
+
         // single triangle
         case 1: // 0001
           poly_start(r, c, vintersect_lo);
@@ -374,7 +374,7 @@ public:
           poly_add(r, c, hintersect_hi);
           poly_merge();
           break;
-          
+
           // single trapezoid
         case 78: // 2220
           poly_start(r, c, vintersect_hi);
@@ -432,7 +432,7 @@ public:
           poly_add(r, c, hintersect_hi);
           poly_merge();
           break;
-          
+
           // single rectangle
         case 4: // 0011
           poly_start(r, c, vintersect_lo);
@@ -527,7 +527,7 @@ public:
           poly_add(r+1, c, grid);
           poly_merge();
           break;
-        
+
         // single pentagon
         case 49: // 1211
           poly_start(r, c, grid);
@@ -721,7 +721,7 @@ public:
           poly_add(r+1, c, hintersect_lo);
           poly_merge();
           break;
-          
+
           // single hexagon
         case 22: // 0211
           poly_start(r+1, c, grid);
@@ -1127,7 +1127,7 @@ public:
             }
           }
           break;
-          
+
         // 8-sided saddle
       case 60: // 2020
         {
@@ -1209,7 +1209,7 @@ public:
       }
     }
   }
-  
+
   virtual List collect() {
     // make polygons
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
@@ -1217,32 +1217,32 @@ public:
 
     // iterate over all locations in the polygon grid
     for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
-      if (((it->second).collected && !(it->second).altpoint) || 
+      if (((it->second).collected && !(it->second).altpoint) ||
           ((it->second).collected && (it->second).collected2 && (it->second).altpoint)) {
         continue; // skip any grid points that are already fully collected
       }
-      
+
       // we have found a new polygon line; process it
       cur_id++;
-        
+
       grid_point start = it->first;
       grid_point cur = start;
       grid_point prev = (it->second).prev;
       // if this point has an alternatve and it hasn't been collected yet then we start there
       if ((it->second).altpoint && !(it->second).collected2) prev = (it->second).prev2;
-        
+
       do {
         point p = calc_point_coords(cur);
         x_out.push_back(p.x);
         y_out.push_back(p.y);
         id.push_back(cur_id);
-        
-        // record that we have processed this point and proceed to next              
+
+        // record that we have processed this point and proceed to next
         if (polygon_grid[cur].altpoint && polygon_grid[cur].prev2 == prev) {
           // if an alternative point exists and its previous point in the polygon
           // corresponds to the recorded previous point, then that's the point
           // we're working with here
-          
+
           // mark current point as collected and advance
           polygon_grid[cur].collected2 = true;
           grid_point newcur = polygon_grid[cur].next2;
@@ -1269,23 +1269,23 @@ protected:
     tmp_poly[0].r = r;
     tmp_poly[0].c = c;
     tmp_poly[0].type = type;
-    
+
     tmp_poly_size = 1;
   }
-  
+
   void line_add(int r, int c, point_type type) { // add point to line
     tmp_poly[tmp_poly_size].r = r;
     tmp_poly[tmp_poly_size].c = c;
     tmp_poly[tmp_poly_size].type = type;
-    
+
     tmp_poly_size++;
   }
-  
+
   void line_merge() { // merge current elementary polygon to prior polygons
     //cout << "merging points: " << tmp_poly[0] << " " << tmp_poly[1] << endl;
-    
+
     int score = 2*polygon_grid.count(tmp_poly[1]) + polygon_grid.count(tmp_poly[0]);
-    
+
     switch(score) {
     case 0: // completely unconnected line segment
       polygon_grid[tmp_poly[0]].next = tmp_poly[1];
@@ -1319,12 +1319,12 @@ protected:
       //cout << "two-way merge not implemented" << endl;
       //break; // two-way merge doesn't work yet
       {
-        int score2 = 
-          8*(polygon_grid[tmp_poly[0]].next == grid_point()) + 
+        int score2 =
+          8*(polygon_grid[tmp_poly[0]].next == grid_point()) +
           4*(polygon_grid[tmp_poly[0]].prev == grid_point()) +
           2*(polygon_grid[tmp_poly[1]].next == grid_point()) +
           (polygon_grid[tmp_poly[1]].prev == grid_point());
-      
+
         switch(score2) {
         case 9: // 1001
           polygon_grid[tmp_poly[0]].next = tmp_poly[1];
@@ -1334,7 +1334,7 @@ protected:
           polygon_grid[tmp_poly[0]].prev = tmp_poly[1];
           polygon_grid[tmp_poly[1]].next = tmp_poly[0];
           break;
-        case 10: // 1010 
+        case 10: // 1010
           {
             polygon_grid[tmp_poly[0]].next = tmp_poly[1];
             polygon_grid[tmp_poly[1]].next = tmp_poly[0];
@@ -1353,7 +1353,7 @@ protected:
           {
             polygon_grid[tmp_poly[0]].prev = tmp_poly[1];
             polygon_grid[tmp_poly[1]].prev = tmp_poly[0];
-          
+
             // need to reverse connections
             grid_point cur = tmp_poly[0];
             do {
@@ -1372,11 +1372,11 @@ protected:
     default:
       cerr << "unknown merge state" << endl;
     }
-    
+
     //cout << "new grid:" << endl;
     //print_polygons_state();
   }
-  
+
 public:
   isoliner(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value = 0) :
     isobander(x, y, z, value, 0) {}
@@ -1384,30 +1384,30 @@ public:
   void set_value(double value) {
     vlo = value;
   }
-  
+
   virtual void calculate_contour() {
     // clear polygon grid and associated internal variables
-    reset_grid(); 
-    
+    reset_grid();
+
     // setup matrix of ternarized cell representations
     LogicalMatrix binarized(nrow, ncol, static_cast<LogicalVector>(grid_z >= vlo).begin());
     IntegerMatrix cells(nrow - 1, ncol - 1);
-    
+
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         int index = 8*binarized(r, c) + 4*binarized(r, c + 1) + 2*binarized(r+1, c+1) + 1*binarized(r + 1, c);
-        
+
         // two-segment saddles
-        if (index == 5 && (central_value(r, c) >= vlo)) {
+        if (index == 5 && (central_value(r, c) < vlo)) {
           index = 10;
-        } else if (index == 10 && (central_value(r, c) >= vlo)) {
+        } else if (index == 10 && (central_value(r, c) < vlo)) {
           index = 5;
         }
-        
+
         cells(r, c) = index;
       }
     }
-    
+
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         switch(cells(r, c)) {
@@ -1441,7 +1441,7 @@ public:
           line_start(r, c, hintersect_lo);
           line_add(r, c, vintersect_lo);
           line_merge();
-          break;          
+          break;
         case 6:
           line_start(r, c, hintersect_lo);
           line_add(r+1, c, hintersect_lo);
@@ -1467,7 +1467,7 @@ public:
           line_start(r, c, vintersect_lo);
           line_add(r+1, c, hintersect_lo);
           line_merge();
-          // like case 4 
+          // like case 4
           line_start(r, c, hintersect_lo);
           line_add(r, c+1, vintersect_lo);
           line_merge();
@@ -1497,7 +1497,7 @@ public:
       }
     }
   }
-  
+
   virtual List collect() {
     // make line segments
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
@@ -1509,13 +1509,13 @@ public:
       if ((it->second).collected) {
         continue; // skip any grid points that are already collected
       }
-      
+
       // we have found a new polygon line; process it
       cur_id++;
-      
+
       grid_point start = it->first;
       grid_point cur = start;
-      
+
       int i = 0;
       if (!(polygon_grid[cur].prev == grid_point())) {
         // back-track until we find the beginning of the line or circle around once
@@ -1527,7 +1527,7 @@ public:
       if (i > 100000) {
         cout << "infinite loop in coordinate collection" << endl;
       }
-      
+
       start = cur; // reset starting point
       i = 0;
       do {
@@ -1536,8 +1536,8 @@ public:
         x_out.push_back(p.x);
         y_out.push_back(p.y);
         id.push_back(cur_id);
-        
-        // record that we have processed this point and proceed to next              
+
+        // record that we have processed this point and proceed to next
         polygon_grid[cur].collected = true;
         cur = polygon_grid[cur].next;
         i++;
@@ -1554,18 +1554,25 @@ public:
   }
 };
 
-
+//' Efficient calculation of isolines and isobands from elevation grid
+//'
+//' @param x Numeric vector specifying the x locations of the grid points.
+//' @param y Numeric vector specifying the y locations of the grid points.
+//' @param z Numeric matrix specifying the elevation values for each grid point.
+//' @param value_low,value_high Numeric vectors of minimum/maximum z values
+//'   for which isobands should be generated.
+//' @export
 // [[Rcpp::export]]
 List isobands(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, const NumericVector &value_low, const NumericVector &value_high) {
   isobander ib(x, y, z);
-  
+
   if (value_low.size() != value_high.size()) {
     stop("Vectors of low and high values must have the same number of elements.");
   }
 
   ib.calculate_contour();
   List out;
-  
+
   auto ilo = value_low.begin();
   for (auto ihi = value_high.begin(); ihi != value_high.end(); ) {
     ib.set_value(*ilo, *ihi);
@@ -1573,97 +1580,73 @@ List isobands(const NumericVector &x, const NumericVector &y, const NumericMatri
     out.push_back(ib.collect());
     ilo++; ihi++;
   }
-  
+
   return out;
 }
 
+//' @rdname isobands
+//' @param value Numeric vector of z values for which isolines should be generated.
+//' @export
 // [[Rcpp::export]]
 List isolines(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, const NumericVector &value) {
   isoliner il(x, y, z);
-  
+
   List out;
-  
+
   for (auto it = value.begin(); it != value.end(); it++) {
     il.set_value(*it);
     il.calculate_contour();
     out.push_back(il.collect());
   }
-  
+
   return out;
 }
 
 
 
-/***  //R
+/***R
 library(grid)
+
+plot_iso <- function(m, vlo, vhi) {
+  df1 <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vlo, vhi)[[1]]
+  df2 <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vlo)[[1]]
+  g <- expand.grid(x = (1:ncol(m))/(ncol(m)+1), y = (nrow(m):1)/(nrow(m)+1))
+  grid.newpage()
+  grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
+  grid.path(df1$x, df1$y, df1$id, gp = gpar(fill = "#acd8e6a0", col = NA))
+  grid.polyline(df2$x, df2$y, df2$id)
+}
+
 m <- matrix(c(0, 1, 0,
               0, 1, 0,
               0, 0, 0), 3, 3, byrow = TRUE)
-  
-m2 <- matrix(c(0, 0, 0, 0, 0, 0,
-              0, 0, 0, 1, 1, 0, 
+plot_iso(m, 0.5, 1.5)
+
+m <- matrix(c(0, 0, 0, 0, 0, 0,
+              0, 0, 0, 1, 1, 0,
               0, 0, 1, 1, 1, 0,
               0, 1, 1, 0, 0, 0,
               0, 0, 0, 1, 0, 0,
               0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
-m2 <- matrix(c(0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0), 4, 4, byrow = TRUE)
-# this does not currently work; need to investigate
-#df1 <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 0.5, 1.5)
-df2 <- isoline((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 0.5)
-g <- expand.grid(x = (1:ncol(m))/(ncol(m)+1), y = (nrow(m):1)/(nrow(m)+1))
-grid.newpage()
-grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
-#grid.path(df1$x, df1$y, df1$id, gp = gpar(fill = "lightblue", col = NA))
-grid.polyline(df2$x, df2$y, df2$id)
+plot_iso(m, 0.5, 1.5)
 
-m <- volcano
-df2 <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(120, 150))
-ggplot(data.frame(), aes(x, y, group = id)) + 
- geom_path(data = as.data.frame(df2[[1]])) +
- geom_path(data = as.data.frame(df2[[2]]))
- 
-
-*/
-
-/*** #R
-library(grid)
-
-plot_isoband_grid <- function(m, vlo, vhi) {
-  df <- isoband((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vlo, vhi)
-  g <- expand.grid(x = (1:ncol(m))/(ncol(m)+1), y = (nrow(m):1)/(nrow(m)+1))
-  grid.newpage()
-  grid.path(df$x, df$y, df$id, gp = gpar(fill = "lightblue"))
-  grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
-}
-
-m <- matrix(c(0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 0), 4, 4, byrow = TRUE)
-plot_isoband_grid(m, .5, 1.5)
-
-m <- matrix(c(1, 1, 1, 1, 1, 1, 
-              1, 1, 1, 1, 1, 1,
-              1, 1, 0, 0, 1, 1,
-              1, 1, 0, 0, 1, 1,
-              1, 1, 1, 1, 1, 1,
-              1, 1, 1, 1, 1, 1), 6, 6, byrow = TRUE)
-
-plot_isoband_grid(m, .5, 1.5)
+m <- matrix(c(0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0.8, 0), 4, 4, byrow = TRUE)
+plot_iso(m, 0.5, 1.5)
 
 m <- volcano
 b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(120, 150), c(140, 152))
+l <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(120, 140, 150, 152))
 
 grid.newpage()
-grid.path(b[[1]]$x, b[[1]]$y, b[[1]]$id, gp = gpar(fill = "lightblue"))
-grid.path(b[[2]]$x, b[[2]]$y, b[[2]]$id, gp = gpar(fill = "tomato"))
+grid.path(b[[1]]$x, b[[1]]$y, b[[1]]$id, gp = gpar(fill = "lightblue", col = NA))
+grid.path(b[[2]]$x, b[[2]]$y, b[[2]]$id, gp = gpar(fill = "tomato", col = NA))
+for (i in seq_along(l)) {
+  grid.polyline(l[[i]]$x, l[[i]]$y, l[[i]]$id)
+}
 
 microbenchmark::microbenchmark(
-  grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 120),
-  isoband(1:ncol(volcano), 1:nrow(volcano), volcano, 120, 140)
+  grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 10*(10:18)),
+  isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(10:18)),
+  isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(9:17), 10*(10:18))
 )
-
-microbenchmark::microbenchmark(
- grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 10*(10:18)),
- isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(10:18)),
- isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(9:17), 10*(10:18))
- )
-*/                         
-                             
+*/
