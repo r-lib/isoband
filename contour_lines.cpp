@@ -24,7 +24,7 @@ double central_value(int row, int col, const NumericMatrix &m) {
 }
 
 // functions that calculate the intersection points on the four corners of a cell
-pair<double, double> intersect_top(int row, int col, double value, 
+pair<double, double> intersect_top(int row, int col, double value,
                                    const NumericVector &x, const NumericVector &y, const NumericMatrix &m) {
   return make_pair(
     interpolate(x[col], x[col+1], m(row, col), m(row, col+1), value),
@@ -32,7 +32,7 @@ pair<double, double> intersect_top(int row, int col, double value,
   );
 }
 
-pair<double, double> intersect_bottom(int row, int col, double value, 
+pair<double, double> intersect_bottom(int row, int col, double value,
                                       const NumericVector &x, const NumericVector &y, const NumericMatrix &m) {
   return make_pair(
     interpolate(x[col], x[col+1], m(row+1, col), m(row+1, col+1), value),
@@ -40,7 +40,7 @@ pair<double, double> intersect_bottom(int row, int col, double value,
   );
 }
 
-pair<double, double> intersect_left(int row, int col, double value, 
+pair<double, double> intersect_left(int row, int col, double value,
                                     const NumericVector &x, const NumericVector &y, const NumericMatrix &m) {
   return make_pair(
     x[col],
@@ -48,7 +48,7 @@ pair<double, double> intersect_left(int row, int col, double value,
   );
 }
 
-pair<double, double> intersect_right(int row, int col, double value, 
+pair<double, double> intersect_right(int row, int col, double value,
                                      const NumericVector &x, const NumericVector &y, const NumericMatrix &m) {
   return make_pair(
     x[col+1],
@@ -84,25 +84,25 @@ DataFrame single_contour_lines(const NumericVector &x, const NumericVector &y, c
 
   if (x.size() != ncol) {stop("Number of x coordinates must match number of columns in density matrix.");}
   if (y.size() != nrow) {stop("Number of y coordinates must match number of rows in density matrix.");}
-    
+
   LogicalMatrix binarized(nrow, ncol, static_cast<LogicalVector>(m >= value).begin());
   IntegerMatrix cells(nrow - 1, ncol - 1);
-  
+
   for (int r = 0; r < nrow-1; r++) {
     for (int c = 0; c < ncol-1; c++) {
       int index = 8*binarized(r, c) + 4*binarized(r, c + 1) + 2*binarized(r+1, c+1) + 1*binarized(r + 1, c);
-      
+
       // two-segment saddles
-      if (index == 5 && (central_value(r, c, m) >= value)) {
+      if (index == 5 && (central_value(r, c, m) < value)) {
         index = 10;
-      } else if (index == 10 && (central_value(r, c, m) >= value)) {
+      } else if (index == 10 && (central_value(r, c, m) < value)) {
         index = 5;
       }
-      
+
       cells(r, c) = index;
     }
   }
-  
+
   // make line segments
   vector<double> x0, x1, y0, y1;  // vectors holding resulting line segments
   pair<double, double> p;    // point for temporary storage
@@ -176,7 +176,7 @@ DataFrame single_contour_lines(const NumericVector &x, const NumericVector &y, c
         x0.push_back(p.first); y0.push_back(p.second);
         p = intersect_bottom(r, c, value, x, y, m);
         x1.push_back(p.first); y1.push_back(p.second);
-        // case 4 
+        // case 4
         p = intersect_top(r, c, value, x, y, m);
         x0.push_back(p.first); y0.push_back(p.second);
         p = intersect_right(r, c, value, x, y, m);
@@ -210,7 +210,7 @@ DataFrame single_contour_lines(const NumericVector &x, const NumericVector &y, c
       }
     }
   }
-  
+
   return DataFrame::create(_["x0"] = x0, _["x1"] = x1, _["y0"] = y0, _["y1"] = y1, _["level"] = NumericVector(x0.size(), value));
 }
 
@@ -225,34 +225,34 @@ void push_point(pair<double, double> p, int cur_id, vector<double> &x_out, vecto
 DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, const NumericMatrix &m, double vlo, double vhi) {
   int nrow = m.nrow();
   int ncol = m.ncol();
-  
+
   if (x.size() != ncol) {stop("Number of x coordinates must match number of columns in density matrix.");}
   if (y.size() != nrow) {stop("Number of y coordinates must match number of rows in density matrix.");}
-  
+
   IntegerVector v(nrow*ncol);
   IntegerVector::iterator iv = v.begin();
   for (NumericMatrix::const_iterator it = m.begin(); it != m.end(); it++) {
     *iv = (*it >= vlo && *it < vhi) + 2*(*it >= vhi);
     iv++;
   }
-  
+
   IntegerMatrix ternarized(nrow, ncol, v.begin());
   IntegerMatrix cells(nrow - 1, ncol - 1);
-  
+
   for (int r = 0; r < nrow-1; r++) {
     for (int c = 0; c < ncol-1; c++) {
       int index = 27*ternarized(r, c) + 9*ternarized(r, c + 1) + 3*ternarized(r + 1, c + 1) + ternarized(r + 1, c);
-      
+
       cells(r, c) = index;
     }
   }
-  
-  
+
+
   // make polygons
   vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygons
   pair<double, double> p;   // point for temporary storage
   int cur_id = 1;           // id counter for the polygons
-  
+
   // all polygons are drawn clockwise for easy merging later on
   for (int r = 0; r < nrow-1; r++) {
     for (int c = 0; c < ncol-1; c++) {
@@ -320,7 +320,7 @@ DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, c
         push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
         cur_id++;
         break;
-        
+
       // single trapezoid
       case 78: // 2220
         push_point(intersect_left(r, c, vhi, x, y, m), cur_id, x_out, y_out, id);
@@ -386,7 +386,7 @@ DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, c
         push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
         cur_id++;
         break;
-        
+
       // single rectangle
       case 4: // 0011
         push_point(intersect_left(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
@@ -484,7 +484,7 @@ DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, c
         push_point(intersect_top(r, c, vlo, x, y, m), cur_id, x_out, y_out, id);
         cur_id++;
         break;
-        
+
       // single square
       case 40: // 1111
         push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
@@ -494,7 +494,7 @@ DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, c
         push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
         cur_id++;
         break;
-        
+
       // single pentagon
       case 49: // 1211
         push_point(top_left(r, c, x, y), cur_id, x_out, y_out, id);
@@ -712,7 +712,7 @@ DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, c
         push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
         cur_id++;
         break;
-   
+
       // single hexagon
       case 22: // 0211
         push_point(bottom_left(r, c, x, y), cur_id, x_out, y_out, id);
@@ -1028,7 +1028,7 @@ DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, c
           }
         }
         break;
-        
+
       // 7-sided saddle
       case 69: // 2120
         {
@@ -1254,7 +1254,7 @@ DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, c
           }
         }
         break;
-        
+
       default:
         // should never get here
         cout << "Unknown case: " << cells(r, c) << endl;
@@ -1263,7 +1263,7 @@ DataFrame single_contour_bands(const NumericVector &x, const NumericVector &y, c
     }
   }
 
-  
+
   return DataFrame::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
 }
 
@@ -1280,18 +1280,18 @@ contour_lines <- function(m, level = NULL) {
 }
 
 df <- contour_lines(volcano)
-p <- ggplot(df, ggplot2::aes(x = x0, y = y0, xend = x1, yend = y1, color = level)) + 
+p <- ggplot(df, ggplot2::aes(x = x0, y = y0, xend = x1, yend = y1, color = level)) +
   geom_segment() +
   scale_color_viridis_c()
 
 df1 <- single_contour_bands(1:ncol(volcano), nrow(volcano):1, volcano, 120, 140)
 df2 <- single_contour_bands(1:ncol(volcano), nrow(volcano):1, volcano, 150, 152)
 df3 <- contour_lines(volcano, level = c(120, 140, 150, 152))
-ggplot(mapping = aes(x, y, group = id)) + 
+ggplot(mapping = aes(x, y, group = id)) +
   geom_polygon(data = df1, color = "lightblue", fill = "lightblue") +
   geom_polygon(data = df2, color = "tomato", fill = "tomato") +
   geom_segment(data = df3, aes(x = x0, y = y0, xend = x1, yend = y1), size = 0.2, inherit.aes = FALSE)
- 
+
 microbenchmark::microbenchmark(
   grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 120),
   single_contour_lines(1:ncol(volcano), 1:nrow(volcano), volcano, 120),

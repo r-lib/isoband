@@ -1,0 +1,19 @@
+Package: isoband
+Title: Generate isolines and isobands from regularly spaced elevation grids
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Claus",
+           family = "Wilke",
+           role = c("aut", "cre"),
+           email = "wilke@austin.utexas.edu")
+Description: Generate contour lines (isolines) and contour polygons (isobands) from
+  regularly spaced grids containing elevation data.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+LinkingTo: 
+    Rcpp
+Imports: 
+    Rcpp
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.0
