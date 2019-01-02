@@ -41,13 +41,16 @@ plot_iso <- function(m, vlo, vhi) {
   grid.polyline(df2$x, df2$y, df2$id)
 }
 
-m <- matrix(c(0, 1, 0,
-              0, 1, 0,
-              0, 0, 0), 3, 3, byrow = TRUE)
-plot_iso(m, 0.5, 1.5)
-
 m <- matrix(c(0, 0, 0, 0, 0, 0,
               0, 0, 0, 1, 1, 0,
+              0, 0, 1, 1, 1, 0,
+              0, 1, 1, 0, 0, 0,
+              0, 0, 0, 1, 0, 0,
+              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+plot_iso(m, 0.5, 1.5)
+
+m <- matrix(c(NA, NA, NA, 0, 0, 0,
+              NA, NA, NA, 1, 1, 0,
               0, 0, 1, 1, 1, 0,
               0, 1, 1, 0, 0, 0,
               0, 0, 0, 1, 0, 0,
@@ -73,7 +76,7 @@ for (i in seq_along(l)) {
 }
 ```
 
-Isolining is ~20% faster than `grDevices::contourLines()`, isobanding is about 2.5 times slower.
+Isolining is about as fast as `grDevices::contourLines()`, isobanding is about 2.5 times slower.
 
 ```{r benchmark}
 microbenchmark::microbenchmark(

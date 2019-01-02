@@ -32,9 +32,12 @@ plot_iso <- function(m, vlo, vhi) {
   grid.polyline(df2$x, df2$y, df2$id)
 }
 
-m <- matrix(c(0, 1, 0,
-              0, 1, 0,
-              0, 0, 0), 3, 3, byrow = TRUE)
+m <- matrix(c(0, 0, 0, 0, 0, 0,
+              0, 0, 0, 1, 1, 0,
+              0, 0, 1, 1, 1, 0,
+              0, 1, 1, 0, 0, 0,
+              0, 0, 0, 1, 0, 0,
+              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
 plot_iso(m, 0.5, 1.5)
 ```
 
@@ -42,8 +45,8 @@ plot_iso(m, 0.5, 1.5)
 
 ``` r
 
-m <- matrix(c(0, 0, 0, 0, 0, 0,
-              0, 0, 0, 1, 1, 0,
+m <- matrix(c(NA, NA, NA, 0, 0, 0,
+              NA, NA, NA, 1, 1, 0,
               0, 0, 1, 1, 1, 0,
               0, 1, 1, 0, 0, 0,
               0, 0, 0, 1, 0, 0,
@@ -79,7 +82,7 @@ for (i in seq_along(l)) {
 
 <img src="man/figures/README-volcano-1.png" width="75%" />
 
-Isolining is ~20% faster than `grDevices::contourLines()`, isobanding is
+Isolining is about as fast as `grDevices::contourLines()`, isobanding is
 about 2.5 times slower.
 
 ``` r
@@ -94,7 +97,7 @@ microbenchmark::microbenchmark(
 #>                               isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (10:18))
 #>             isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (9:17),      10 * (10:18))
 #>       min       lq     mean   median       uq       max neval
-#>  1.625307 1.769483 2.566982 2.109082 2.930211 10.644908   100
-#>  1.297890 1.382552 1.703192 1.632265 1.874349  2.769563   100
-#>  4.054031 4.398169 5.026563 4.775082 5.260982 10.153111   100
+#>  1.708694 1.856855 2.670190 2.040156 2.760775 10.056764   100
+#>  1.717886 1.824342 2.219387 1.986709 2.516435  3.553901   100
+#>  4.403163 4.784361 5.462273 5.123574 5.727923 11.602064   100
 ```
