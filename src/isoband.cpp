@@ -1401,6 +1401,11 @@ public:
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         int index = 8*binarized(r, c) + 4*binarized(r, c + 1) + 2*binarized(r+1, c+1) + 1*binarized(r + 1, c);
+        if (NumericMatrix::is_na(grid_z(r, c)) || NumericMatrix::is_na(grid_z(r, c + 1)) ||
+            NumericMatrix::is_na(grid_z(r + 1, c)) || NumericMatrix::is_na(grid_z(r + 1, c + 1))) {
+          // we don't draw any contour lines if at least one of the corners is NA
+          index = 0;
+        }
 
         // two-segment saddles
         if (index == 5 && (central_value(r, c) < vlo)) {
