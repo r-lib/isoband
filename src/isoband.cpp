@@ -308,6 +308,11 @@ public:
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         int index = 27*ternarized(r, c) + 9*ternarized(r, c + 1) + 3*ternarized(r + 1, c + 1) + ternarized(r + 1, c);
+        if (NumericMatrix::is_na(grid_z(r, c)) || NumericMatrix::is_na(grid_z(r, c + 1)) ||
+            NumericMatrix::is_na(grid_z(r + 1, c)) || NumericMatrix::is_na(grid_z(r + 1, c + 1))) {
+              // we don't draw any contours if at least one of the corners is NA
+              index = 0;
+            }
         cells(r, c) = index;
         //cout << index << " ";
       }
