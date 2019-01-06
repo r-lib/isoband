@@ -8,7 +8,7 @@ Authors@R:
            email = "wilke@austin.utexas.edu")
 Description: Generate contour lines (isolines) and contour polygons (isobands) from
   regularly spaced grids containing elevation data.
-License: MIT + file LICENSE
+License: GPL-2 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 LinkingTo: 
