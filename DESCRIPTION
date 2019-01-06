@@ -14,6 +14,9 @@ LazyData: true
 LinkingTo: 
     Rcpp
 Imports: 
-    Rcpp
+    Rcpp,
+    rlang,
+    grid,
+    ggplot2
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
