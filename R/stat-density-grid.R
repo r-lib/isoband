@@ -15,24 +15,30 @@
 #' }
 #' @examples
 #' # default uses `geom_tile()` for drawing
-#' ggplot(faithful, aes(eruptions, waiting, fill = stat(density))) +
-#'   stat_density_grid(alpha = 0.5) +
-#'   geom_point(size = 0.3)
+#' ggplot(faithful, aes(eruptions, waiting)) +
+#'   stat_density_grid(aes(fill = stat(density))) +
+#'   geom_point(size = 0.3, color = "white")
 #'
 #' # discretized colors
-#' ggplot(faithful, aes(eruptions, waiting, fill = stat(zmin))) +
-#'   stat_density_grid(alpha = 0.5) +
-#'   geom_point(size = 0.3)
+#' ggplot(faithful, aes(eruptions, waiting)) +
+#'   stat_density_grid(aes(fill = stat(zmin))) +
+#'   geom_point(size = 0.3, color = "white")
 #'
 #' # points
-#' ggplot(faithful, aes(eruptions, waiting, color = stat(density), size = stat(density))) +
-#'   stat_density_grid(geom = "point", n = 20) +
-#'   geom_point(size = 0.3)
+#' ggplot(faithful, aes(eruptions, waiting)) +
+#'   stat_density_grid(
+#'     aes(color = stat(density), size = stat(density)),
+#'     geom = "point", n = 20, stroke = 0
+#'   ) +
+#'   geom_point(size = 0.75, shape = 21, fill = "white", color = "black")
 #'
 #' # contour bands
-#' ggplot(faithful, aes(eruptions, waiting, fill = stat(zmin))) +
-#'   stat_density_grid(geom = "isobands", color = "black", alpha = 0.5) +
-#'   geom_point(size = 0.3)
+#' ggplot(faithful, aes(eruptions, waiting)) +
+#'   stat_density_grid(
+#'     aes(fill = stat(zmin)), geom = "isobands",
+#'     color = "gray70"
+#'   ) +
+#'   geom_point(size = 0.3, color = "white")
 #' @export
 stat_density_grid <- function(mapping = NULL, data = NULL,
                               geom = "tile", position = "identity",
@@ -87,6 +93,6 @@ StatDensitygrid <- ggproto("StatDensitygrid", Stat,
     df$z <- df$density
     df$group <- data$group[1]
 
-    StatIsolevels$compute_panel(df, scales, bins, binwidth, breaks)
+    StatIsolevels$compute_group(df, scales, bins, binwidth, breaks)
   }
 )

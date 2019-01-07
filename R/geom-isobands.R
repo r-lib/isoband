@@ -107,7 +107,8 @@ GeomIsobands <- ggproto("GeomIsobands", Geom,
       coords <- coord$transform(bands[[i]], panel_params)
       if (length(coords$x) > 0) {
         gp <- gpar(
-          col = NA,
+          col = alpha(aesthetics$fill[i],
+                      aesthetics$fill_alpha[i] %||% aesthetics$alpha[i]),
           fill = alpha(aesthetics$fill[i],
                        aesthetics$fill_alpha[i] %||% aesthetics$alpha[i])
         )
