@@ -10,13 +10,13 @@
 \usage{
 geom_isobands(mapping = NULL, data = NULL, stat = "isolevels",
   position = "identity", ..., bins = NULL, binwidth = NULL,
-  breaks = NULL, na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE)
+  breaks = NULL, polygon_outline = TRUE, na.rm = FALSE,
+  show.legend = NA, inherit.aes = TRUE)
 
 geom_density_bands(mapping = NULL, data = NULL, stat = "densitygrid",
   position = "identity", ..., bins = NULL, binwidth = NULL,
-  breaks = NULL, na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE)
+  breaks = NULL, polygon_outline = TRUE, na.rm = FALSE,
+  show.legend = NA, inherit.aes = TRUE)
 }
 \arguments{
 \item{data}{The data to be displayed in this layer. There are three
@@ -64,6 +64,11 @@ display.}
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
+
+\item{polygon_outlines}{Draw filled polygons with equally colored outlines? The
+default is \code{TRUE}, which works well in cases where isobands are drawn without
+colored isolines. However, it can create drawing artifacts when used in
+combination with alpha transparency.}
 }
 \description{
 Draw isoband and isoline contours
@@ -79,7 +84,18 @@ ggplot(volcano3d, aes(x, y, z = z)) +
   theme_bw()
 
 ggplot(volcano3d, aes(x, y, z = z)) +
-  geom_isobands(aes(fill = stat(zmin)), fill_alpha = 0.5, size = 0.2) +
+  geom_isobands(aes(fill = stat(zmin)), color = NA) +
+  scale_fill_viridis_c(guide = "legend") +
+  coord_cartesian(expand = FALSE) +
+  theme_bw()
+
+# set polygon_outline = FALSE when drawing filled polygons
+# with alpha transparency
+ggplot(volcano3d, aes(x, y, z = z)) +
+  geom_isobands(
+    aes(fill = stat(zmin)), color = NA,
+    alpha = 0.5, polygon_outline = FALSE
+  ) +
   scale_fill_viridis_c(guide = "legend") +
   coord_cartesian(expand = FALSE) +
   theme_bw()

@@ -1,6 +1,10 @@
 #' Draw isoband and isoline contours
 #'
 #' @inheritParams stat_isolevels
+#' @param polygon_outlines Draw filled polygons with equally colored outlines? The
+#'   default is `TRUE`, which works well in cases where isobands are drawn without
+#'   colored isolines. However, it can create drawing artifacts when used in
+#'   combination with alpha transparency.
 #' @examples
 #' volcano3d <- reshape2::melt(volcano)
 #' names(volcano3d) <- c("x", "y", "z")
@@ -12,7 +16,18 @@
 #'   theme_bw()
 #'
 #' ggplot(volcano3d, aes(x, y, z = z)) +
-#'   geom_isobands(aes(fill = stat(zmin)), fill_alpha = 0.5, size = 0.2) +
+#'   geom_isobands(aes(fill = stat(zmin)), color = NA) +
+#'   scale_fill_viridis_c(guide = "legend") +
+#'   coord_cartesian(expand = FALSE) +
+#'   theme_bw()
+#'
+#' # set polygon_outline = FALSE when drawing filled polygons
+#' # with alpha transparency
+#' ggplot(volcano3d, aes(x, y, z = z)) +
+#'   geom_isobands(
+#'     aes(fill = stat(zmin)), color = NA,
+#'     alpha = 0.5, polygon_outline = FALSE
+#'   ) +
 #'   scale_fill_viridis_c(guide = "legend") +
 #'   coord_cartesian(expand = FALSE) +
 #'   theme_bw()
@@ -26,6 +41,7 @@ geom_isobands <- function(mapping = NULL, data = NULL,
                           stat = "isolevels", position = "identity",
                           ...,
                           bins = NULL, binwidth = NULL, breaks = NULL,
+                          polygon_outline = TRUE,
                           na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) {
   layer(
     data = data,
@@ -36,6 +52,7 @@ geom_isobands <- function(mapping = NULL, data = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      polygon_outline = polygon_outline,
       bins = bins,
       binwidth = binwidth,
       breaks = breaks,
@@ -51,6 +68,7 @@ geom_density_bands <- function(mapping = NULL, data = NULL,
                                stat = "densitygrid", position = "identity",
                                ...,
                                bins = NULL, binwidth = NULL, breaks = NULL,
+                               polygon_outline = TRUE,
                                na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) {
   layer(
     data = data,
@@ -61,6 +79,7 @@ geom_density_bands <- function(mapping = NULL, data = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      polygon_outline = polygon_outline,
       bins = bins,
       binwidth = binwidth,
       breaks = breaks,
@@ -85,7 +104,7 @@ GeomIsobands <- ggproto("GeomIsobands", Geom,
   ),
   nonmissing_aes = c("zmin", "zmax"),
 
-  draw_group = function(data, panel_params, coord) {
+  draw_group = function(data, panel_params, coord, polygon_outline = TRUE) {
     z <- tapply(data$z, data[c("y", "x")], identity)
 
     if (is.list(z)) {
@@ -106,11 +125,16 @@ GeomIsobands <- ggproto("GeomIsobands", Geom,
     for (i in seq_along(bands)) {
       coords <- coord$transform(bands[[i]], panel_params)
       if (length(coords$x) > 0) {
+        fill <- alpha(aesthetics$fill[i], aesthetics$fill_alpha[i] %||% aesthetics$alpha[i])
+        if (isTRUE(polygon_outline)) {
+          col <- fill
+        } else {
+          col <- NA
+        }
         gp <- gpar(
-          col = alpha(aesthetics$fill[i],
-                      aesthetics$fill_alpha[i] %||% aesthetics$alpha[i]),
-          fill = alpha(aesthetics$fill[i],
-                       aesthetics$fill_alpha[i] %||% aesthetics$alpha[i])
+          col = col,
+          fill = fill,
+          lwd = aesthetics$size*.pt
         )
         bandgrobs[[j]] <- pathGrob(coords$x, coords$y, coords$id, gp = gp)
         j <- j + 1
