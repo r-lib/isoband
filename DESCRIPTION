@@ -17,6 +17,8 @@ Imports:
     Rcpp,
     rlang,
     grid,
-    ggplot2
+    ggplot2,
+    scales,
+    MASS
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0

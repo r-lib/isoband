@@ -1,15 +1,7 @@
 #' Draw isoband and isoline contours
 #'
+#' @inheritParams stat_isolevels
 #' @examples
-#' ggplot(mapping = aes(eruptions, waiting)) +
-#'   geom_point(data = faithful, size = 0.3) +
-#'   geom_isobands(
-#'     data = faithfuld,
-#'     aes(z = density, fill = stat(level)),
-#'     n = 10, alpha = 0.5, size = 0.2
-#'   ) +
-#'   scale_fill_viridis_c(guide = "legend")
-#'
 #' volcano3d <- reshape2::melt(volcano)
 #' names(volcano3d) <- c("x", "y", "z")
 #'
@@ -24,13 +16,17 @@
 #'   scale_fill_viridis_c(guide = "legend") +
 #'   coord_cartesian(expand = FALSE) +
 #'   theme_bw()
+#'
+#' ggplot(faithful, aes(eruptions, waiting)) +
+#'   geom_density_bands(color = "gray40", alpha = 0.5, size = 0.2) +
+#'   geom_point(size = 0.3) +
+#'   scale_fill_viridis_c(guide = "legend")
 #' @export
 geom_isobands <- function(mapping = NULL, data = NULL,
                           stat = "isolevels", position = "identity",
                           ...,
-                          na.rm = FALSE,
-                          show.legend = NA,
-                          inherit.aes = TRUE) {
+                          bins = NULL, binwidth = NULL, breaks = NULL,
+                          na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) {
   layer(
     data = data,
     mapping = mapping,
@@ -40,11 +36,40 @@ geom_isobands <- function(mapping = NULL, data = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      bins = bins,
+      binwidth = binwidth,
+      breaks = breaks,
       na.rm = na.rm,
       ...
     )
   )
 }
+
+#' @rdname geom_isobands
+#' @export
+geom_density_bands <- function(mapping = NULL, data = NULL,
+                               stat = "densitygrid", position = "identity",
+                               ...,
+                               bins = NULL, binwidth = NULL, breaks = NULL,
+                               na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) {
+  layer(
+    data = data,
+    mapping = mapping,
+    stat = stat,
+    geom = GeomIsobands,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      bins = bins,
+      binwidth = binwidth,
+      breaks = breaks,
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
+
 
 #' @rdname geom_isobands
 #' @format NULL
