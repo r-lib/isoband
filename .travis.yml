@@ -3,3 +3,9 @@
 language: R
 sudo: false
 cache: packages
+
+env:
+  global:
+  - _R_CHECK_FORCE_SUGGESTS_=false
+  - MAKEFLAGS="-j 2"
+  - TRAVIS_CXXFLAGS="-Wall -Wextra -pedantic -Werror -std=c++11"
