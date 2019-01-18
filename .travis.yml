@@ -4,8 +4,18 @@ language: R
 sudo: false
 cache: packages
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-5
+
 env:
   global:
   - _R_CHECK_FORCE_SUGGESTS_=false
   - MAKEFLAGS="-j 2"
   - TRAVIS_CXXFLAGS="-Wall -Wextra -pedantic -Werror -std=c++11"
+  - CC="gcc-5"
+  - CXX="g++-5"
+
