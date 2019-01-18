@@ -19,6 +19,10 @@ Imports:
     grid,
     ggplot2,
     scales,
+    stats,
     MASS
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
+Suggests: 
+    testthat,
+    reshape2

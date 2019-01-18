@@ -1,7 +1,8 @@
 #' Generate 2d kernel density estimates
 #'
 #' Generate 2d kernel density estimates
-#' @inheritParams ggplot2::stat_identity
+#' @inheritParams ggplot2::layer
+#' @inheritParams ggplot2::geom_point
 #' @inheritParams stat_isolevels
 #' @param n Number of grid points in each direction.
 #' @param h Bandwidth (vector of length two). If `NULL`, estimated
@@ -14,6 +15,8 @@
 #'   \item{`z`}{the density estimate, identical to `density`}
 #' }
 #' @examples
+#' library(ggplot2)
+#'
 #' # default uses `geom_tile()` for drawing
 #' ggplot(faithful, aes(eruptions, waiting)) +
 #'   stat_density_grid(aes(fill = stat(density))) +

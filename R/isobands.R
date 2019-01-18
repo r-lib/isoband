@@ -26,7 +26,7 @@ isobands <- function(x, y, z, levels_low, levels_high) {
   }
 
   out <- isobands_impl(x, y, z, levels_low, levels_high)
-  setNames(out, paste0(levels_low, "-", levels_high))
+  stats::setNames(out, paste0(levels_low, "-", levels_high))
 }
 
 #' @rdname isobands
@@ -34,5 +34,5 @@ isobands <- function(x, y, z, levels_low, levels_high) {
 #' @export
 isolines <- function(x, y, z, levels) {
   out <- isolines_impl(x, y, z, levels)
-  setNames(out, levels)
+  stats::setNames(out, levels)
 }

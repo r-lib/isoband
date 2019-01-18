@@ -1,7 +1,8 @@
 #' Bin a 2d elevation raster into bands of similar height
 #'
 #' Bin a 2d elevation raster into bands of similar height.
-#' @inheritParams ggplot2::stat_identity
+#' @inheritParams ggplot2::layer
+#' @inheritParams ggplot2::geom_point
 #' @param bins Number of bins for discretization. Has priority
 #'   over `binwidth`.
 #' @param binwidth Binwidth used during discretization.

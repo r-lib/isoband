@@ -218,7 +218,7 @@ protected:
             tmp_point_connect[i].altpoint = true;
             break;
           default:
-            cerr << "undefined merging configuration:" << score << endl;
+            stop("undefined merging configuration: %i\n", score);
           }
         }
       }
@@ -242,12 +242,14 @@ protected:
     //print_polygons_state();
   }
 
+
   void print_polygons_state() {
     for (auto it = polygon_grid.begin(); it != polygon_grid.end(); it++) {
       cout << it->first << ": " << it->second << endl;
     }
     cout << endl;
   }
+
 
   // linear interpolation of boundary intersections
   double interpolate(double x0, double x1, double z0, double z1, double value) {
@@ -1305,7 +1307,7 @@ protected:
         polygon_grid[tmp_poly[1]].next = tmp_poly[0];
       } else {
         // should never go here
-        cerr << "cannot merge line segment at interior of existing line segment" << endl;
+        stop("cannot merge line segment at interior of existing line segment");
       }
       break;
     case 2: // only second point connects
@@ -1317,7 +1319,7 @@ protected:
         polygon_grid[tmp_poly[0]].next = tmp_poly[1];
       } else {
         // should never go here
-        cerr << "cannot merge line segment at interior of existing line segment" << endl;
+        stop("cannot merge line segment at interior of existing line segment");
       }
       break;
     case 3: // two-way merge
@@ -1370,12 +1372,12 @@ protected:
           }
           break;
         default:  // should never go here
-          cerr << "cannot merge line segment at interior of existing line segment" << endl;
+          stop("cannot merge line segment at interior of existing line segment");
         }
       }
     break;
     default:
-      cerr << "unknown merge state" << endl;
+      stop("unknown merge state");
     }
 
     //cout << "new grid:" << endl;
@@ -1535,7 +1537,7 @@ public:
         } while (!(cur == start || polygon_grid[cur].prev == grid_point() || i > 100000));
       }
       if (i > 100000) {
-        cout << "infinite loop in coordinate collection" << endl;
+        warning("infinite loop in coordinate collection");
       }
 
       start = cur; // reset starting point

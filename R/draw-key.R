@@ -1,6 +1,8 @@
-#' @rdname geom_isobands
+#' Draw polygon path legend keys
+#'
 #' @usage NULL
 #' @format NULL
+#' @keywords internal
 #' @export
 draw_key_polypath <- function(data, params, size) {
   lwd <- min(data$size, min(size) / 4)

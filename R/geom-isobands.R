@@ -1,11 +1,16 @@
 #' Draw isoband and isoline contours
 #'
+#' Draw isoband and isoline contours.
+#' @inheritParams ggplot2::layer
+#' @inheritParams ggplot2::geom_point
 #' @inheritParams stat_isolevels
-#' @param polygon_outlines Draw filled polygons with equally colored outlines? The
+#' @param polygon_outline Draw filled polygons with equally colored outlines? The
 #'   default is `TRUE`, which works well in cases where isobands are drawn without
 #'   colored isolines. However, it can create drawing artifacts when used in
 #'   combination with alpha transparency.
 #' @examples
+#' library(ggplot2)
+#'
 #' volcano3d <- reshape2::melt(volcano)
 #' names(volcano3d) <- c("x", "y", "z")
 #'
