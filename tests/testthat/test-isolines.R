@@ -15,7 +15,8 @@ test_that("line segments get merged", {
   out <- isolines(x = 1:3, y = 2:1, z, levels = 0.5)
   expect_setequal(out[[1]]$x, c(2.5, 3.0, 1.5, 1.5))
   expect_setequal(out[[1]]$y, c(2.0, 1.5, 2.0, 1.0))
-  expect_equal(out[[1]]$id, rep(1:2, each = 2))
+  expect_setequal(out[[1]]$id, c(1:2))
+  expect_equal(length(out[[1]]$id), 4)
 
   # two separate lines get merged in second row
   z <- matrix(c(0, 1, 0,
