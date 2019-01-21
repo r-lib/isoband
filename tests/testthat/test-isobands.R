@@ -51,4 +51,14 @@ test_that("NAs are handled correctly", {
                   10*c(3, 2, 1, 1, 2, 2, 3, 3) +
                     c(1, 1, 1, 2, 2, 3, 3, 2))
   expect_equal(out[[1]]$id, rep(1, 8))
+
+  z <- matrix(c(NA, 1, 1,
+                 1, 1, 1,
+                 1, 1, NA), ncol = 3, nrow = 3, byrow = TRUE)
+  out <- isobands(x = 1:3, y = 3:1, z, levels_low = 0.5, levels_high = 1.5)
+  expect_setequal(10*out[[1]]$x + out[[1]]$y,
+                  10*c(1, 1, 2, 2, 2, 2, 3, 3) +
+                    c(1, 2, 2, 1, 2, 3, 3, 2))
+  expect_setequal(out[[1]]$id, c(1:2))
+  expect_equal(length(out[[1]]$id), 8)
 })
