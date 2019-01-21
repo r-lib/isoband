@@ -4,8 +4,8 @@
 \alias{plot_iso}
 \title{Visualize a single isoband}
 \usage{
-plot_iso(m, vlo, vhi, fill_lo = "black", fill_mid = "gray50",
-  fill_hi = "white", newpage = TRUE)
+plot_iso(m, vlo, vhi, fill_lo = "gray90", fill_mid = "gray40",
+  fill_hi = "black", fill_band = "cornsilk", newpage = TRUE)
 }
 \arguments{
 \item{m}{input matrix}
@@ -13,6 +13,17 @@ plot_iso(m, vlo, vhi, fill_lo = "black", fill_mid = "gray50",
 \item{vlo}{lower cutoff for isobanding}
 
 \item{vhi}{higher cutoff for isobanding}
+
+\item{fill_lo}{fill color for points below the lower cutoff}
+
+\item{fill_mid}{fill color for points between the two cutoffs}
+
+\item{fill_hi}{fill color for points above the higher cutoff}
+
+\item{fill_band}{fill color for the isoband}
+
+\item{newpage}{boolean, indicating whether \code{grid.newpage()} should
+be called or not}
 }
 \description{
 This function visualizes a single isoband calculated from a matrix. It is mainly useful
