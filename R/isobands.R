@@ -5,6 +5,55 @@
 #' @param z Numeric matrix specifying the elevation values for each grid point.
 #' @param levels_low,levels_high Numeric vectors of minimum/maximum z values
 #'   for which isobands should be generated.
+#' @examples
+#' library(grid)
+#'
+#' plot_iso <- function(m, vlo, vhi) {
+#'   df_bands <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vlo, vhi)[[1]]
+#'   df_lines_lo <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vlo)[[1]]
+#'   df_lines_hi <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vhi)[[1]]
+#'   g <- expand.grid(x = (1:ncol(m))/(ncol(m)+1), y = (nrow(m):1)/(nrow(m)+1))
+#'   grid.newpage()
+#'   grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
+#'   grid.path(df_bands$x, df_bands$y, df_bands$id, gp = gpar(fill = "#acd8e6a0", col = NA))
+#'   grid.polyline(df_lines_lo$x, df_lines_lo$y, df_lines_lo$id)
+#'   grid.polyline(df_lines_hi$x, df_lines_hi$y, df_lines_hi$id)
+#' }
+#'
+#' # one simple connected shape
+#' m <- matrix(c(0, 0, 0, 0, 0, 0,
+#'               0, 0, 0, 1, 1, 0,
+#'               0, 0, 1, 1, 1, 0,
+#'               0, 1, 1, 0, 0, 0,
+#'               0, 0, 0, 1, 0, 0,
+#'               0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+#' plot_iso(m, 0.5, 1.5)
+#'
+#' # NAs are ignored
+#' m <- matrix(c(NA, NA, NA, 0, 0, 0,
+#'               NA, NA, NA, 1, 1, 0,
+#'                0,  0,  1, 1, 1, 0,
+#'                0,  1,  1, 0, 0, 0,
+#'                0,  0,  0, 1, 0, 0,
+#'                0,  0,  0, 0, 0, 0), 6, 6, byrow = TRUE)
+#' plot_iso(m, 0.5, 1.5)
+#'
+#' # two separate shapes
+#' m <- matrix(c(0, 0, 1, 1,
+#'               0, 1, 1, 1,
+#'               1, 1, 0, 0,
+#'               0, 0, 0.8, 0), 4, 4, byrow = TRUE)
+#' plot_iso(m, 0.5, 1.5)
+#'
+#' # shape with hole
+#' m <- matrix(c(0, 0, 0, 0, 0, 0,
+#'               0, 1, 1, 1, 1, 0,
+#'               0, 1, 2, 2, 1, 0,
+#'               0, 1, 2, 2, 1, 0,
+#'               0, 1, 1, 1, 1, 0,
+#'               0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+#' plot_iso(m, 0.5, 1.5)
+
 #' @export
 isobands <- function(x, y, z, levels_low, levels_high) {
   nlow <- length(levels_low)
