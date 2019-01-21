@@ -35,8 +35,10 @@ plot_iso <- function(m, vlo, vhi) {
   grid.newpage()
   grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
   grid.path(df_bands$x, df_bands$y, df_bands$id, gp = gpar(fill = "#acd8e6a0", col = NA))
-  grid.polyline(df_lines_lo$x, df_lines_lo$y, df_lines_lo$id)
-  grid.polyline(df_lines_hi$x, df_lines_hi$y, df_lines_hi$id)
+  if (length(df_lines_lo$x) > 0)
+    grid.polyline(df_lines_lo$x, df_lines_lo$y, df_lines_lo$id)
+  if (length(df_lines_hi$x) > 0)
+    grid.polyline(df_lines_hi$x, df_lines_hi$y, df_lines_hi$id)
 }
 
 # one simple connected shape

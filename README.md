@@ -5,6 +5,8 @@
 
 [![Build
 Status](https://travis-ci.org/clauswilke/isoband.svg?branch=master)](https://travis-ci.org/clauswilke/isoband)
+[![Coverage
+Status](https://img.shields.io/codecov/c/github/clauswilke/isoband/master.svg)](https://codecov.io/github/clauswilke/isoband?branch=master)
 
 Generate contour lines (isolines) and contour polygons (isobands) from
 regularly spaced grids containing elevation data.
@@ -100,7 +102,7 @@ microbenchmark::microbenchmark(
 #>                               isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (10:18))
 #>             isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (9:17),      10 * (10:18))
 #>       min       lq     mean   median       uq       max neval
-#>  1.562228 1.738201 2.354181 1.966709 2.519438  9.435842   100
-#>  1.654156 1.742636 2.046236 1.877635 2.135159  7.315972   100
-#>  4.295534 4.656617 5.247599 4.999137 5.444409 11.042004   100
+#>  1.653287 1.821338 2.350678 2.022496 2.538219  8.525243   100
+#>  1.718481 1.818973 2.197304 2.008301 2.180246  8.205451   100
+#>  4.498705 4.802478 5.238148 5.019103 5.411689 12.646945   100
 ```
