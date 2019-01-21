@@ -40,3 +40,15 @@ test_that("line segments get merged", {
                   10*c(2.5, 2.0, 1.5, 2.0, 2.5) + c(2.0, 2.5, 2.0, 1.5, 2.0))
   expect_equal(out[[1]]$id, rep(1, 5))
 })
+
+test_that("NAs are handled correctly", {
+  z <- matrix(c(NA, 0, 0,
+                 0, 1, 1,
+                 0, 1, 1), ncol = 3, nrow = 3, byrow = TRUE)
+  out <- isolines(x = 1:3, y = 3:1, z, levels = 0.5)
+  expect_setequal(10*out[[1]]$x + out[[1]]$y,
+                  10*c(1.5, 1.5, 2.0, 3.0) +
+                    c(2.0, 1.0, 2.5, 2.5))
+  expect_setequal(out[[1]]$id, c(1:2))
+  expect_equal(length(out[[1]]$id), 4)
+})
