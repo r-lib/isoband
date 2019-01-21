@@ -320,6 +320,7 @@ public:
       }
       //cout << endl;
     }
+    checkUserInterrupt();
 
     // all polygons must be drawn clockwise for proper merging
     for (int r = 0; r < nrow-1; r++) {
@@ -1235,9 +1236,10 @@ public:
       grid_point start = it->first;
       grid_point cur = start;
       grid_point prev = (it->second).prev;
-      // if this point has an alternatve and it hasn't been collected yet then we start there
+      // if this point has an alternative and it hasn't been collected yet then we start there
       if ((it->second).altpoint && !(it->second).collected2) prev = (it->second).prev2;
 
+      int i = 0;
       do {
         point p = calc_point_coords(cur);
         x_out.push_back(p.x);
@@ -1262,6 +1264,9 @@ public:
           prev = cur;
           cur = newcur;
         }
+        i++;
+        if (i % 100000 == 0)
+          checkUserInterrupt();
       } while (!(cur == start)); // keep going until we reach the start point again
     }
     return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
@@ -1348,11 +1353,15 @@ protected:
 
             // need to reverse connections
             grid_point cur = tmp_poly[1];
+            int i = 0;
             do {
               grid_point tmp = polygon_grid[cur].prev;
               polygon_grid[cur].prev = polygon_grid[cur].next;
               polygon_grid[cur].next = tmp;
               cur = tmp;
+              i++;
+              if (i % 100000 == 0)
+                checkUserInterrupt();
             } while (!(cur == grid_point()));
           }
           break;
@@ -1363,11 +1372,15 @@ protected:
 
             // need to reverse connections
             grid_point cur = tmp_poly[0];
+            int i = 0;
             do {
               grid_point tmp = polygon_grid[cur].next;
               polygon_grid[cur].next = polygon_grid[cur].prev;
               polygon_grid[cur].prev = tmp;
               cur = tmp;
+              i++;
+              if (i % 100000 == 0)
+                checkUserInterrupt();
             } while (!(cur == grid_point()));
           }
           break;
@@ -1419,6 +1432,8 @@ public:
         cells(r, c) = index;
       }
     }
+
+    checkUserInterrupt();
 
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
@@ -1534,10 +1549,9 @@ public:
         do {
           cur = polygon_grid[cur].prev;
           i++;
-        } while (!(cur == start || polygon_grid[cur].prev == grid_point() || i > 100000));
-      }
-      if (i > 100000) {
-        warning("infinite loop in coordinate collection");
+          if (i % 100000 == 0)
+            checkUserInterrupt();
+        } while (!(cur == start || polygon_grid[cur].prev == grid_point()));
       }
 
       start = cur; // reset starting point
@@ -1553,7 +1567,9 @@ public:
         polygon_grid[cur].collected = true;
         cur = polygon_grid[cur].next;
         i++;
-      } while (!(cur == start || cur == grid_point() || i > 100000)); // keep going until we reach the start point again
+        if (i % 100000 == 0)
+          checkUserInterrupt();
+      } while (!(cur == start || cur == grid_point())); // keep going until we reach the start point again
       // if we're back to start, need to output that point one more time
       if (cur == start) {
         point p = calc_point_coords(cur);
