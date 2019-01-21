@@ -5,7 +5,8 @@
 \title{Visualize a single isoband}
 \usage{
 plot_iso(m, vlo, vhi, fill_lo = "gray90", fill_mid = "gray40",
-  fill_hi = "black", fill_band = "cornsilk", newpage = TRUE)
+  fill_hi = "black", fill_band = "cornsilk", col_lo = "black",
+  col_hi = "black", newpage = TRUE)
 }
 \arguments{
 \item{m}{input matrix}
@@ -21,6 +22,10 @@ plot_iso(m, vlo, vhi, fill_lo = "gray90", fill_mid = "gray40",
 \item{fill_hi}{fill color for points above the higher cutoff}
 
 \item{fill_band}{fill color for the isoband}
+
+\item{col_lo}{line color for lower cutoff}
+
+\item{col_hi}{line color for higher cutoff}
 
 \item{newpage}{boolean, indicating whether \code{grid.newpage()} should
 be called or not}

@@ -5,8 +5,8 @@ test_that("elementary polygons get merged", {
   z <- matrix(c(0, 0, 1,
                 1, 1, 1), ncol = 3, nrow = 2, byrow = TRUE)
   out <- isobands(x = 1:3, y = 2:1, z, levels_low = 0.5, levels_high = 1.5)
-  expect_setequal(10*out[[1]]$x + out[[1]]$y,
-                  10*c(3.0, 2.0, 1.0, 1.0, 2.0, 2.5, 3.0) +
+  expect_setequal(10000*out[[1]]$x + out[[1]]$y,
+                  10000*c(3.0, 2.0, 1.0, 1.0, 2.0, 2.5, 3.0) +
                     c(1.0, 1.0, 1.0, 1.5, 1.5, 2.0, 2.0))
   expect_equal(out[[1]]$id, rep(1, 7))
   #
@@ -14,8 +14,8 @@ test_that("elementary polygons get merged", {
   z <- matrix(c(1, 2, 1,
                 1, 2, 2), ncol = 3, nrow = 2, byrow = TRUE)
   out <- isobands(x = 1:3, y = 2:1, z, levels_low = 0.5, levels_high = 1.5)
-  expect_setequal(10*out[[1]]$x + out[[1]]$y,
-                  10*c(3.0, 2.5, 3.0, 1.0, 1.5, 1.5, 1.0) +
+  expect_setequal(10000*out[[1]]$x + out[[1]]$y,
+                  10000*c(3.0, 2.5, 3.0, 1.0, 1.5, 1.5, 1.0) +
                     c(1.5, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0))
   expect_setequal(out[[1]]$id, c(1:2))
   expect_equal(length(out[[1]]$id), 7)
@@ -25,8 +25,8 @@ test_that("elementary polygons get merged", {
                 1, 2, 1,
                 0, 0, 0), ncol = 3, nrow = 3, byrow = TRUE)
   out <- isobands(x = 1:3, y = 3:1, z, levels_low = 0.5, levels_high = 1.5)
-  expect_setequal(10*out[[1]]$x + out[[1]]$y,
-                  10*c(3.0, 2.0, 1.0, 1.0, 1.0, 1.5, 1.5, 2.0, 2.5, 2.5, 3.0, 3.0) +
+  expect_setequal(10000*out[[1]]$x + out[[1]]$y,
+                  10000*c(3.0, 2.0, 1.0, 1.0, 1.0, 1.5, 1.5, 2.0, 2.5, 2.5, 3.0, 3.0) +
                     c(1.50, 1.25, 1.50, 2.00, 3.00, 3.00, 2.00, 1.75, 2.00, 3.00, 3.00, 2.00))
   expect_equal(out[[1]]$id, rep(1, 12))
 
@@ -35,8 +35,8 @@ test_that("elementary polygons get merged", {
                 1, 2, 1,
                 1, 1, 1), ncol = 3, nrow = 3, byrow = TRUE)
   out <- isobands(x = 1:3, y = 3:1, z, levels_low = 0.5, levels_high = 1.5)
-  expect_setequal(10*out[[1]]$x + out[[1]]$y,
-                  10*c(3.0, 2.0, 1.0, 1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 2.5, 2.0, 1.5) +
+  expect_setequal(10000*out[[1]]$x + out[[1]]$y,
+                  10000*c(3.0, 2.0, 1.0, 1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 2.5, 2.0, 1.5) +
                     c(1.0, 1.0, 1.0, 2.0, 3.0, 3.0, 3.0, 2.0, 1.5, 2.0, 2.5, 2.0))
   expect_setequal(out[[1]]$id, c(1:2))
   expect_equal(length(out[[1]]$id), 12)
@@ -47,8 +47,8 @@ test_that("NAs are handled correctly", {
                  1, 1, 1,
                  1, 1, 1), ncol = 3, nrow = 3, byrow = TRUE)
   out <- isobands(x = 1:3, y = 3:1, z, levels_low = 0.5, levels_high = 1.5)
-  expect_setequal(10*out[[1]]$x + out[[1]]$y,
-                  10*c(3, 2, 1, 1, 2, 2, 3, 3) +
+  expect_setequal(10000*out[[1]]$x + out[[1]]$y,
+                  10000*c(3, 2, 1, 1, 2, 2, 3, 3) +
                     c(1, 1, 1, 2, 2, 3, 3, 2))
   expect_equal(out[[1]]$id, rep(1, 8))
 
@@ -56,8 +56,8 @@ test_that("NAs are handled correctly", {
                  1, 1, 1,
                  1, 1, NA), ncol = 3, nrow = 3, byrow = TRUE)
   out <- isobands(x = 1:3, y = 3:1, z, levels_low = 0.5, levels_high = 1.5)
-  expect_setequal(10*out[[1]]$x + out[[1]]$y,
-                  10*c(1, 1, 2, 2, 2, 2, 3, 3) +
+  expect_setequal(10000*out[[1]]$x + out[[1]]$y,
+                  10000*c(1, 1, 2, 2, 2, 2, 3, 3) +
                     c(1, 2, 2, 1, 2, 3, 3, 2))
   expect_setequal(out[[1]]$id, c(1:2))
   expect_equal(length(out[[1]]$id), 8)
@@ -81,8 +81,8 @@ test_that("All elementary shapes are calculated correctly", {
   out <- isobands(x = 1:18, y = 11:1, z, levels_low = 0.5, levels_high = 1.5)
 
   expect_setequal(
-    1000*out[[1]]$x + out[[1]]$y,
-    1000*c(16.00, 15.50, 15.50, 16.00, 16.25, 16.00, 15.00, 14.50, 14.75, 14.75, 14.25, 14.25,
+    10000*out[[1]]$x + out[[1]]$y,
+    10000*c(16.00, 15.50, 15.50, 16.00, 16.25, 16.00, 15.00, 14.50, 14.75, 14.75, 14.25, 14.25,
            14.00, 13.75, 13.75, 13.25, 13.25, 13.50, 13.00, 12.75, 12.00, 11.50, 11.50, 11.00,
            10.00,  9.00,  8.50,  8.50,  8.00,  7.50,  7.50,  7.00,  6.50,  6.50,  6.00,  5.75,
             5.75,  5.25,  5.25,  5.00,  4.50,  4.50,  4.00,  3.50,  3.50,  3.25,  3.00,  2.50,

@@ -6,6 +6,8 @@
 #' @param m input matrix
 #' @param vlo lower cutoff for isobanding
 #' @param vhi higher cutoff for isobanding
+#' @param col_lo line color for lower cutoff
+#' @param col_hi line color for higher cutoff
 #' @param fill_lo fill color for points below the lower cutoff
 #' @param fill_mid fill color for points between the two cutoffs
 #' @param fill_hi fill color for points above the higher cutoff
@@ -14,7 +16,7 @@
 #'   be called or not
 #' @export
 plot_iso <- function(m, vlo, vhi, fill_lo = "gray90", fill_mid = "gray40", fill_hi = "black",
-                     fill_band = "cornsilk", newpage = TRUE) {
+                     fill_band = "cornsilk", col_lo = "black", col_hi = "black", newpage = TRUE) {
   x <- 0.05 + 0.9*(0:(ncol(m)-1))/(ncol(m)-1)
   y <- 0.05 + 0.9*((nrow(m)-1):0)/(nrow(m)-1)
   df_bands <- isobands(x, y, m, vlo, vhi)[[1]]
@@ -27,9 +29,11 @@ plot_iso <- function(m, vlo, vhi, fill_lo = "gray90", fill_mid = "gray40", fill_
   if (length(df_bands$x) > 0)
     grid.path(df_bands$x, df_bands$y, df_bands$id, gp = gpar(fill = fill_band, col = NA))
   if (length(df_lines_lo$x) > 0)
-    grid.polyline(df_lines_lo$x, df_lines_lo$y, df_lines_lo$id)
+    grid.polyline(df_lines_lo$x, df_lines_lo$y, df_lines_lo$id,
+                  gp = gpar(col = col_lo))
   if (length(df_lines_hi$x) > 0)
-    grid.polyline(df_lines_hi$x, df_lines_hi$y, df_lines_hi$id)
+    grid.polyline(df_lines_hi$x, df_lines_hi$y, df_lines_hi$id,
+                  gp = gpar(col = col_hi))
   grid.points(df_points$x, df_points$y, default.units = "npc", pch = 21, size = unit(0.5, "char"),
               gp = gpar(fill = pfill, col = pcol))
 }
