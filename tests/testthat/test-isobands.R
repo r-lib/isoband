@@ -253,8 +253,29 @@ test_that("Eight-sided saddles", {
   expect_equal(length(out[[1]]$id), 14)
 
   # midpoint inside the band
-  #out <- isobands(x = 1:4, y = 3:1, z, levels_low = 0.5, levels_high = 1.5)
+  out <- isobands(x = 1:3, y = 2:1, z, levels_low = 0.5, levels_high = 1.5)
+  expect_setequal(
+    10000*out[[1]]$x + out[[1]]$y,
+    10000*c(2.75, 2.25, 2.00, 1.75, 1.25,
+            1.00, 1.00, 1.25, 1.75, 2.00,
+            2.25, 2.75, 3.00, 3.00) +
+          c(1.00, 1.00, 1.25, 1.00, 1.00,
+            1.25, 1.75, 2.00, 2.00, 1.75,
+            2.00, 2.00, 1.75, 1.25)
+  )
+  expect_equal(out[[1]]$id, rep(1, 14))
 
   # midpoint below the band
-  #out <- isobands(x = 1:4, y = 3:1, z, levels_low = 1.2, levels_high = 1.5)
-  })
+  out <- isobands(x = 1:3, y = 2:1, z, levels_low = 1.2, levels_high = 1.5)
+  expect_setequal(
+    10000*out[[1]]$x + out[[1]]$y,
+    10000*c(3.00, 3.00, 2.75, 2.60, 2.40,
+            2.00, 1.60, 1.75, 2.00, 2.25,
+            1.40, 1.25, 1.00, 1.00) +
+          c(1.40, 1.25, 1.00, 1.00, 2.00,
+            1.60, 2.00, 2.00, 1.75, 2.00,
+            1.00, 1.00, 1.25, 1.40)
+  )
+  expect_setequal(out[[1]]$id, c(1:3))
+  expect_equal(length(out[[1]]$id), 14)
+})
