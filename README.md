@@ -50,6 +50,7 @@ isolines(1:ncol(m), 1:nrow(m), m, 0.5)
 #> 
 #> $`0.5`$id
 #>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
 isobands(1:ncol(m), 1:nrow(m), m, 0.5, 1.5)
 #> $`0.5-1.5`
 #> $`0.5-1.5`$x
@@ -112,8 +113,8 @@ plot_iso(m, 0.5, 1.5)
 
 <img src="man/figures/README-basic-plotting-3.png" width="50%" />
 
-The algorithm has no problem with larger datasets. Next we calculate a
-few isolines/isobands for the volcano dataset.
+The algorithm has no problem with larger datasets. Let’s calculate a few
+isolines/isobands for the volcano dataset.
 
 ``` r
 m <- volcano
@@ -133,7 +134,7 @@ for (i in seq_along(l)) {
 <img src="man/figures/README-volcano-1.png" width="75%" />
 
 Isolining is about as fast as `grDevices::contourLines()`, isobanding is
-about 2.5 times slower.
+approximately 2.5 times slower.
 
 ``` r
 microbenchmark::microbenchmark(
@@ -147,7 +148,7 @@ microbenchmark::microbenchmark(
 #>                               isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (10:18))
 #>             isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (9:17),      10 * (10:18))
 #>       min       lq     mean   median       uq       max neval
-#>  1.572760 1.778821 2.577200 1.985523 2.781643 10.221204   100
-#>  1.685023 1.800588 2.090089 2.027148 2.230192  3.036254   100
-#>  4.244879 4.502801 4.912952 4.724115 5.066078  7.358238   100
+#>  1.629629 1.902334 2.916969 2.435455 3.156160 17.337077   100
+#>  1.706788 1.859153 2.240307 2.185938 2.508821  3.658807   100
+#>  4.356943 4.723402 5.443805 5.089021 6.081608  8.325564   100
 ```

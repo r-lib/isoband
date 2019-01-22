@@ -76,8 +76,8 @@ test_that("All elementary shapes are calculated correctly", {
                 1, 0, 1, 1, 1, 2, 2, 0, 2, 1, 2, 2, 0, 0, 0, 1, 0, 2,
                 0, 1, 0, 2, 1, 0, 1, 1, 1, 2, 2, 0, 2, 1, 2, 2, 0, 0,
                 0, 0, 0, 1, 0, 2, 1, 0, 1, 1, 1, 2, 2, 0, 2, 1, 2, 2,
-                0, 0, 0, 1, 0, 2, 1, 0, 1, 1, 1, 2, 2, 0, 2, 1, 2, 2
-  ), ncol = 18, nrow = 11, byrow = TRUE)
+                0, 0, 0, 1, 0, 2, 1, 0, 1, 1, 1, 2, 2, 0, 2, 1, 2, 2),
+              ncol = 18, nrow = 11, byrow = TRUE)
   out <- isobands(x = 1:18, y = 11:1, z, levels_low = 0.5, levels_high = 1.5)
 
   expect_setequal(
@@ -140,3 +140,121 @@ test_that("All elementary shapes are calculated correctly", {
   expect_setequal(out[[1]]$id, c(1:26))
   expect_equal(length(out[[1]]$id), 324)
 })
+
+
+test_that("Six-sided saddles", {
+  # a matrix that contains all six-sided saddles
+  z <- matrix(c(0, 1, 1, 2,
+                1, 0, 2, 1,
+                0, 1, 1, 2),
+              ncol = 4, nrow = 3, byrow = TRUE)
+  # midpoint outside the band
+  out <- isobands(x = 1:4, y = 3:1, z, levels_low = 0.6, levels_high = 1.4)
+  expect_setequal(
+    10000*out[[1]]$x + out[[1]]$y,
+    10000*c(3.0, 2.0, 1.6, 2.0, 2.3, 2.0,
+            1.6, 2.0, 3.0, 3.4, 3.0, 2.7,
+            3.0, 3.4, 1.0, 1.0, 1.0, 1.4,
+            4.0, 4.0, 4.0, 3.6) +
+          c(1.0, 1.0, 1.0, 1.4, 2.0, 2.6,
+            3.0, 3.0, 3.0, 3.0, 2.6, 2.0,
+            1.4, 1.0, 1.6, 2.0, 2.4, 2.0,
+            2.4, 2.0, 1.6, 2.0)
+  )
+  expect_setequal(out[[1]]$id, c(1:3))
+  expect_equal(length(out[[1]]$id), 22)
+
+  # midpoint inside the band
+  out <- isobands(x = 1:4, y = 3:1, z, levels_low = 0.4, levels_high = 1.6)
+  expect_setequal(
+    10000*out[[1]]$x + out[[1]]$y,
+    10000*c(3.0, 2.0, 1.4, 1.0, 1.0, 1.0,
+            1.4, 2.0, 3.0, 3.6, 4.0, 4.0,
+            4.0, 3.6, 3.0, 3.4, 3.0, 2.8,
+            2.0, 2.2, 2.0, 1.6) +
+          c(1.0, 1.0, 1.0, 1.4, 2.0, 2.6,
+            3.0, 3.0, 3.0, 3.0, 2.6, 2.0,
+            1.4, 1.0, 1.6, 2.0, 2.4, 2.0,
+            1.6, 2.0, 2.4, 2.0)
+  )
+  expect_setequal(out[[1]]$id, c(1:3))
+  expect_equal(length(out[[1]]$id), 22)
+})
+
+
+test_that("Seven-sided saddles", {
+  # a matrix that contains all seven-sided saddles
+  z <- matrix(c(0, 1, 0, 1, 2, 1,
+                2, 0, 2, 2, 0, 2,
+                0, 1, 0, 1, 2, 1),
+              ncol = 6, nrow = 3, byrow = TRUE)
+  # midpoint inside the band
+  out <- isobands(x = 1:6, y = 3:1, z, levels_low = 0.5, levels_high = 1.5)
+  expect_setequal(
+    10000*out[[1]]$x + out[[1]]$y,
+    10000*c(6.00, 6.00, 5.50, 5.00, 4.50, 4.00,
+            3.50, 3.00, 2.50, 2.00, 1.50, 1.00,
+            1.00, 1.25, 1.00, 1.00, 1.50, 2.00,
+            2.50, 3.00, 3.50, 4.00, 4.50, 5.00,
+            5.50, 6.00, 6.00, 5.75, 4.00, 4.25,
+            4.00, 3.00, 2.75, 3.00, 2.00, 2.25,
+            2.00, 1.75, 5.00, 5.25, 5.00, 4.75) +
+          c(1.50, 1.00, 1.00, 1.25, 1.00, 1.00,
+            1.00, 1.25, 1.00, 1.00, 1.00, 1.25,
+            1.75, 2.00, 2.25, 2.75, 3.00, 3.00,
+            3.00, 2.75, 3.00, 3.00, 3.00, 2.75,
+            3.00, 3.00, 2.50, 2.00, 1.50, 2.00,
+            2.50, 2.25, 2.00, 1.75, 1.50, 2.00,
+            2.50, 2.00, 1.75, 2.00, 2.25, 2.00)
+  )
+  expect_setequal(out[[1]]$id, c(1:4))
+  expect_equal(length(out[[1]]$id), 42)
+
+  # midpoint outside the band
+  out <- isobands(x = 1:6, y = 3:1, z, levels_low = 0.8, levels_high = 1.2)
+  expect_setequal(
+    10000*out[[1]]$x + out[[1]]$y,
+    10000*c(6.0, 6.0, 5.8, 5.0, 4.4, 5.0,
+            5.6, 4.2, 4.0, 3.8, 3.0, 2.4,
+            3.0, 3.8, 4.0, 4.2, 4.0, 3.0,
+            2.6, 3.0, 4.0, 2.2, 2.0, 1.8,
+            2.0, 1.0, 1.4, 1.0, 1.0, 1.6,
+            1.0, 5.0, 5.4, 5.0, 4.6, 6.0,
+            5.8, 6.0, 2.2, 2.0, 1.8, 2.0) +
+          c(1.2, 1.0, 1.0, 1.4, 2.0, 2.6,
+            2.0, 1.0, 1.0, 1.0, 1.4, 2.0,
+            2.6, 3.0, 3.0, 3.0, 2.8, 2.4,
+            2.0, 1.6, 1.2, 1.0, 1.0, 1.0,
+            1.2, 1.6, 2.0, 2.4, 2.6, 2.0,
+            1.4, 1.6, 2.0, 2.4, 2.0, 2.8,
+            3.0, 3.0, 3.0, 2.8, 3.0, 3.0)
+  )
+  expect_setequal(out[[1]]$id, c(1:8))
+  expect_equal(length(out[[1]]$id), 42)
+})
+
+test_that("Eight-sided saddles", {
+  # a matrix that contains all eight-sided saddles
+  z <- matrix(c(0, 2, 0,
+                2, 0, 2),
+              ncol = 3, nrow = 2, byrow = TRUE)
+  # midpoint above the band
+  out <- isobands(x = 1:3, y = 2:1, z, levels_low = 0.5, levels_high = 0.8)
+  expect_setequal(
+    10000*out[[1]]$x + out[[1]]$y,
+    10000*c(3.00, 3.00, 2.60, 2.75, 2.00,
+            2.40, 2.25, 2.00, 1.75, 1.60,
+            1.00, 1.00, 1.25, 1.40) +
+          c(1.75, 1.60, 2.00, 2.00, 1.40,
+            1.00, 1.00, 1.25, 1.00, 1.00,
+            1.60, 1.75, 2.00, 2.00)
+  )
+  expect_setequal(out[[1]]$id, c(1:3))
+  expect_equal(length(out[[1]]$id), 14)
+
+  # midpoint inside the band
+  #out <- isobands(x = 1:4, y = 3:1, z, levels_low = 0.5, levels_high = 1.5)
+
+  # midpoint below the band
+  #out <- isobands(x = 1:4, y = 3:1, z, levels_low = 1.2, levels_high = 1.5)
+  })

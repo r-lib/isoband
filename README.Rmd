@@ -42,6 +42,7 @@ m <- matrix(c(0, 0, 0, 0, 0,
               0, 0, 0, 0, 0), 5, 5, byrow = TRUE)
 
 isolines(1:ncol(m), 1:nrow(m), m, 0.5)
+
 isobands(1:ncol(m), 1:nrow(m), m, 0.5, 1.5)
 ```
 
@@ -75,7 +76,7 @@ m <- matrix(c(0, 0, 1, 1,
 plot_iso(m, 0.5, 1.5)
 ```
 
-The algorithm has no problem with larger datasets. Next we calculate a few isolines/isobands for the volcano dataset.
+The algorithm has no problem with larger datasets. Let's calculate a few isolines/isobands for the volcano dataset.
 ```{r volcano, fig.asp = 1, out.width = "75%"}
 m <- volcano
 b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(80, 120, 150), c(110, 140, 152))
@@ -91,7 +92,7 @@ for (i in seq_along(l)) {
 }
 ```
 
-Isolining is about as fast as `grDevices::contourLines()`, isobanding is about 2.5 times slower.
+Isolining is about as fast as `grDevices::contourLines()`, isobanding is approximately 2.5 times slower.
 
 ```{r benchmark}
 microbenchmark::microbenchmark(
