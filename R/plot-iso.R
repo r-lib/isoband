@@ -15,7 +15,7 @@
 #' @param newpage boolean, indicating whether `grid.newpage()` should
 #'   be called or not
 #' @export
-plot_iso <- function(m, vlo, vhi, fill_lo = "gray90", fill_mid = "gray40", fill_hi = "black",
+plot_iso <- function(m, vlo, vhi, fill_lo = "gray95", fill_mid = "gray50", fill_hi = "black",
                      fill_band = "cornsilk", col_lo = "black", col_hi = "black", newpage = TRUE) {
   x <- 0.05 + 0.9*(0:(ncol(m)-1))/(ncol(m)-1)
   y <- 0.05 + 0.9*((nrow(m)-1):0)/(nrow(m)-1)

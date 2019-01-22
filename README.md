@@ -21,22 +21,62 @@ devtools::install_github("clauswilke/isoband")
 
 ## Example
 
-Simple isobanding examples:
+We begin with a few simple examples. The two main workhorses of the
+package are the functions `isolines()` and `isobands()`, respectively.
+They return a list of isolines/isobands for each isolevel specified.
+Each isoline/isoband consists of vectors of x and y coordinates, as well
+as a vector of ids specifying which sets of coordinates should be
+connected. This format can be handed directly to
+`grid.polyline()`/`grid.path()` for drawing (see below).
 
 ``` r
 library(isoband)
-library(grid)
 
-plot_iso <- function(m, vlo, vhi) {
-  df1 <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vlo, vhi)[[1]]
-  df2 <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, vlo)[[1]]
-  g <- expand.grid(x = (1:ncol(m))/(ncol(m)+1), y = (nrow(m):1)/(nrow(m)+1))
-  grid.newpage()
-  grid.points(g$x, g$y, default.units = "npc", pch = 19, size = unit(0.5, "char"))
-  grid.path(df1$x, df1$y, df1$id, gp = gpar(fill = "#acd8e6a0", col = NA))
-  grid.polyline(df2$x, df2$y, df2$id)
-}
+m <- matrix(c(0, 0, 0, 0, 0,
+              0, 1, 2, 1, 0,
+              0, 1, 2, 0, 0,
+              0, 1, 0, 1, 0,
+              0, 0, 0, 0, 0), 5, 5, byrow = TRUE)
 
+isolines(1:ncol(m), 1:nrow(m), m, 0.5)
+#> $`0.5`
+#> $`0.5`$x
+#>  [1] 4.00 3.50 3.00 2.50 2.00 1.50 1.50 1.50 2.00 3.00 4.00 4.50 4.00 3.75
+#> [15] 4.00 4.50 4.00
+#> 
+#> $`0.5`$y
+#>  [1] 4.50 4.00 3.75 4.00 4.50 4.00 3.00 2.00 1.50 1.25 1.50 2.00 2.50 3.00
+#> [15] 3.50 4.00 4.50
+#> 
+#> $`0.5`$id
+#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+isobands(1:ncol(m), 1:nrow(m), m, 0.5, 1.5)
+#> $`0.5-1.5`
+#> $`0.5-1.5`$x
+#>  [1] 2.50 2.00 1.50 1.50 1.50 2.00 3.00 4.00 4.50 4.00 3.75 4.00 4.50 4.00
+#> [15] 3.50 3.00 3.00 3.25 3.50 3.00 2.50 2.50
+#> 
+#> $`0.5-1.5`$y
+#>  [1] 4.00 4.50 4.00 3.00 2.00 1.50 1.25 1.50 2.00 2.50 3.00 3.50 4.00 4.50
+#> [15] 4.00 3.75 3.25 3.00 2.00 1.75 2.00 3.00
+#> 
+#> $`0.5-1.5`$id
+#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2
+```
+
+The function `plot_iso()` is a convenience function for debugging and
+testing.
+
+``` r
+plot_iso(m, 0.5, 1.5)
+```
+
+<img src="man/figures/README-basic-example-plot-1.png" width="50%" />
+
+A few more simple examples. Missing values and disconnected areas are
+all handled correctly.
+
+``` r
 m <- matrix(c(0, 0, 0, 0, 0, 0,
               0, 0, 0, 1, 1, 0,
               0, 0, 1, 1, 1, 0,
@@ -46,36 +86,41 @@ m <- matrix(c(0, 0, 0, 0, 0, 0,
 plot_iso(m, 0.5, 1.5)
 ```
 
-<img src="man/figures/README-basic-examples-1.png" width="75%" />
+<img src="man/figures/README-basic-plotting-1.png" width="50%" />
 
 ``` r
 
 m <- matrix(c(NA, NA, NA, 0, 0, 0,
               NA, NA, NA, 1, 1, 0,
-              0, 0, 1, 1, 1, 0,
-              0, 1, 1, 0, 0, 0,
-              0, 0, 0, 1, 0, 0,
-              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+               0,  0,  1, 1, 1, 0,
+               0,  1,  1, 0, 0, 0,
+               0,  0,  0, 1, 0, 0,
+               0,  0,  0, 0, 0, 0), 6, 6, byrow = TRUE)
 plot_iso(m, 0.5, 1.5)
 ```
 
-<img src="man/figures/README-basic-examples-2.png" width="75%" />
+<img src="man/figures/README-basic-plotting-2.png" width="50%" />
 
 ``` r
 
-m <- matrix(c(0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0.8, 0), 4, 4, byrow = TRUE)
+m <- matrix(c(0, 0, 1, 1,
+              0, 1, 1, 1,
+              1, 1, 0, 0,
+              0, 0, 0.8, 0), 4, 4, byrow = TRUE)
 plot_iso(m, 0.5, 1.5)
 ```
 
-<img src="man/figures/README-basic-examples-3.png" width="75%" />
+<img src="man/figures/README-basic-plotting-3.png" width="50%" />
 
-Isobanding the volcano dataset:
+The algorithm has no problem with larger datasets. Next we calculate a
+few isolines/isobands for the volcano dataset.
 
 ``` r
 m <- volcano
 b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(80, 120, 150), c(110, 140, 152))
 l <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(110, 120, 140, 150, 152))
 
+library(grid)
 grid.newpage()
 grid.path(b[[1]]$x, b[[1]]$y, b[[1]]$id, gp = gpar(fill = "cornsilk", col = NA))
 grid.path(b[[2]]$x, b[[2]]$y, b[[2]]$id, gp = gpar(fill = "lightblue", col = NA))
@@ -102,7 +147,7 @@ microbenchmark::microbenchmark(
 #>                               isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (10:18))
 #>             isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (9:17),      10 * (10:18))
 #>       min       lq     mean   median       uq       max neval
-#>  1.653287 1.821338 2.350678 2.022496 2.538219  8.525243   100
-#>  1.718481 1.818973 2.197304 2.008301 2.180246  8.205451   100
-#>  4.498705 4.802478 5.238148 5.019103 5.411689 12.646945   100
+#>  1.626867 1.749204 2.409475 1.954476 2.522536 10.089407   100
+#>  1.694592 1.798536 2.068423 2.043860 2.203273  3.030934   100
+#>  4.237472 4.489288 5.126154 4.804774 5.285899 15.584814   100
 ```
