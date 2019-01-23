@@ -13,12 +13,7 @@ using namespace Rcpp;
 
 using namespace std;
 
-// point in output x-y space
-struct point {
-  double x, y; // x and y coordinates
-
-  point(double x_in, double y_in) : x(x_in), y(y_in) {}
-};
+#include "polygon.h" // for point
 
 // point in abstract grid space
 enum point_type {

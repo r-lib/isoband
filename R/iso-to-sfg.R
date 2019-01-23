@@ -43,3 +43,4 @@ multilinestring <- function(object) {
     class = c("XY", "MULTILINESTRING", "sfg")
   )
 }
+
