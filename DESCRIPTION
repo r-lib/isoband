@@ -12,7 +12,8 @@ License: GPL-2 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 LinkingTo: 
-    Rcpp
+    Rcpp,
+    testthat
 Imports: 
     Rcpp,
     rlang,

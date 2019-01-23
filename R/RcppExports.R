@@ -2,14 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 isobands_impl <- function(x, y, z, value_low, value_high) {
-    .Call('_isoband_isobands_impl', PACKAGE = 'isoband', x, y, z, value_low, value_high)
+    .Call(`_isoband_isobands_impl`, x, y, z, value_low, value_high)
 }
 
 isolines_impl <- function(x, y, z, value) {
-    .Call('_isoband_isolines_impl', PACKAGE = 'isoband', x, y, z, value)
+    .Call(`_isoband_isolines_impl`, x, y, z, value)
 }
 
 separate_polygons <- function() {
-    invisible(.Call('_isoband_separate_polygons', PACKAGE = 'isoband'))
+    invisible(.Call(`_isoband_separate_polygons`))
 }
 

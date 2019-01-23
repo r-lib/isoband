@@ -2,7 +2,7 @@
 #'
 #' @name isoband
 #' @docType package
-#' @useDynLib isoband
+#' @useDynLib isoband, .registration = TRUE
 #' @import ggplot2
 #' @import rlang
 #' @import grid

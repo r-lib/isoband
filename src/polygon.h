@@ -16,4 +16,10 @@ struct point {
 
 typedef vector<point> polygon;
 
+enum in_polygon_type {
+  inside,       // point is inside a polygon
+  outside,      // point is outside a polygon
+  undetermined // point lies right on the boundary
+};
+
 #endif // POLYGON_H
