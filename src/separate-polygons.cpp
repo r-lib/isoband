@@ -16,6 +16,21 @@ ostream & operator<<(ostream &out, const point &p) {
   return out;
 }
 
+ostream & operator<<(ostream &out, const in_polygon_type &t) {
+  switch(t) {
+  case inside:
+    out << "inside";
+    break;
+  case outside:
+    out << "outside";
+    break;
+  default:
+    out << "undetermined";
+  }
+  return out;
+}
+
+
 
 /* Calculate the number of times a ray extending from point P to the right
  * intersects with the line segment defined by p0, p1. This number is
@@ -24,7 +39,7 @@ ostream & operator<<(ostream &out, const point &p) {
  */
 int ray_intersections(point P, point p0, point p1) {
   checkUserInterrupt();
-  cout << P << " " << p0 << " " << p1 << endl;
+  //cout << P << " " << p0 << " " << p1 << endl;
 
   // simple cases
   if (p0.y < p1.y) {
@@ -47,7 +62,7 @@ int ray_intersections(point P, point p0, point p1) {
 
   double t = (P.y - p0.y)/dy;
   double xint = p0.x + t*(p1.x - p0.x);
-  cout << "t = " << t << "; xint = " << xint << endl;
+  //cout << "t = " << t << "; xint = " << xint << endl;
   if (xint < P.x) {
     return 0;
   }
@@ -89,7 +104,7 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
   int i = istart;
   do {
     int itr = ray_intersections(P, poly[i], poly[i+1]);
-
+    //cout << i << " " << itr << endl;
     if (itr < 0) {
       // undetermined case, so we're done
       return undetermined;
@@ -107,28 +122,33 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
         if (j == istart) {
           wrap_around = true;
         }
+        if (ray_intersections(P, poly[j], poly[j+1]) < 0) {
+          // if the point lies exactly on any of these segments the case is undetermined
+          return undetermined;
+        }
         j++;
       } while (poly[j].y == poly[i+1].y);
 
-      if ((from_above && poly[j].y < poly[i+1].y) ||
-          (!from_above && poly[j].y > poly[i+1].y)) {
-        // correct intersection
-        intersections += itr;
+      //cout << from_above << " " << i+1 << " " << j << " " << poly[i+1] << " " << poly[j] << endl;
+      if ((!from_above && poly[j].y < poly[i+1].y) ||
+          (from_above && poly[j].y > poly[i+1].y)) {
+        // incorrect intersection
+        //cout << "incorrect intersection" << endl;
+        itr = 0;
       }
       i = j; // fast forward
-      if (wrap_around) {
+      if (wrap_around || i == istart) {
+        //cout << "have wrapped around during fast forward" << endl;
+        //cout << "increment intersections (wa) at " << i << " " << itr << " " << intersections << endl;
+        intersections += itr;
         break;
       }
-      else {
-        continue;
-      }
     }
+    //cout << "increment intersections (el) at " << i << " " << itr << " " << intersections << endl;
     intersections += itr;
     i++;
     if (i == n-1) i = 0;
   } while(i != istart);
-
-  cout << "intersections: " << intersections << endl;
 
   if (intersections % 2 == 1) return inside;
   return outside;
@@ -136,6 +156,7 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
 
 // [[Rcpp::export]]
 void separate_polygons() {
+  /*
   polygon poly = {
     point(2, .5),
     point(2.5, .5),
@@ -149,6 +170,7 @@ void separate_polygons() {
   };
 
   point P(0, 0.5); // is this right or wrong? point is on the boundary I think it's right
+ */
 
   /* This case crashes!
   polygon poly = {
@@ -161,7 +183,16 @@ void separate_polygons() {
   point P(0, 0.5);
   */
 
-  in_polygon_type result = point_in_polygon(P, poly);
+  polygon poly = {
+    point(0, 0),
+    point(0, 1),
+    point(1, 1),
+    point(1, 0),
+    point(0, 0)
+  };
+
+
+  in_polygon_type result = point_in_polygon(point(0, 0), poly);
   cout << "result: " << result << endl;
 }
 
@@ -194,8 +225,33 @@ context("Point in polygon") {
       point(0, 0)
     };
 
-    point P(0.5, 0.5);
-    expect_true(point_in_polygon(P, poly) == inside);
+    expect_true(point_in_polygon(point(0.5, 0.5), poly) == inside);
+    expect_true(point_in_polygon(point(-0.5, 0.5), poly) == outside);
+    expect_true(point_in_polygon(point(1.5, 0.5), poly) == outside);
+    expect_true(point_in_polygon(point(0.5, -0.5), poly) == outside);
+    expect_true(point_in_polygon(point(0.5, 1.5), poly) == outside);
+    expect_true(point_in_polygon(point(-1, 1), poly) == outside);
+    expect_true(point_in_polygon(point(2, 1), poly) == outside);
+    expect_true(point_in_polygon(point(-1, 0), poly) == outside);
+    expect_true(point_in_polygon(point(2, 0), poly) == outside);
+    expect_true(point_in_polygon(point(0, 0), poly) == undetermined);
+    expect_true(point_in_polygon(point(1, 0), poly) == undetermined);
+    expect_true(point_in_polygon(point(0, 1), poly) == undetermined);
+    expect_true(point_in_polygon(point(1, 1), poly) == undetermined);
+  }
+
+  test_that("Degenerate polygons") {
+    polygon poly = {
+      point(0, 0),
+      point(1, 0),
+      point(2, 0),
+      point(0, 0)
+    };
+
+    expect_true(point_in_polygon(point(-.5, 0), poly) == outside);
+    expect_true(point_in_polygon(point(2.5, 0), poly) == outside);
+    expect_true(point_in_polygon(point(0.5, 0), poly) == undetermined);
+    expect_true(point_in_polygon(point(1.5, 0), poly) == undetermined);
   }
 }
 
