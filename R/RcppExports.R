@@ -9,3 +9,7 @@ isolines_impl <- function(x, y, z, value) {
     .Call('_isoband_isolines_impl', PACKAGE = 'isoband', x, y, z, value)
 }
 
+separate_polygons <- function() {
+    invisible(.Call('_isoband_separate_polygons', PACKAGE = 'isoband'))
+}
+

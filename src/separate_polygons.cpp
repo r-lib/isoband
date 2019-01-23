@@ -9,6 +9,14 @@ using namespace std;
 
 #include "polygon.h"
 
+// eventually, move this to a polygon.cpp
+
+ostream & operator<<(ostream &out, const point &p) {
+  out << "(" << p.x << ", " << p.y << ")";
+  return out;
+}
+
+
 /* Calculate the number of times a ray extending from point P to the right
  * intersects with the line segment defined by p0, p1. This number is
  * always either 0 or 1.

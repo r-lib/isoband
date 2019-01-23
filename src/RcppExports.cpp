@@ -34,10 +34,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// separate_polygons
+void separate_polygons();
+RcppExport SEXP _isoband_separate_polygons() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    separate_polygons();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_isoband_isobands_impl", (DL_FUNC) &_isoband_isobands_impl, 5},
     {"_isoband_isolines_impl", (DL_FUNC) &_isoband_isolines_impl, 4},
+    {"_isoband_separate_polygons", (DL_FUNC) &_isoband_separate_polygons, 0},
     {NULL, NULL, 0}
 };
 

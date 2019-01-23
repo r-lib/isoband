@@ -13,11 +13,6 @@ struct point {
   point(double x_in, double y_in) : x(x_in), y(y_in) {}
 };
 
-ostream & operator<<(ostream &out, const point &p) {
-  out << "(" << p.x << ", " << p.y << ")";
-  return out;
-}
-
 
 typedef vector<point> polygon;
 
