@@ -8,6 +8,7 @@ using namespace Rcpp;
 using namespace std;
 
 #include "polygon.h"
+#include "separate-polygons.h"
 
 // eventually, move this to a polygon.cpp
 
@@ -143,6 +144,7 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
         intersections += itr;
         break;
       }
+      i--; // decrement by one because it'll be incremented again below
     }
     //cout << "increment intersections (el) at " << i << " " << itr << " " << intersections << endl;
     intersections += itr;
@@ -156,102 +158,24 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
 
 // [[Rcpp::export]]
 void separate_polygons() {
-  /*
-  polygon poly = {
-    point(2, .5),
-    point(2.5, .5),
-    point(2, 0),
-    point(0, 0),
-    point(0, 1),
-    point(1, 1),
-    point(1, .5),
-    point(1.4, .5),
-    point(2, .5)
-  };
-
-  point P(0, 0.5); // is this right or wrong? point is on the boundary I think it's right
- */
-
-  /* This case crashes!
   polygon poly = {
     point(.5, 2),
     point(.5, 1),
     point(.5, .5),
     point(.5, 2)
   };
-
-  point P(0, 0.5);
-  */
-
-  polygon poly = {
-    point(0, 0),
-    point(0, 1),
-    point(1, 1),
-    point(1, 0),
-    point(0, 0)
-  };
+  in_polygon_type result;
 
 
-  in_polygon_type result = point_in_polygon(point(0, 0), poly);
+  //cout << "result: " << point_in_polygon(point(0, .9), poly) << endl;
+  // this result is wrong, needs fixing; output should be "outside"
+  //cout << "result: " << point_in_polygon(point(0, .5), poly) << endl;
+  // this result is wrong, needs fixing; output should be "outside"
+  result = point_in_polygon(point(0.6, 0.8), poly);
   cout << "result: " << result << endl;
 }
-
-
-/* Things to regression-test for point_in_polygon():
- *  Degenerate polygon, horizontal line
- *  Degenerate polygon, vertical line
- *  Degenerate polygon, single point
- *  Point inside
- *  Point outside
- *  Point aligned with point of one segment, inside
- *  Point aligned with point of one segment, outside
- *
- *  When points lie right on a polygon boundary, result should be `undetermined`.
- */
 
 // testing code
 /*** R
 separate_polygons()
 */
-
-
-context("Point in polygon") {
-  test_that("Simple square") {
-    polygon poly = {
-      point(0, 0),
-      point(0, 1),
-      point(1, 1),
-      point(1, 0),
-      point(0, 0)
-    };
-
-    expect_true(point_in_polygon(point(0.5, 0.5), poly) == inside);
-    expect_true(point_in_polygon(point(-0.5, 0.5), poly) == outside);
-    expect_true(point_in_polygon(point(1.5, 0.5), poly) == outside);
-    expect_true(point_in_polygon(point(0.5, -0.5), poly) == outside);
-    expect_true(point_in_polygon(point(0.5, 1.5), poly) == outside);
-    expect_true(point_in_polygon(point(-1, 1), poly) == outside);
-    expect_true(point_in_polygon(point(2, 1), poly) == outside);
-    expect_true(point_in_polygon(point(-1, 0), poly) == outside);
-    expect_true(point_in_polygon(point(2, 0), poly) == outside);
-    expect_true(point_in_polygon(point(0, 0), poly) == undetermined);
-    expect_true(point_in_polygon(point(1, 0), poly) == undetermined);
-    expect_true(point_in_polygon(point(0, 1), poly) == undetermined);
-    expect_true(point_in_polygon(point(1, 1), poly) == undetermined);
-  }
-
-  test_that("Degenerate polygons") {
-    polygon poly = {
-      point(0, 0),
-      point(1, 0),
-      point(2, 0),
-      point(0, 0)
-    };
-
-    expect_true(point_in_polygon(point(-.5, 0), poly) == outside);
-    expect_true(point_in_polygon(point(2.5, 0), poly) == outside);
-    expect_true(point_in_polygon(point(0.5, 0), poly) == undetermined);
-    expect_true(point_in_polygon(point(1.5, 0), poly) == undetermined);
-  }
-}
-
