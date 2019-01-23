@@ -4,7 +4,6 @@
 #include "separate-polygons.h"
 
 /* Things to regression-test for point_in_polygon():
- *  Degenerate polygon, vertical line
  *  Degenerate polygon, single point
  *  Point aligned with point of one segment, inside
  *  Point aligned with point of one segment, outside
@@ -34,6 +33,36 @@ context("Point in polygon") {
     expect_true(point_in_polygon(point(1, 0), poly) == undetermined);
     expect_true(point_in_polygon(point(0, 1), poly) == undetermined);
     expect_true(point_in_polygon(point(1, 1), poly) == undetermined);
+  }
+
+  test_that("Simple diamond") {
+    polygon poly = {
+      point(0, -.5),
+      point(-.5, 0),
+      point(0, .5),
+      point(.5, 0),
+      point(0, -.5)
+    };
+
+    expect_true(point_in_polygon(point(0, 0), poly) == inside);
+    expect_true(point_in_polygon(point(-1, 0), poly) == outside);
+    expect_true(point_in_polygon(point(1, 0), poly) == outside);
+    expect_true(point_in_polygon(point(-.3, -.3), poly) == outside);
+    expect_true(point_in_polygon(point(-.3, .3), poly) == outside);
+    expect_true(point_in_polygon(point(.3, .3), poly) == outside);
+    expect_true(point_in_polygon(point(.3, -.3), poly) == outside);
+    expect_true(point_in_polygon(point(-.2, -.2), poly) == inside);
+    expect_true(point_in_polygon(point(-.2, .2), poly) == inside);
+    expect_true(point_in_polygon(point(.2, .2), poly) == inside);
+    expect_true(point_in_polygon(point(.2, -.2), poly) == inside);
+    expect_true(point_in_polygon(point(0, -.5), poly) == undetermined);
+    expect_true(point_in_polygon(point(-.5, 0), poly) == undetermined);
+    expect_true(point_in_polygon(point(0, .5), poly) == undetermined);
+    expect_true(point_in_polygon(point(.5, 0), poly) == undetermined);
+    expect_true(point_in_polygon(point(-.25, -.25), poly) == undetermined);
+    expect_true(point_in_polygon(point(-.25, .25), poly) == undetermined);
+    expect_true(point_in_polygon(point(.25, .25), poly) == undetermined);
+    expect_true(point_in_polygon(point(.25, -.25), poly) == undetermined);
   }
 
   test_that("Degenerate polygon: horizontal line") {
