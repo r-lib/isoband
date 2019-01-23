@@ -77,6 +77,19 @@ context("Point in polygon") {
     expect_true(point_in_polygon(point(2.5, 0), poly) == outside);
     expect_true(point_in_polygon(point(0.5, 0), poly) == undetermined);
     expect_true(point_in_polygon(point(1.5, 0), poly) == undetermined);
+
+    // alternative version
+    polygon poly2 = {
+      point(1, 0),
+      point(2, 0),
+      point(0, 0),
+      point(1, 0)
+    };
+
+    expect_true(point_in_polygon(point(-.5, 0), poly2) == outside);
+    expect_true(point_in_polygon(point(2.5, 0), poly2) == outside);
+    expect_true(point_in_polygon(point(0.5, 0), poly2) == undetermined);
+    expect_true(point_in_polygon(point(1.5, 0), poly2) == undetermined);
   }
 
   test_that("Degenerate polygon: vertical line") {
@@ -98,6 +111,26 @@ context("Point in polygon") {
     expect_true(point_in_polygon(point(.5, 1.5), poly) == undetermined);
     expect_true(point_in_polygon(point(.5, 1), poly) == undetermined);
     expect_true(point_in_polygon(point(.5, .5), poly) == undetermined);
+
+    // alternative version
+    polygon poly2 = {
+      point(.5, 1),
+      point(.5, .5),
+      point(.5, 2),
+      point(.5, 1)
+    };
+
+    expect_true(point_in_polygon(point(0, 2), poly2) == outside);
+    expect_true(point_in_polygon(point(0, 1.5), poly2) == outside);
+    expect_true(point_in_polygon(point(0, 1), poly2) == outside);
+    expect_true(point_in_polygon(point(0, .8), poly2) == outside);
+    expect_true(point_in_polygon(point(0, .5), poly2) == outside);
+    expect_true(point_in_polygon(point(0, .4), poly2) == outside);
+    expect_true(point_in_polygon(point(1, 1), poly2) == outside);
+    expect_true(point_in_polygon(point(.5, 2), poly2) == undetermined);
+    expect_true(point_in_polygon(point(.5, 1.5), poly2) == undetermined);
+    expect_true(point_in_polygon(point(.5, 1), poly2) == undetermined);
+    expect_true(point_in_polygon(point(.5, .5), poly2) == undetermined);
   }
 }
 

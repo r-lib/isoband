@@ -58,7 +58,7 @@ int ray_intersections(point P, point p0, point p1) {
       if ((P.x < p0.x) && (P.x < p1.x)) return 1;
       else return -1;
     }
-    else return 0;
+    else return 0; // should never get here; handled by simple cases above
   }
 
   double t = (P.y - p0.y)/dy;
