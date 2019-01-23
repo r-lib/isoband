@@ -208,10 +208,48 @@ context("Point in polygon") {
       point(4, 1)
     };
 
-    expect_true(point_in_polygon(point(-1, 1), poly3) == outside);
-    expect_true(point_in_polygon(point(5, 1), poly3) == outside);
-    expect_true(point_in_polygon(point(0.5, 1), poly3) == inside);
+    expect_true(point_in_polygon(point(-1, 1), poly4) == outside);
+    expect_true(point_in_polygon(point(5, 1), poly4) == outside);
+    expect_true(point_in_polygon(point(0.5, 1), poly4) == inside);
   }
+
+  test_that("Zigzag 1") {
+    polygon poly = {
+      point(0, 2),
+      point(1, 1),
+      point(2, 1.5),
+      point(3, 1),
+      point(4, 1.5),
+      point(5, 0),
+      point(0, 0),
+      point(0, 2)
+    };
+
+    expect_true(point_in_polygon(point(-1, 1), poly) == outside);
+    expect_true(point_in_polygon(point(5, 1), poly) == outside);
+    expect_true(point_in_polygon(point(0.5, 1), poly) == inside);
+    expect_true(point_in_polygon(point(3, 1), poly) == undetermined);
+  }
+
+  test_that("Zigzag 2") {
+    polygon poly = {
+      point(0, 2),
+      point(1, 1),
+      point(2, 1.5),
+      point(3, 1),
+      point(4, 1.5),
+      point(4, 3),
+      point(0, 3),
+      point(0, 2)
+    };
+
+    expect_true(point_in_polygon(point(-1, 1), poly) == outside);
+    expect_true(point_in_polygon(point(5, 1), poly) == outside);
+    expect_true(point_in_polygon(point(0.5, 1), poly) == outside);
+    expect_true(point_in_polygon(point(1, 1.3), poly) == inside);
+    expect_true(point_in_polygon(point(3, 1), poly) == undetermined);
+  }
+
 }
 
 

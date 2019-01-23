@@ -121,7 +121,7 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
           j = 0;
         }
         if (j == istart) {
-          wrap_around = true;
+          wrap_around = true; // should never get here, due to choice of istart
         }
         if (ray_intersections(P, poly[j], poly[j+1]) < 0) {
           // if the point lies exactly on any of these segments the case is undetermined
