@@ -132,5 +132,87 @@ context("Point in polygon") {
     expect_true(point_in_polygon(point(.5, 1), poly2) == undetermined);
     expect_true(point_in_polygon(point(.5, .5), poly2) == undetermined);
   }
+
+  test_that("Degenerate polygon: point") {
+    polygon poly = {
+      point(0, 0),
+      point(0, 0)
+    };
+
+    expect_true(point_in_polygon(point(-1, 0), poly) == outside);
+    expect_true(point_in_polygon(point(1, 0), poly) == outside);
+    expect_true(point_in_polygon(point(0, -1), poly) == outside);
+    expect_true(point_in_polygon(point(0, 1), poly) == outside);
+    expect_true(point_in_polygon(point(0.5, 0.5), poly) == outside);
+    expect_true(point_in_polygon(point(0, 0), poly) == undetermined);
+  }
+
+
+  test_that("Multiple flat line segments") {
+    polygon poly = {
+      point(0, 2),
+      point(1, 1),
+      point(2, 1),
+      point(3, 1),
+      point(4, 1),
+      point(4, 0),
+      point(0, 0),
+      point(0, 2)
+    };
+
+    expect_true(point_in_polygon(point(-1, 1), poly) == outside);
+    expect_true(point_in_polygon(point(5, 1), poly) == outside);
+    expect_true(point_in_polygon(point(0.5, 1), poly) == inside);
+
+    // alternative version
+    polygon poly2 = {
+      point(1, 1),
+      point(2, 1),
+      point(3, 1),
+      point(4, 1),
+      point(4, 0),
+      point(0, 0),
+      point(0, 2),
+      point(1, 1)
+    };
+
+    expect_true(point_in_polygon(point(-1, 1), poly2) == outside);
+    expect_true(point_in_polygon(point(5, 1), poly2) == outside);
+    expect_true(point_in_polygon(point(0.5, 1), poly2) == inside);
+
+    // alternative version 2
+    polygon poly3 = {
+      point(2, 1),
+      point(3, 1),
+      point(4, 1),
+      point(4, 0),
+      point(0, 0),
+      point(0, 2),
+      point(1, 1),
+      point(2, 1)
+    };
+
+    expect_true(point_in_polygon(point(-1, 1), poly3) == outside);
+    expect_true(point_in_polygon(point(5, 1), poly3) == outside);
+    expect_true(point_in_polygon(point(0.5, 1), poly3) == inside);
+
+    // alternative version 3
+    polygon poly4 = {
+      point(4, 1),
+      point(4, 0),
+      point(0, 0),
+      point(0, 2),
+      point(1, 1),
+      point(2, 1),
+      point(3, 1),
+      point(4, 1)
+    };
+
+    expect_true(point_in_polygon(point(-1, 1), poly3) == outside);
+    expect_true(point_in_polygon(point(5, 1), poly3) == outside);
+    expect_true(point_in_polygon(point(0.5, 1), poly3) == inside);
+  }
 }
+
+
 

@@ -159,19 +159,12 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
 // [[Rcpp::export]]
 void separate_polygons() {
   polygon poly = {
-    point(.5, 2),
-    point(.5, 1),
-    point(.5, .5),
-    point(.5, 2)
+    point(0, 0),
+    point(0, 0)
   };
   in_polygon_type result;
 
-
-  //cout << "result: " << point_in_polygon(point(0, .9), poly) << endl;
-  // this result is wrong, needs fixing; output should be "outside"
-  //cout << "result: " << point_in_polygon(point(0, .5), poly) << endl;
-  // this result is wrong, needs fixing; output should be "outside"
-  result = point_in_polygon(point(0.6, 0.8), poly);
+  result = point_in_polygon(point(0, 1), poly);
   cout << "result: " << result << endl;
 }
 
