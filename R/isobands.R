@@ -78,7 +78,7 @@ isobands <- function(x, y, z, levels_low, levels_high) {
 
   out <- isobands_impl(x, y, z, levels_low, levels_high)
   structure(
-    stats::setNames(out, paste0(levels_low, "-", levels_high)),
+    stats::setNames(out, paste0(levels_low, ":", levels_high)),
     class = c("isobands", "iso")
   )
 }

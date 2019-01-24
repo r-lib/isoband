@@ -285,8 +285,14 @@ NumericMatrix polygon_as_matrix(polygon p) {
 
 // [[Rcpp::export]]
 List separate_polygons(const NumericVector &x, const NumericVector &y, const IntegerVector &id) {
+  List out; // final result
+
   int n = x.size();
-  if (n == 0) return List();
+  if (n == 0) {
+    // set sf classes
+    out.attr("class") = CharacterVector::create("XY", "MULTIPOLYGON", "sfg");
+    return out;
+  }
   if (y.size() != n || id.size() != n) {
     stop("Inputs x, y, and id must be of the same length.");
   }
@@ -332,8 +338,6 @@ List separate_polygons(const NumericVector &x, const NumericVector &y, const Int
       }
     }
 
-  List out;
-
   int next_poly = hi.top_level_poly();
   while(next_poly >= 0) {
     List rings;
@@ -352,7 +356,6 @@ List separate_polygons(const NumericVector &x, const NumericVector &y, const Int
 
   // set sf classes
   out.attr("class") = CharacterVector::create("XY", "MULTIPOLYGON", "sfg");
-
   return(out);
 }
 
