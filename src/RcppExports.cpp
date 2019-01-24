@@ -35,11 +35,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // separate_polygons
-void separate_polygons();
-RcppExport SEXP _isoband_separate_polygons() {
+void separate_polygons(const NumericVector& x, const NumericVector& y, const IntegerVector& id);
+RcppExport SEXP _isoband_separate_polygons(SEXP xSEXP, SEXP ySEXP, SEXP idSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    separate_polygons();
+    Rcpp::traits::input_parameter< const NumericVector& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type id(idSEXP);
+    separate_polygons(x, y, id);
     return R_NilValue;
 END_RCPP
 }
@@ -49,7 +52,7 @@ RcppExport SEXP run_testthat_tests();
 static const R_CallMethodDef CallEntries[] = {
     {"_isoband_isobands_impl", (DL_FUNC) &_isoband_isobands_impl, 5},
     {"_isoband_isolines_impl", (DL_FUNC) &_isoband_isolines_impl, 4},
-    {"_isoband_separate_polygons", (DL_FUNC) &_isoband_separate_polygons, 0},
+    {"_isoband_separate_polygons", (DL_FUNC) &_isoband_separate_polygons, 3},
     {"run_testthat_tests",         (DL_FUNC) &run_testthat_tests,         0},
     {NULL, NULL, 0}
 };
