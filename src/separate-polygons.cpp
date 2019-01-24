@@ -163,7 +163,7 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
 }
 
 
-in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference) {
+in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference, bool fast) {
   int ins = 0, out = 0, undet = 0;
 
   for (int i = 0; i < query.size()-1; i++) {
@@ -177,6 +177,11 @@ in_polygon_type polygon_in_polygon(const polygon &query, const polygon &referenc
     default:
       undet += 1;
     }
+
+    // shortcut for faster classification: if at least one
+    // non-ambiguous point is found, we know whether we're inside
+    // or outside
+    if (fast && (ins > 0 || out > 0)) break;
   }
 
   if (ins > 0 && out == 0) {

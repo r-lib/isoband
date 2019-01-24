@@ -287,8 +287,8 @@ context("Polygon in polygon") {
     expect_true(polygon_in_polygon(p1, p2) == outside);
     expect_true(polygon_in_polygon(p1, p3) == outside);
     expect_true(polygon_in_polygon(p3, p1) == outside);
-    expect_true(polygon_in_polygon(p1, p4) == undetermined);
-    expect_true(polygon_in_polygon(p4, p1) == undetermined);
+    expect_true(polygon_in_polygon(p1, p4, false) == undetermined);
+    expect_true(polygon_in_polygon(p4, p1, false) == undetermined);
   }
 
   test_that("Degenerate case") {

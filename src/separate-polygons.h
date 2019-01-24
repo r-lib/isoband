@@ -19,7 +19,10 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly);
 /* Test whether a polygon (the query) lies fully inside another polygon
  * (the reference). Undetermined points are ignored. If no clear determination
  * can be made, returns undetermined.
+ *
+ * The fast option determines whether we should call the outcome based on
+ * only the first non-ambiguous point we find or on all points.
  */
-in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference);
+in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference, bool fast = true);
 
 #endif
