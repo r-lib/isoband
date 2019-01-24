@@ -252,5 +252,53 @@ context("Point in polygon") {
 
 }
 
+context("Polygon in polygon") {
+  test_that("Basic relationships") {
+    polygon p1 = {
+      point(0, 0),
+      point(0, 2),
+      point(2, 2),
+      point(2, 0),
+      point(0, 0)
+    };
+    polygon p2 = {
+      point(0.5, 0.5),
+      point(0.5, 1.5),
+      point(1.5, 1.5),
+      point(1.5, 0.5),
+      point(0.5, 0.5)
+    };
+    polygon p3 = {
+      point(-1, -1),
+      point(-1, 0),
+      point(0, 0),
+      point(0, -1),
+      point(-1, -1)
+    };
+    polygon p4 = {
+      point(-1, -1),
+      point(-1, 1),
+      point(1, 1),
+      point(1, -1),
+      point(-1, -1)
+    };
 
+    expect_true(polygon_in_polygon(p2, p1) == inside);
+    expect_true(polygon_in_polygon(p1, p2) == outside);
+    expect_true(polygon_in_polygon(p1, p3) == outside);
+    expect_true(polygon_in_polygon(p3, p1) == outside);
+    expect_true(polygon_in_polygon(p1, p4) == undetermined);
+    expect_true(polygon_in_polygon(p4, p1) == undetermined);
+  }
 
+  test_that("Degenerate case") {
+    polygon p1 = {
+      point(0, 0),
+      point(0, 2),
+      point(2, 2),
+      point(2, 0),
+      point(0, 0)
+    };
+    expect_true(polygon_in_polygon(p1, p1) == undetermined);
+  }
+}

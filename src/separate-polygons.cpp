@@ -156,15 +156,84 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
   return outside;
 }
 
+
+in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference) {
+  int ins = 0, out = 0, undet = 0;
+
+  for (int i = 0; i < query.size()-1; i++) {
+    switch(point_in_polygon(query[i], reference)) {
+    case inside:
+      ins += 1;
+      break;
+    case outside:
+      out += 1;
+      break;
+    default:
+      undet += 1;
+    }
+  }
+
+  if (ins > 0 && out == 0) {
+    return inside;
+  }
+
+  if (out > 0 && ins == 0) {
+    return outside;
+  }
+
+  return undetermined;
+}
+
 // [[Rcpp::export]]
 void separate_polygons() {
-  polygon poly = {
+  polygon p1 = {
     point(0, 0),
+    point(0, 2),
+    point(2, 2),
+    point(2, 0),
     point(0, 0)
   };
+  polygon p2 = {
+    point(0.5, 0.5),
+    point(0.5, 1.5),
+    point(1.5, 1.5),
+    point(1.5, 0.5),
+    point(0.5, 0.5)
+  };
+  polygon p3 = {
+    point(-1, -1),
+    point(-1, 0),
+    point(0, 0),
+    point(0, -1),
+    point(-1, -1)
+  };
+
+  polygon p4 = {
+    point(-1, -1),
+    point(-1, 1),
+    point(1, 1),
+    point(1, -1),
+    point(-1, -1)
+  };
+
   in_polygon_type result;
 
-  result = point_in_polygon(point(0, 1), poly);
+  result = polygon_in_polygon(p2, p1);
+  cout << "result: " << result << endl;
+
+  result = polygon_in_polygon(p1, p2);
+  cout << "result: " << result << endl;
+
+  result = polygon_in_polygon(p1, p3);
+  cout << "result: " << result << endl;
+
+  result = polygon_in_polygon(p3, p1);
+  cout << "result: " << result << endl;
+
+  result = polygon_in_polygon(p1, p4);
+  cout << "result: " << result << endl;
+
+  result = polygon_in_polygon(p4, p1);
   cout << "result: " << result << endl;
 }
 

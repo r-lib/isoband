@@ -16,4 +16,10 @@ int ray_intersections(point P, point p0, point p1);
  */
 in_polygon_type point_in_polygon(const point &P, const polygon &poly);
 
+/* Test whether a polygon (the query) lies fully inside another polygon
+ * (the reference). Undetermined points are ignored. If no clear determination
+ * can be made, returns undetermined.
+ */
+in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference);
+
 #endif
