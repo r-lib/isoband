@@ -32,7 +32,7 @@ iso_to_sfg.default <- function(x) {
 
 #' @export
 iso_to_sfg.isolines <- function(x) {
-  mapply(multilinestring, x)
+  mapply(multilinestring, x, SIMPLIFY = FALSE)
 }
 
 multilinestring <- function(object) {
@@ -42,5 +42,14 @@ multilinestring <- function(object) {
     unname(mapply(cbind, x, y, SIMPLIFY = FALSE)),
     class = c("XY", "MULTILINESTRING", "sfg")
   )
+}
+
+#' @export
+iso_to_sfg.isobands <- function(x) {
+  mapply(multipolygon, x, SIMPLIFY = FALSE)
+}
+
+multipolygon <- function(object) {
+  separate_polygons(object$x, object$y, object$id)
 }
 

@@ -5,6 +5,8 @@ using namespace Rcpp;
 
 #include <iostream>
 #include <vector>
+#include <set>
+
 using namespace std;
 
 #include "polygon.h"
@@ -188,10 +190,103 @@ in_polygon_type polygon_in_polygon(const polygon &query, const polygon &referenc
   return undetermined;
 }
 
+
+class polygon_hierarchy {
+private:
+  // for each polygon, contains a set of exterior polygons
+  vector<set<int>> ext_polygons;
+  vector<bool> active_polygons;
+
+public:
+  polygon_hierarchy(int n) {
+    ext_polygons.resize(n);
+    active_polygons.resize(n);
+
+    // initially, all polygons are active
+    for (auto it = active_polygons.begin(); it != active_polygons.end(); it++) {
+      *it = true;
+    }
+  }
+
+  void print() {
+    for (int i = 0; i < ext_polygons.size(); i++) {
+      cout << "polygon " << i << " (active = " << active_polygons[i] << ")" << endl;
+      cout << "  enclosing: ";
+      for (auto it = ext_polygons[i].begin(); it != ext_polygons[i].end(); it++) {
+        cout << (*it) << " ";
+      }
+      cout << endl;
+    }
+  }
+
+  void set_exterior(int poly, int exterior) {
+    ext_polygons[poly].insert(exterior);
+  }
+
+  void remove(int poly) {
+    for (auto it = ext_polygons.begin(); it != ext_polygons.end(); it++) {
+      it->erase(poly);
+    }
+  }
+
+  // returns the next top level polygon found
+  int top_level_poly() {
+    int i = 0;
+    do {
+      if (active_polygons[i] && ext_polygons[i].size() == 0) {
+        active_polygons[i] = false;
+        break;
+      }
+      i++;
+    } while (i < ext_polygons.size());
+    if (i == ext_polygons.size()) {
+      // we have run out of top-level polygons, hence we're done
+      i = -1;
+    }
+
+    return i;
+  }
+
+  // find all holes belonging to polygon, remove them and the parent
+  // polygon from the hierarchy, and return
+  set<int> collect_holes(int poly) {
+    set<int> holes;
+
+    int i = 0;
+    do {
+      if (active_polygons[i] &&
+          ext_polygons[i].size() == 1 &&
+          ext_polygons[i].count(poly) == 1) {
+        holes.insert(i);
+        active_polygons[i] = false;
+      }
+      i++;
+    } while (i < ext_polygons.size());
+
+    for (auto it = holes.begin(); it != holes.end(); it++) {
+      remove(*it);
+    }
+    remove(poly);
+
+    return holes;
+  }
+};
+
+NumericMatrix polygon_as_matrix(polygon p) {
+  NumericMatrix m(p.size(), 2);
+
+  for (int i = 0; i < p.size(); i++) {
+    m(i, 0) = p[i].x;
+    m(i, 1) = p[i].y;
+  }
+
+  return m;
+}
+
 // [[Rcpp::export]]
-void separate_polygons(const NumericVector &x, const NumericVector &y, const IntegerVector &id) {
+List separate_polygons(const NumericVector &x, const NumericVector &y, const IntegerVector &id) {
   int n = x.size();
-  if (n == 0) return;
+  if (n == 0) return List();
   if (y.size() != n || id.size() != n) {
     stop("Inputs x, y, and id must be of the same length.");
   }
@@ -220,13 +315,45 @@ void separate_polygons(const NumericVector &x, const NumericVector &y, const Int
 
   polys[cur_poly].push_back(polys[cur_poly][0]); // close circle
 
+  // set up polygon hierarchy
+  polygon_hierarchy hi(polys.size());
   for (int i = 0; i < polys.size(); i++)
     for (int j = 0; j < polys.size(); j++ ) {
       if (i == j) continue;
 
       in_polygon_type result = polygon_in_polygon(polys[i], polys[j]);
-      cout << "Polygon " << i << " is " << result << " of polygon " << j << endl;
+      //cout << "polygon " << i << " is " << result << " of polygon " << j << endl;
+
+      if (result == inside) {
+        hi.set_exterior(i, j);
+      }
+      else if (result == undetermined){
+        stop("Found polygons without undefined interior/exterior relationship.");
+      }
     }
+
+  List out;
+
+  int next_poly = hi.top_level_poly();
+  while(next_poly >= 0) {
+    List rings;
+    rings.push_back(polygon_as_matrix(polys[next_poly]));
+    // cout << "top-level polygon: " << next_poly << endl;
+
+    set<int> holes = hi.collect_holes(next_poly);
+    for (auto it = holes.begin(); it != holes.end(); it++) {
+      rings.push_back(polygon_as_matrix(polys[*it]));
+      //cout << "  hole: " << (*it) << endl;
+    }
+    out.push_back(rings);
+    next_poly = hi.top_level_poly();
+    //hi.print();
+  }
+
+  // set sf classes
+  out.attr("class") = CharacterVector::create("XY", "MULTIPOLYGON", "sfg");
+
+  return(out);
 }
 
 // testing code
@@ -239,5 +366,15 @@ m <- matrix(c(0, 0, 0, 0, 0, 0,
               0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
 
 z <- isobands(1:6, 1:6, m, 0.5, 1.5)
-separate_polygons(z[[1]]$x, z[[1]]$y, z[[1]]$id)
+mp1 <- separate_polygons(z[[1]]$x, z[[1]]$y, z[[1]]$id)
+
+m <- matrix(c(0, 0, 0, 0, 0, 0,
+              0, 2, 2, 2, 2, 0,
+              0, 2, 0, 0, 2, 0,
+              0, 2, 0, 0, 2, 0,
+              0, 2, 2, 2, 2, 0,
+              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+
+z <- isobands(1:6, 1:6, m, 0.5, 1.5)
+mp2 <- separate_polygons(z[[1]]$x, z[[1]]$y, z[[1]]$id)
 */

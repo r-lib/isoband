@@ -35,15 +35,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // separate_polygons
-void separate_polygons(const NumericVector& x, const NumericVector& y, const IntegerVector& id);
+List separate_polygons(const NumericVector& x, const NumericVector& y, const IntegerVector& id);
 RcppExport SEXP _isoband_separate_polygons(SEXP xSEXP, SEXP ySEXP, SEXP idSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const NumericVector& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type y(ySEXP);
     Rcpp::traits::input_parameter< const IntegerVector& >::type id(idSEXP);
-    separate_polygons(x, y, id);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(separate_polygons(x, y, id));
+    return rcpp_result_gen;
 END_RCPP
 }
 
