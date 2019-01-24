@@ -10,11 +10,15 @@ using namespace std;
 #include "polygon.h"
 #include "separate-polygons.h"
 
-// eventually, move this to a polygon.cpp
+// eventually, move these bits to a polygon.cpp
 
 ostream & operator<<(ostream &out, const point &p) {
   out << "(" << p.x << ", " << p.y << ")";
   return out;
+}
+
+bool operator==(const point &p1, const point &p2) {
+  return (p1.x == p2.x) && (p1.y == p2.y);
 }
 
 ostream & operator<<(ostream &out, const in_polygon_type &t) {
@@ -31,7 +35,7 @@ ostream & operator<<(ostream &out, const in_polygon_type &t) {
   return out;
 }
 
-
+// end bits that should be moved
 
 /* Calculate the number of times a ray extending from point P to the right
  * intersects with the line segment defined by p0, p1. This number is
@@ -185,59 +189,55 @@ in_polygon_type polygon_in_polygon(const polygon &query, const polygon &referenc
 }
 
 // [[Rcpp::export]]
-void separate_polygons() {
-  polygon p1 = {
-    point(0, 0),
-    point(0, 2),
-    point(2, 2),
-    point(2, 0),
-    point(0, 0)
-  };
-  polygon p2 = {
-    point(0.5, 0.5),
-    point(0.5, 1.5),
-    point(1.5, 1.5),
-    point(1.5, 0.5),
-    point(0.5, 0.5)
-  };
-  polygon p3 = {
-    point(-1, -1),
-    point(-1, 0),
-    point(0, 0),
-    point(0, -1),
-    point(-1, -1)
-  };
+void separate_polygons(const NumericVector &x, const NumericVector &y, const IntegerVector &id) {
+  int n = x.size();
+  if (n == 0) return;
+  if (y.size() != n || id.size() != n) {
+    stop("Inputs x, y, and id must be of the same length.");
+  }
 
-  polygon p4 = {
-    point(-1, -1),
-    point(-1, 1),
-    point(1, 1),
-    point(1, -1),
-    point(-1, -1)
-  };
+  // create polygons from input data
+  vector<polygon> polys;
+  int cur_id = id[0];
+  int cur_poly = 0;
+  polys.push_back(polygon());
+  for (int i = 0; i<n; i++) {
+    if (id[i] != cur_id) {
+      // complete current polygon and start new one
+      polys.push_back(polygon());
+      cur_id = id[i];
+      cur_poly += 1;
+    }
+    polys[cur_poly].push_back(point(x[i], y[i]));
+  }
 
-  in_polygon_type result;
+  // close all polygons if necessary
+  for (auto it = polys.begin(); it != polys.end(); it++) {
+    if (!(it->front() == it->back())) {
+      it->push_back(it->front());
+    }
+  }
 
-  result = polygon_in_polygon(p2, p1);
-  cout << "result: " << result << endl;
+  polys[cur_poly].push_back(polys[cur_poly][0]); // close circle
 
-  result = polygon_in_polygon(p1, p2);
-  cout << "result: " << result << endl;
+  for (int i = 0; i < polys.size(); i++)
+    for (int j = 0; j < polys.size(); j++ ) {
+      if (i == j) continue;
 
-  result = polygon_in_polygon(p1, p3);
-  cout << "result: " << result << endl;
-
-  result = polygon_in_polygon(p3, p1);
-  cout << "result: " << result << endl;
-
-  result = polygon_in_polygon(p1, p4);
-  cout << "result: " << result << endl;
-
-  result = polygon_in_polygon(p4, p1);
-  cout << "result: " << result << endl;
+      in_polygon_type result = polygon_in_polygon(polys[i], polys[j]);
+      cout << "Polygon " << i << " is " << result << " of polygon " << j << endl;
+    }
 }
 
 // testing code
 /*** R
-separate_polygons()
+m <- matrix(c(0, 0, 0, 0, 0, 0,
+              0, 1, 1, 1, 1, 0,
+              0, 1, 2, 2, 1, 0,
+              0, 1, 2, 0, 1, 0,
+              0, 1, 1, 1, 1, 0,
+              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+
+z <- isobands(1:6, 1:6, m, 0.5, 1.5)
+separate_polygons(z[[1]]$x, z[[1]]$y, z[[1]]$id)
 */

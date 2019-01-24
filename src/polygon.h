@@ -13,6 +13,7 @@ struct point {
   point(double x_in, double y_in) : x(x_in), y(y_in) {}
 };
 
+bool operator==(const point &p1, const point &p2);
 
 typedef vector<point> polygon;
 
