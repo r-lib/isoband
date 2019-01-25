@@ -14,6 +14,15 @@
 #' @param fill_band fill color for the isoband
 #' @param newpage boolean, indicating whether `grid.newpage()` should
 #'   be called or not
+#' @examples
+#' m <- matrix(c(0, 0, 0, 0, 0, 0,
+#'               0, 2, 2, 2, 2, 0,
+#'               0, 2, 0, 0, 2, 0,
+#'               0, 2, 0, 0, 2, 0,
+#'               0, 2, 2, 2, 2, 0,
+#'               0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+#'
+#' plot_iso(m, 0.5, 1.5)
 #' @export
 plot_iso <- function(m, vlo, vhi, fill_lo = "gray95", fill_mid = "gray50", fill_hi = "black",
                      fill_band = "cornsilk", col_lo = "black", col_hi = "black", newpage = TRUE) {

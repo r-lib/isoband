@@ -34,3 +34,13 @@ be called or not}
 This function visualizes a single isoband calculated from a matrix. It is mainly useful
 for debugging and visualizing the isobanding algorithm
 }
+\examples{
+m <- matrix(c(0, 0, 0, 0, 0, 0,
+              0, 2, 2, 2, 2, 0,
+              0, 2, 0, 0, 2, 0,
+              0, 2, 0, 0, 2, 0,
+              0, 2, 2, 2, 2, 0,
+              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+
+plot_iso(m, 0.5, 1.5)
+}
