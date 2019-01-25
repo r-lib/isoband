@@ -279,3 +279,46 @@ test_that("Eight-sided saddles", {
   expect_setequal(out[[1]]$id, c(1:3))
   expect_equal(length(out[[1]]$id), 14)
 })
+
+
+
+test_that("Inconsistent numbers of isoband levels cause an error", {
+  m <- matrix(c(0, 0, 1, 1,
+                0, 1, 1, 1,
+                1, 1, 0, 0,
+                0, 0, 1, 0), 4, 4, byrow = TRUE)
+
+  # single values are recycled
+  expect_silent(
+    isobands(1:4, 1:4, m, 0.5, c(0.5, 1.5))
+  )
+
+  expect_silent(
+    isobands(1:4, 1:4, m, c(0.5, 1.5), 0.5)
+  )
+
+  # error, multiple values are not recycled
+  expect_error(
+    isobands(1:4, 1:4, m, c(0.5, 1.5, 2.5), c(0.5, 1.5)),
+    "must be of equal length or of length 1"
+  )
+
+  expect_error(
+    isobands(1:4, 1:4, m, c(0.5, 1.5), c(0.5, 1.5, 2.5)),
+    "must be of equal length or of length 1"
+  )
+
+})
+
+
+test_that("Swap isoband levels if given in the wrong order", {
+  m <- matrix(c(0, 0, 1, 1,
+                0, 1, 1, 1,
+                1, 1, 0, 0,
+                0, 0, 1, 0), 4, 4, byrow = TRUE)
+
+  out1 <- isobands(1:4, 1:4, m, c(-.5, 0.5), c(0.5, 1.5))
+  out2 <- isobands(1:4, 1:4, m, c(0.5, 1.5), c(-.5, 0.5))
+
+  expect_equivalent(out1, out2)
+})
