@@ -8,7 +8,7 @@ Authors@R:
            email = "wilke@austin.utexas.edu")
 Description: Generate contour lines (isolines) and contour polygons (isobands) from
   regularly spaced grids containing elevation data.
-License: GPL-2 + file LICENSE
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 LinkingTo: 
@@ -16,17 +16,12 @@ LinkingTo:
     testthat
 Imports: 
     Rcpp,
-    rlang,
-    grid,
-    ggplot2,
-    scales,
-    stats,
-    MASS
+    grid
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
 Suggests: 
+    ggplot2,
     sf,
     testthat,
-    covr,
-    reshape2
+    covr
 SystemRequirements: C++11

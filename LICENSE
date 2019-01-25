@@ -1,6 +1,2 @@
-The overall license for this package is GPL-2, due to code copied from ggplot2.
-
-All code not derived from ggplot2 (i.e., in particular, all C++ code) is licensed under the MIT license (see LICENSE.md).
-
-YEAR: 2018
+YEAR: 2019
 COPYRIGHT HOLDER: Claus O. Wilke

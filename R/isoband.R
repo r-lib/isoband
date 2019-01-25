@@ -3,9 +3,7 @@
 #' @name isoband
 #' @docType package
 #' @useDynLib isoband, .registration = TRUE
-#' @import ggplot2
-#' @import rlang
-#' @import grid
 #' @importFrom Rcpp sourceCpp
+#' @import grid
 NULL
 

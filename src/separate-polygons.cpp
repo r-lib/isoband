@@ -277,12 +277,21 @@ public:
   }
 };
 
-NumericMatrix polygon_as_matrix(polygon p) {
-  NumericMatrix m(p.size(), 2);
+NumericMatrix polygon_as_matrix(polygon p, bool reverse = false) {
+  int n = p.size();
 
-  for (int i = 0; i < p.size(); i++) {
-    m(i, 0) = p[i].x;
-    m(i, 1) = p[i].y;
+  NumericMatrix m(n, 2);
+
+  if (reverse) {
+    for (int i = n; i > 0; i--) {
+      m(n-i, 0) = p[i-1].x;
+      m(n-i, 1) = p[i-1].y;
+    }
+  } else {
+    for (int i = 0; i < n; i++) {
+      m(i, 0) = p[i].x;
+      m(i, 1) = p[i].y;
+    }
   }
 
   return m;
@@ -351,7 +360,8 @@ List separate_polygons(const NumericVector &x, const NumericVector &y, const Int
 
     set<int> holes = hi.collect_holes(next_poly);
     for (auto it = holes.begin(); it != holes.end(); it++) {
-      rings.push_back(polygon_as_matrix(polys[*it]));
+      // we reverse holes so they run in the same direction as outer polygons
+      rings.push_back(polygon_as_matrix(polys[*it], true));
       //cout << "  hole: " << (*it) << endl;
     }
     out.push_back(rings);
