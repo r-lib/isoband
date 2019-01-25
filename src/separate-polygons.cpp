@@ -333,8 +333,6 @@ List separate_polygons(const NumericVector &x, const NumericVector &y, const Int
     }
   }
 
-  polys[cur_poly].push_back(polys[cur_poly][0]); // close circle
-
   // set up polygon hierarchy
   polygon_hierarchy hi(polys.size());
   for (int i = 0; i < polys.size(); i++)

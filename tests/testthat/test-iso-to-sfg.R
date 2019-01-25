@@ -1,6 +1,11 @@
 context("test-iso-to-sfg")
 
 test_that("conversion of isolines to sfg", {
+  #m <- matrix(c(0, 0, 0, 2,
+  #              0, 1, 0, 2,
+  #              0, 0, 0, 0), 3, 4, byrow = TRUE)
+  #lines <- isolines(1:4, 3:1, m, c(0.5, 1.5))
+
   lines <- structure(
     list(
       `0.5` = list(
@@ -57,6 +62,14 @@ test_that("conversion of isolines to sfg", {
 
 
 test_that("conversion of isobands to sfg", {
+  #m <- matrix(c(0, 0, 0, 0, 0, 0,
+  #              0, 2, 2, 2, 2, 0,
+  #              0, 2, 0, 0, 2, 0,
+  #              0, 2, 0, 0, 2, 0,
+  #              0, 2, 2, 2, 2, 0,
+  #              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+  #bands <- isobands(1:6, 1:6, m, 0.5, 1.5)
+
   bands <- structure(
     list(
       `0.5:1.5` = list(
@@ -105,8 +118,8 @@ test_that("conversion of isobands to sfg", {
   expect_equal(
     out[["0.5:1.5"]][[2]][[1]],
     cbind(
-      c(4.75, 4.00, 3.00, 2.25, 2.25, 3.00, 4.00, 4.75, 4.75, 4.75),
-      c(4.00, 4.75, 4.75, 4.00, 3.00, 2.25, 2.25, 3.00, 4.00, 4.00)
+      c(4.75, 4.00, 3.00, 2.25, 2.25, 3.00, 4.00, 4.75, 4.75),
+      c(4.00, 4.75, 4.75, 4.00, 3.00, 2.25, 2.25, 3.00, 4.00)
     )
   )
 
