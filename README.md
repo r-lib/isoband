@@ -155,7 +155,73 @@ ggplot() +
 
 <img src="man/figures/README-volcano-1.png" width="75%" />
 
-Isolining is about as fast as `grDevices::contourLines()`, isobanding is
+We can also use this approach to convert bitmap images into polygons and
+plot with ggplot2.
+
+``` r
+library(magick)
+#> Linking to ImageMagick 6.9.9.39
+#> Enabled features: cairo, fontconfig, freetype, lcms, pango, rsvg, webp
+#> Disabled features: fftw, ghostscript, x11
+library(sf)
+library(ggplot2)
+library(isoband)
+library(colorspace)
+
+sf_from_image <- function(image) {
+  image_gray <- image %>% image_quantize(colorspace = "gray")
+  image_raster <- as.raster(image_gray)
+  d <- dim(image_raster)
+  m <- matrix(c((255-col2rgb(image_raster)[1,])), nrow = d[1], ncol = d[2], byrow = TRUE)
+  b <- isobands(1:d[2], d[1]:1, m, 20*(-1:13), 20*(0:14))
+  bands <- iso_to_sfg(b)
+  data <- st_sf(
+    level = letters[1:length(bands)],
+    geometry = st_sfc(bands)
+  )
+}
+
+img <- image_resize(image_read("https://pbs.twimg.com/profile_images/905186381995147264/7zKAG5sY_400x400.jpg"), "200x200")
+img_sf <- sf_from_image(img)
+
+p1 <- ggplot(img_sf) + 
+  geom_sf(color = "gray10", fill = NA, size = 0.05) + 
+  coord_sf(expand = FALSE) +
+  theme_gray() +
+  theme(
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    axis.ticks.length = grid::unit(0, "pt"),
+    plot.margin = margin(0, 0, 0, 0)
+  )
+
+p2 <- ggplot(img_sf) + 
+  geom_sf(aes(fill = level, color = level)) + 
+  coord_sf(expand = FALSE) +
+  theme_void()
+
+p3 <- ggplot(img_sf) + 
+  geom_sf(aes(fill = level), color = "gray30", size = 0.1) + 
+  scale_fill_hue(aesthetics = c("color", "fill"), guide = "none", direction = -1) +
+  coord_sf(expand = FALSE) +
+  theme_void()
+
+cowplot::plot_grid(
+  p1,
+  p2 + scale_fill_discrete_sequential(aesthetics = c("color", "fill"), palette = "Inferno", guide = "none", rev = TRUE),
+  p2 + scale_fill_discrete_sequential(aesthetics = c("color", "fill"), palette = "Viridis", guide = "none", rev = TRUE),
+  p3,
+  scale = 0.9
+)
+```
+
+![](man/figures/README-polygon-hadley-1.png)<!-- -->
+
+## Performance
+
+The code is written in C++ and performance is generally good. Isolining
+is about as fast as `grDevices::contourLines()`, isobanding is
 approximately 2.5 times slower.
 
 ``` r
@@ -169,8 +235,8 @@ microbenchmark::microbenchmark(
 #>  grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano,      levels = 10 * (10:18))
 #>                               isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (10:18))
 #>             isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (9:17),      10 * (10:18))
-#>       min       lq     mean   median       uq      max neval
-#>  1.650314 1.853480 2.711182 2.147723 3.094145 12.04088   100
-#>  1.746031 1.915165 2.367075 2.196047 2.662343  4.88075   100
-#>  4.336652 4.812021 5.778308 5.348152 6.333666 13.80761   100
+#>       min       lq     mean   median       uq       max neval
+#>  1.675161 1.812835 2.694624 2.129540 2.744745 16.622916   100
+#>  1.761252 1.850351 2.429487 1.959520 2.346297  9.678578   100
+#>  4.376592 4.630960 5.593479 4.959469 5.679508 13.972505   100
 ```

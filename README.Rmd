@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "50%"
+  dpi = 150
 )
 ```
 # isoband
@@ -47,12 +47,12 @@ isobands(1:ncol(m), 1:nrow(m), m, 0.5, 1.5)
 ```
 
 The function `plot_iso()` is a convenience function for debugging and testing.
-```{r basic-example-plot, fig.asp = 1}
+```{r basic-example-plot, fig.asp = 1, out.width = "50%"}
 plot_iso(m, 0.5, 1.5)
 ```
 
 A few more simple examples. Missing values and disconnected areas are all handled correctly.
-```{r basic-plotting, fig.asp = 1}
+```{r basic-plotting, fig.asp = 1, out.width = "50%"}
 m <- matrix(c(0, 0, 0, 0, 0, 0,
               0, 0, 0, 1, 1, 0,
               0, 0, 1, 1, 1, 0,
@@ -104,7 +104,66 @@ ggplot() +
 
 ```
 
-Isolining is about as fast as `grDevices::contourLines()`, isobanding is approximately 2.5 times slower.
+We can also use this approach to convert bitmap images into polygons and plot with ggplot2.
+
+```{r polygon-hadley, fig.asp = 1}
+library(magick)
+library(sf)
+library(ggplot2)
+library(isoband)
+library(colorspace)
+
+sf_from_image <- function(image) {
+  image_gray <- image %>% image_quantize(colorspace = "gray")
+  image_raster <- as.raster(image_gray)
+  d <- dim(image_raster)
+  m <- matrix(c((255-col2rgb(image_raster)[1,])), nrow = d[1], ncol = d[2], byrow = TRUE)
+  b <- isobands(1:d[2], d[1]:1, m, 20*(-1:13), 20*(0:14))
+  bands <- iso_to_sfg(b)
+  data <- st_sf(
+    level = letters[1:length(bands)],
+    geometry = st_sfc(bands)
+  )
+}
+
+img <- image_resize(image_read("https://pbs.twimg.com/profile_images/905186381995147264/7zKAG5sY_400x400.jpg"), "200x200")
+img_sf <- sf_from_image(img)
+
+p1 <- ggplot(img_sf) + 
+  geom_sf(color = "gray10", fill = NA, size = 0.05) + 
+  coord_sf(expand = FALSE) +
+  theme_gray() +
+  theme(
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    axis.ticks.length = grid::unit(0, "pt"),
+    plot.margin = margin(0, 0, 0, 0)
+  )
+
+p2 <- ggplot(img_sf) + 
+  geom_sf(aes(fill = level, color = level)) + 
+  coord_sf(expand = FALSE) +
+  theme_void()
+
+p3 <- ggplot(img_sf) + 
+  geom_sf(aes(fill = level), color = "gray30", size = 0.1) + 
+  scale_fill_hue(aesthetics = c("color", "fill"), guide = "none", direction = -1) +
+  coord_sf(expand = FALSE) +
+  theme_void()
+
+cowplot::plot_grid(
+  p1,
+  p2 + scale_fill_discrete_sequential(aesthetics = c("color", "fill"), palette = "Inferno", guide = "none", rev = TRUE),
+  p2 + scale_fill_discrete_sequential(aesthetics = c("color", "fill"), palette = "Viridis", guide = "none", rev = TRUE),
+  p3,
+  scale = 0.9
+)
+```
+
+## Performance
+
+The code is written in C++ and performance is generally good. Isolining is about as fast as `grDevices::contourLines()`, isobanding is approximately 2.5 times slower.
 
 ```{r benchmark}
 microbenchmark::microbenchmark(
@@ -114,4 +173,3 @@ microbenchmark::microbenchmark(
 )
 
 ```
-
