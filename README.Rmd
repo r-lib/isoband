@@ -28,9 +28,9 @@ Install from github with:
 devtools::install_github("clauswilke/isoband")
 ```
 
-## Example
+## Examples
 
-We begin with a few simple examples. The two main workhorses of the package are the functions `isolines()` and `isobands()`, respectively. They return a list of isolines/isobands for each isolevel specified. Each isoline/isoband consists of vectors of x and y coordinates, as well as a vector of ids specifying which sets of coordinates should be connected. This format can be handed directly to `grid.polyline()`/`grid.path()` for drawing (see below).
+The two main workhorses of the package are the functions `isolines()` and `isobands()`, respectively. They return a list of isolines/isobands for each isolevel specified. Each isoline/isoband consists of vectors of x and y coordinates, as well as a vector of ids specifying which sets of coordinates should be connected. This format can be handed directly to `grid.polyline()`/`grid.path()` for drawing. However, we can also convert the output to spatial features and draw with ggplot2 (see below).
 
 ```{r basic-example, fig.asp = 1}
 library(isoband)
@@ -76,20 +76,32 @@ m <- matrix(c(0, 0, 1, 1,
 plot_iso(m, 0.5, 1.5)
 ```
 
-The algorithm has no problem with larger datasets. Let's calculate a few isolines/isobands for the volcano dataset.
+The algorithm has no problem with larger datasets. Let's calculate isolines and isobands for the volcano dataset, convert to sf, and plot with ggplot2.
 ```{r volcano, fig.asp = 1, out.width = "75%"}
-m <- volcano
-b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(80, 120, 150), c(110, 140, 152))
-l <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, c(110, 120, 140, 150, 152))
+library(ggplot2)
+library(sf)
 
-library(grid)
-grid.newpage()
-grid.path(b[[1]]$x, b[[1]]$y, b[[1]]$id, gp = gpar(fill = "cornsilk", col = NA))
-grid.path(b[[2]]$x, b[[2]]$y, b[[2]]$id, gp = gpar(fill = "lightblue", col = NA))
-grid.path(b[[3]]$x, b[[3]]$y, b[[3]]$id, gp = gpar(fill = "tomato", col = NA))
-for (i in seq_along(l)) {
-  grid.polyline(l[[i]]$x, l[[i]]$y, l[[i]]$id)
-}
+m <- volcano
+b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(9:19), 10*(10:20))
+l <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(10:19))
+
+bands <- iso_to_sfg(b)
+data_bands <- st_sf(
+  level = 1:length(bands),
+  geometry = st_sfc(bands)
+)
+lines <- iso_to_sfg(l)
+data_lines <- st_sf(
+  level = 2:(length(lines)+1),
+  geometry = st_sfc(lines)
+)
+
+ggplot() +
+  geom_sf(data = data_bands, aes(fill = level), color = NA, alpha = 0.7) +
+  geom_sf(data = data_lines, color = "black") +
+  scale_fill_viridis_c(guide = "none") +
+  coord_sf(expand = FALSE)
+
 ```
 
 Isolining is about as fast as `grDevices::contourLines()`, isobanding is approximately 2.5 times slower.

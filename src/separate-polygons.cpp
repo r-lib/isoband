@@ -18,9 +18,6 @@ using namespace std;
  * so intersection in indetermined.
  */
 int ray_intersections(point P, point p0, point p1) {
-  checkUserInterrupt();
-  //cout << P << " " << p0 << " " << p1 << endl;
-
   // simple cases
   if (p0.y < p1.y) {
     if ((P.y < p0.y) || (P.y > p1.y)) return 0;
@@ -308,7 +305,9 @@ List separate_polygons(const NumericVector &x, const NumericVector &y, const Int
 
   // set up polygon hierarchy
   polygon_hierarchy hi(polys.size());
-  for (int i = 0; i < polys.size(); i++)
+  for (int i = 0; i < polys.size(); i++) {
+    checkUserInterrupt();
+
     for (int j = 0; j < polys.size(); j++ ) {
       if (i == j) continue;
 
@@ -322,9 +321,14 @@ List separate_polygons(const NumericVector &x, const NumericVector &y, const Int
         stop("Found polygons without undefined interior/exterior relationship.");
       }
     }
+  }
 
   int next_poly = hi.top_level_poly();
+  int i = 0;
   while(next_poly >= 0) {
+    if (i % 1000 == 0) checkUserInterrupt();
+    i++;
+
     List rings;
     rings.push_back(polygon_as_matrix(polys[next_poly]));
     // cout << "top-level polygon: " << next_poly << endl;
