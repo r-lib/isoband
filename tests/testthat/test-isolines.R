@@ -80,3 +80,27 @@ test_that("All elementary segments are calculated correctly", {
   expect_setequal(out[[1]]$id, c(1:5))
   expect_equal(length(out[[1]]$id), 33)
 })
+
+
+test_that("Saddles", {
+  # a matrix that contains all saddles (there are only two)
+  z <- matrix(c(0, 1, 0,
+                1, 0, 1),
+              ncol = 3, nrow = 2, byrow = TRUE)
+
+  out <- isolines(x = 1:3, y = 2:1, z, levels = 0.5)
+
+  expect_setequal(10000*out[[1]]$x + out[[1]]$y,
+                  10000*c(2.5, 3.0, 2.5, 2.0, 1.5, 1.5, 1.0) +
+                        c(2.0, 1.5, 1.0, 1.5, 1.0, 2.0, 1.5))
+  expect_setequal(out[[1]]$id, c(1:3))
+  expect_equal(length(out[[1]]$id), 7)
+
+  out <- isolines(x = 1:3, y = 2:1, z, levels = 0.6)
+
+  expect_setequal(10000*out[[1]]$x + out[[1]]$y,
+                  10000*c(1.6, 2.0, 2.4, 3.0, 2.6, 1.0, 1.4) +
+                        c(2.0, 1.6, 2.0, 1.4, 1.0, 1.4, 1.0))
+  expect_setequal(out[[1]]$id, c(1:3))
+  expect_equal(length(out[[1]]$id), 7)
+})

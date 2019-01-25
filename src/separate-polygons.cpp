@@ -12,33 +12,6 @@ using namespace std;
 #include "polygon.h"
 #include "separate-polygons.h"
 
-// eventually, move these bits to a polygon.cpp
-
-ostream & operator<<(ostream &out, const point &p) {
-  out << "(" << p.x << ", " << p.y << ")";
-  return out;
-}
-
-bool operator==(const point &p1, const point &p2) {
-  return (p1.x == p2.x) && (p1.y == p2.y);
-}
-
-ostream & operator<<(ostream &out, const in_polygon_type &t) {
-  switch(t) {
-  case inside:
-    out << "inside";
-    break;
-  case outside:
-    out << "outside";
-    break;
-  default:
-    out << "undetermined";
-  }
-  return out;
-}
-
-// end bits that should be moved
-
 /* Calculate the number of times a ray extending from point P to the right
  * intersects with the line segment defined by p0, p1. This number is
  * 0 or 1. However, -1 is returned if the point lies exactly on the segment,
