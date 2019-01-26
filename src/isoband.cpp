@@ -266,6 +266,8 @@ protected:
       return point(grid_x[p.c], interpolate(grid_y[p.r], grid_y[p.r+1], grid_z(p.r, p.c), grid_z(p.r+1, p.c), vlo));
     case vintersect_hi: // intersection with vertical edge, high value
       return point(grid_x[p.c], interpolate(grid_y[p.r], grid_y[p.r+1], grid_z(p.r, p.c), grid_z(p.r+1, p.c), vhi));
+    default:
+      return point(0, 0); // should never get here
     }
   }
 

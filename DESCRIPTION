@@ -1,13 +1,13 @@
 Package: isoband
-Title: Generate isolines and isobands from regularly spaced elevation grids
+Title: Generate Isolines and Isobands from Regularly Spaced Elevation Grids
 Version: 0.1.0
 Authors@R: 
     person(given = "Claus",
            family = "Wilke",
            role = c("aut", "cre"),
            email = "wilke@austin.utexas.edu")
-Description: Generate contour lines (isolines) and contour polygons (isobands) from
-  regularly spaced grids containing elevation data.
+Description: A fast C++ implementation to generate contour lines (isolines) and
+  contour polygons (isobands) from regularly spaced grids containing elevation data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
