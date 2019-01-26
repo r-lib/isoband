@@ -32,7 +32,8 @@ be called or not}
 }
 \description{
 This function visualizes a single isoband calculated from a matrix. It is mainly useful
-for debugging and visualizing the isobanding algorithm
+for debugging and visualizing the isobanding algorithm. See \code{\link[=isobands]{isobands()}} for more
+examples.
 }
 \examples{
 m <- matrix(c(0, 0, 0, 0, 0, 0,

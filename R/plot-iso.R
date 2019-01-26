@@ -1,7 +1,8 @@
 #' Visualize a single isoband
 #'
 #' This function visualizes a single isoband calculated from a matrix. It is mainly useful
-#' for debugging and visualizing the isobanding algorithm
+#' for debugging and visualizing the isobanding algorithm. See [`isobands()`] for more
+#' examples.
 #'
 #' @param m input matrix
 #' @param vlo lower cutoff for isobanding

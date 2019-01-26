@@ -163,17 +163,13 @@ library(magick)
 #> Linking to ImageMagick 6.9.9.39
 #> Enabled features: cairo, fontconfig, freetype, lcms, pango, rsvg, webp
 #> Disabled features: fftw, ghostscript, x11
-library(sf)
-library(ggplot2)
-library(isoband)
-library(colorspace)
 
 sf_from_image <- function(image) {
   image_gray <- image %>% image_quantize(colorspace = "gray")
   image_raster <- as.raster(image_gray)
   d <- dim(image_raster)
   m <- matrix(c((255-col2rgb(image_raster)[1,])), nrow = d[1], ncol = d[2], byrow = TRUE)
-  b <- isobands(1:d[2], d[1]:1, m, 20*(-1:13), 20*(0:14))
+  b <- isobands(1:d[2], d[1]:1, m, 20*(0:13), 20*(1:14))
   bands <- iso_to_sfg(b)
   data <- st_sf(
     level = letters[1:length(bands)],
@@ -209,8 +205,14 @@ p3 <- ggplot(img_sf) +
 
 cowplot::plot_grid(
   p1,
-  p2 + scale_fill_discrete_sequential(aesthetics = c("color", "fill"), palette = "Inferno", guide = "none", rev = TRUE),
-  p2 + scale_fill_discrete_sequential(aesthetics = c("color", "fill"), palette = "Viridis", guide = "none", rev = TRUE),
+  p2 + scale_fill_viridis_d(
+    aesthetics = c("color", "fill"), option = "B", guide = "none",
+    direction = -1
+  ),
+  p2 + scale_fill_viridis_d(
+    aesthetics = c("color", "fill"), option = "D", guide = "none",
+    direction = -1
+  ),
   p3,
   scale = 0.9
 )
@@ -236,7 +238,7 @@ microbenchmark::microbenchmark(
 #>                               isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (10:18))
 #>             isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (9:17),      10 * (10:18))
 #>       min       lq     mean   median       uq       max neval
-#>  1.675161 1.812835 2.694624 2.129540 2.744745 16.622916   100
-#>  1.761252 1.850351 2.429487 1.959520 2.346297  9.678578   100
-#>  4.376592 4.630960 5.593479 4.959469 5.679508 13.972505   100
+#>  1.623163 1.754017 2.316944 1.892529 2.178831 10.729141   100
+#>  1.750317 1.857125 2.276085 1.947959 2.359221  9.654656   100
+#>  4.382390 4.625374 5.072554 4.800300 5.340838  9.739161   100
 ```
