@@ -3,13 +3,6 @@
 #include "polygon.h"
 #include "separate-polygons.h"
 
-/* Things to regression-test for point_in_polygon():
- *  Degenerate polygon, single point
- *  Point aligned with point of one segment, inside
- *  Point aligned with point of one segment, outside
- */
-
-
 context("Point in polygon") {
   test_that("Simple square") {
     polygon poly = {
