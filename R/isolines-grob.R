@@ -68,7 +68,7 @@ makeContent.test_grob <- function(x) {
   label_width_in <- convertWidth(stringWidth(x$label), "in", valueOnly = TRUE)
   label_height_in <- convertHeight(stringHeight(x$label) + stringDescent(x$label), "in", valueOnly = TRUE)
 
-  print(glue::glue("grob: ({grob_width_in}, {grob_height_in}); label: ({label_width_in}, {label_height_in})"))
+  #print(glue::glue("grob: ({grob_width_in}, {grob_height_in}); label: ({label_width_in}, {label_height_in})"))
   textGrob(x$label)
 }
 
