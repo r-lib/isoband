@@ -172,4 +172,76 @@ context("Crop to unit box") {
     expect_true(near_equal(crop1.x, 0));
     expect_true(near_equal(crop1.y, .9));
   }
+
+  test_that("Double intersections") {
+    point crop1, crop2;
+    segment_crop_type result;
+
+    // horizontal lines
+    result = crop_to_unit_box(point(-1, .5), point(2, .5), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 0));
+    expect_true(near_equal(crop1.y, .5));
+    expect_true(near_equal(crop2.x, 1));
+    expect_true(near_equal(crop2.y, .5));
+
+    result = crop_to_unit_box(point(2, .5), point(-1, .5), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 1));
+    expect_true(near_equal(crop1.y, .5));
+    expect_true(near_equal(crop2.x, 0));
+    expect_true(near_equal(crop2.y, .5));
+
+    // vertical lines
+    result = crop_to_unit_box(point(.5, -1), point(.5, 2), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, .5));
+    expect_true(near_equal(crop1.y, 0));
+    expect_true(near_equal(crop2.x, .5));
+    expect_true(near_equal(crop2.y, 1));
+
+    result = crop_to_unit_box(point(.5, 2), point(.5, -1), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, .5));
+    expect_true(near_equal(crop1.y, 1));
+    expect_true(near_equal(crop2.x, .5));
+    expect_true(near_equal(crop2.y, 0));
+
+    // diagonals through corner points
+    result = crop_to_unit_box(point(-3, -3), point(2, 2), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 0));
+    expect_true(near_equal(crop1.y, 0));
+    expect_true(near_equal(crop2.x, 1));
+    expect_true(near_equal(crop2.y, 1));
+
+    result = crop_to_unit_box(point(-1, 2), point(3, -2), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 0));
+    expect_true(near_equal(crop1.y, 1));
+    expect_true(near_equal(crop2.x, 1));
+    expect_true(near_equal(crop2.y, 0));
+
+    // still needed:
+    // 1. individual corners
+    // 2. horizontally and vertically across
+
+  }
+
+  test_that("Points non-trivially outside") {
+    point crop1, crop2;
+    segment_crop_type result;
+
+    result = crop_to_unit_box(point(-.2, .9), point(.1, 1.2), crop1, crop2);
+    expect_true(result == none);
+
+    result = crop_to_unit_box(point(1.2, .9), point(.9, 1.2), crop1, crop2);
+    expect_true(result == none);
+
+    result = crop_to_unit_box(point(-.2, .1), point(.1, -.2), crop1, crop2);
+    expect_true(result == none);
+
+    result = crop_to_unit_box(point(1.2, .1), point(.9, -.2), crop1, crop2);
+    expect_true(result == none);
+  }
 }

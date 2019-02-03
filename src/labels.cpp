@@ -77,7 +77,7 @@ bool double_intersection(const point &p1, const point &p2, point &ip1, point &ip
   double dy = p2.y - p1.y;
 
   if (dx == 0) {
-    if (dy == 0) return false; // degenerate case
+    if (dy == 0) return false; // degenerate case, should never get here
 
     // vertical line
     // trivial cases have been exlcuded by calling function, therefore this is easy
