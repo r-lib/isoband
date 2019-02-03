@@ -222,10 +222,95 @@ context("Crop to unit box") {
     expect_true(near_equal(crop2.x, 1));
     expect_true(near_equal(crop2.y, 0));
 
-    // still needed:
-    // 1. individual corners
-    // 2. horizontally and vertically across
+    // top left corner
+    result = crop_to_unit_box(point(-.4, .4), point(.4, 1.2), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 0));
+    expect_true(near_equal(crop1.y, .8));
+    expect_true(near_equal(crop2.x, .2));
+    expect_true(near_equal(crop2.y, 1));
 
+    result = crop_to_unit_box(point(.4, 1.2), point(-.4, .4), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, .2));
+    expect_true(near_equal(crop1.y, 1));
+    expect_true(near_equal(crop2.x, 0));
+    expect_true(near_equal(crop2.y, .8));
+
+    // top right corner
+    result = crop_to_unit_box(point(1.4, .4), point(.6, 1.2), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 1));
+    expect_true(near_equal(crop1.y, .8));
+    expect_true(near_equal(crop2.x, .8));
+    expect_true(near_equal(crop2.y, 1));
+
+    result = crop_to_unit_box(point(.6, 1.2), point(1.4, .4), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, .8));
+    expect_true(near_equal(crop1.y, 1));
+    expect_true(near_equal(crop2.x, 1));
+    expect_true(near_equal(crop2.y, .8));
+
+    // bottom left corner
+    result = crop_to_unit_box(point(-.4, .6), point(.4, -.2), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 0));
+    expect_true(near_equal(crop1.y, .2));
+    expect_true(near_equal(crop2.x, .2));
+    expect_true(near_equal(crop2.y, 0));
+
+    result = crop_to_unit_box(point(.4, -.2), point(-.4, .6), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, .2));
+    expect_true(near_equal(crop1.y, 0));
+    expect_true(near_equal(crop2.x, 0));
+    expect_true(near_equal(crop2.y, .2));
+
+    // bottom right corner
+    result = crop_to_unit_box(point(.4, -.4), point(1.2, .4), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, .8));
+    expect_true(near_equal(crop1.y, 0));
+    expect_true(near_equal(crop2.x, 1));
+    expect_true(near_equal(crop2.y, .2));
+
+    result = crop_to_unit_box(point(1.2, .4), point(.4, -.4), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 1));
+    expect_true(near_equal(crop1.y, .2));
+    expect_true(near_equal(crop2.x, .8));
+    expect_true(near_equal(crop2.y, 0));
+
+    // horizontally across
+    result = crop_to_unit_box(point(-1, -.2), point(3, 1.4), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 0));
+    expect_true(near_equal(crop1.y, .2));
+    expect_true(near_equal(crop2.x, 1));
+    expect_true(near_equal(crop2.y, .6));
+
+    result = crop_to_unit_box(point(3, 1.4), point(-1, -.2), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, 1));
+    expect_true(near_equal(crop1.y, .6));
+    expect_true(near_equal(crop2.x, 0));
+    expect_true(near_equal(crop2.y, .2));
+
+    // vertically across
+    result = crop_to_unit_box(point(-.2, -1), point(1.4, 3), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, .2));
+    expect_true(near_equal(crop1.y, 0));
+    expect_true(near_equal(crop2.x, .6));
+    expect_true(near_equal(crop2.y, 1));
+
+    result = crop_to_unit_box(point(1.4, 3), point(-.2, -1), crop1, crop2);
+    expect_true(result == in_middle);
+    expect_true(near_equal(crop1.x, .6));
+    expect_true(near_equal(crop1.y, 1));
+    expect_true(near_equal(crop2.x, .2));
+    expect_true(near_equal(crop2.y, 0));
   }
 
   test_that("Points non-trivially outside") {

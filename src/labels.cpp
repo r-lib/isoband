@@ -80,7 +80,7 @@ bool double_intersection(const point &p1, const point &p2, point &ip1, point &ip
     if (dy == 0) return false; // degenerate case, should never get here
 
     // vertical line
-    // trivial cases have been exlcuded by calling function, therefore this is easy
+    // trivial cases have been excluded by calling function, therefore this is easy
     ip1.x = p1.x;
     ip2.x = p1.x;
     if (p1.y >= 1) {
