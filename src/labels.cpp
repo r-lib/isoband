@@ -2,6 +2,7 @@
 using namespace Rcpp;
 
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 #include "labels.h"
@@ -211,22 +212,134 @@ segment_crop_type crop_to_unit_box(const point &p1, const point &p2, point &crop
   return none;
 }
 
+// helper function for crop_lines()
+void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id_out,
+                   const point &p1, const point &p2, int &cur_id_out,
+                   bool &p1_recorded, bool &p2_recorded, bool &new_line_segment) {
+  if (new_line_segment) {
+    cur_id_out++;
+    new_line_segment = false;
+  }
+
+  if (!p1_recorded) {
+    x_out.push_back(p1.x);
+    y_out.push_back(p1.y);
+    id_out.push_back(cur_id_out);
+    p1_recorded = true;
+  }
+
+  if (!p2_recorded) {
+    x_out.push_back(p2.x);
+    y_out.push_back(p2.y);
+    id_out.push_back(cur_id_out);
+    p2_recorded = true;
+  }
+}
+
 // [[Rcpp::export]]
-void test(const NumericVector &pll, const NumericVector &plr, const NumericVector &pul, const NumericVector &p) {
-  point ll(pll[0], pll[1]);
-  point lr(plr[0], plr[1]);
-  point ul(pul[0], pul[1]);
-  point p1(p[0], p[1]);
+List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
+                const NumericVector &p_mid, const double width, const double height, const double theta) {
+  if (x.size() != y.size()) {
+    stop("Number of x and y coordinates must match.");
+  }
+  if (x.size() != id.size()) {
+    stop("Number of x coordinates and id values must match.");
+  }
+  if (p_mid.size() != 2) {
+    stop("Box midpoint needs to be a vector of 2 numeric values.");
+  }
+
+  // set up transformation
+  // lower left point of cropping rectangle
+  point ll(p_mid[0] - width*cos(theta)/2 + height*sin(theta)/2,
+           p_mid[1] - width*sin(theta)/2 - height*cos(theta)/2);
+  // lower right point
+  point lr(ll.x + width*cos(theta), ll.y + width*sin(theta));
+  // upper right point
+  point ul(ll.x - height*sin(theta), ll.y + height*cos(theta));
 
   unitbox_transformer t(ll, lr, ul);
 
-  point p2 = t.transform(p1);
-  point p3 = t.inv_transform(p2);
+  // output variables
+  NumericVector x_out, y_out;
+  IntegerVector id_out;
 
-  cout << p1 << "; " << p2 << "; " << p3 << endl;
+  // crop
+  int cur_id = id[0]; // TODO: need to check that it exists, return early if input is length 0 or 1
+  int cur_id_out = 0; // first output id - 1
+  bool p1_recorded = false;
+  bool p2_recorded = false;
+  bool new_line_segment = true;
+  point p1, p2, p1t, p2t;
+  point crop1, crop2;
+  p1 = point(x[0], y[0]);
+  p1t = t.transform(p1);
+  uint i = 1;
+  while(i < x.size()) {
+    if (cur_id != id[i]) {
+      // id mismatch means we are starting a new line segment
+      p1 = point(x[i], y[i]);
+      p1t = t.transform(p1);
+      cur_id = id[i];
+      p1_recorded = false;
+      new_line_segment = true;
+      i++;
+      continue;
+    }
+    p2 = point(x[i], y[i]);
+    p2t = t.transform(p2);
+    segment_crop_type result = crop_to_unit_box(p1t, p2t, crop1, crop2);
+    switch(result) {
+    case none: // nothing to be done, record and move on
+      p2_recorded = false;
+      break;
+    case complete:
+      // skip recording for this line segment
+      p1_recorded = true;
+      p2_recorded = true;
+      // start new line segment with next point
+      new_line_segment = true;
+      break;
+    case at_beginning:
+      p1t = crop1;
+      p1 = t.inv_transform(p1t);
+      p1_recorded = false;
+      new_line_segment = true;
+      break;
+    case at_end:
+      p2t = crop1;
+      p2 = t.inv_transform(p2t);
+      p2_recorded = false;
+      new_line_segment = true;
+      break;
+    case in_middle:
+      p2_recorded = false;
+      record_points(x_out, y_out, id_out, p1, t.inv_transform(crop1), cur_id_out,
+                    p1_recorded, p2_recorded, new_line_segment);
+      p1t = crop2;
+      p1 = t.inv_transform(p1t);
+      p1_recorded = false;
+      p2_recorded = false;
+      new_line_segment = true;
+      break;
+    default:
+      break; // should never get here
+    }
+
+    record_points(x_out, y_out, id_out, p1, p2, cur_id_out,
+                  p1_recorded, p2_recorded, new_line_segment);
+    p1 = p2;
+    p1t = p2t;
+    i++;
+  }
+
+  return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id_out);
 }
 
 
 /*** R
-test(c(1, 1), c(2, 2), c(0, 2), c(3, 3))
+x <- c(0, 0, 1, 1, 0, 2, 3, 4, 2)
+y <- c(0, 1, 1, 0, 0, 2, 2, 3, 2)
+id <- c(1, 1, 1, 1, 1, 2, 2, 2, 2)
+crop_lines(x, y, id, c(10, 10), 1, 1, 0)
 */
