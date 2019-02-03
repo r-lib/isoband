@@ -288,11 +288,9 @@ List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
     }
     p2 = point(x[i], y[i]);
     p2t = t.transform(p2);
+    p2_recorded = false;
     segment_crop_type result = crop_to_unit_box(p1t, p2t, crop1, crop2);
     switch(result) {
-    case none: // nothing to be done, record and move on
-      p2_recorded = false;
-      break;
     case complete:
       // skip recording for this line segment
       p1_recorded = true;
@@ -307,9 +305,9 @@ List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
       new_line_segment = true;
       break;
     case at_end:
-      p2t = crop1;
-      p2 = t.inv_transform(p2t);
       p2_recorded = false;
+      record_points(x_out, y_out, id_out, p1, t.inv_transform(crop1), cur_id_out,
+                    p1_recorded, p2_recorded, new_line_segment);
       new_line_segment = true;
       break;
     case in_middle:
@@ -322,8 +320,8 @@ List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
       p2_recorded = false;
       new_line_segment = true;
       break;
-    default:
-      break; // should never get here
+    default:   // nothing to be done, record and move on
+      break;
     }
 
     record_points(x_out, y_out, id_out, p1, p2, cur_id_out,
@@ -338,8 +336,10 @@ List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
 
 
 /*** R
-x <- c(0, 0, 1, 1, 0, 2, 3, 4, 2)
+x <- c(0, 0, 1, 1, 0, 2, 3, 2.5, 2)
 y <- c(0, 1, 1, 0, 0, 2, 2, 3, 2)
 id <- c(1, 1, 1, 1, 1, 2, 2, 2, 2)
-crop_lines(x, y, id, c(10, 10), 1, 1, 0)
+out <- crop_lines(x, y, id, c(1, 1), 1, 1, 0)
+grid.newpage()
+grid.polyline(x = out$x/5, y = out$y/5, id = out$id)
 */
