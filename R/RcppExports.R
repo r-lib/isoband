@@ -9,8 +9,8 @@ isolines_impl <- function(x, y, z, value) {
     .Call(`_isoband_isolines_impl`, x, y, z, value)
 }
 
-test <- function(p1, p2) {
-    invisible(.Call(`_isoband_test`, p1, p2))
+test <- function(pll, plr, pul, p) {
+    invisible(.Call(`_isoband_test`, pll, plr, pul, p))
 }
 
 separate_polygons <- function(x, y, id) {

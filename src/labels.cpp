@@ -212,36 +212,21 @@ segment_crop_type crop_to_unit_box(const point &p1, const point &p2, point &crop
 }
 
 // [[Rcpp::export]]
-void test(const NumericVector &p1, const NumericVector &p2) {
-  point start(p1[0], p1[1]);
-  point end(p2[0], p2[1]);
-  point crop1, crop2;
+void test(const NumericVector &pll, const NumericVector &plr, const NumericVector &pul, const NumericVector &p) {
+  point ll(pll[0], pll[1]);
+  point lr(plr[0], plr[1]);
+  point ul(pul[0], pul[1]);
+  point p1(p[0], p[1]);
 
-  segment_crop_type result = crop_to_unit_box(start, end, crop1, crop2);
+  unitbox_transformer t(ll, lr, ul);
 
-  cout << start << "; " << end << ": ";
-  switch(result) {
-  case none:
-    cout << "crop result: none" << endl;
-    break;
-  case complete:
-      cout << "crop result: complete" << endl;
-    break;
-  case at_beginning:
-    cout << "crop result: at beginning " << crop1 << endl;
-    break;
-  case at_end:
-    cout << "crop result: at end " << crop1 << endl;
-    break;
-  case in_middle:
-    cout << "crop result: in middle " << crop1 << " " << crop2 << endl;
-    break;
-  default:
-    cout << "crop result: not implemented" << endl;
-  }
+  point p2 = t.transform(p1);
+  point p3 = t.inv_transform(p2);
+
+  cout << p1 << "; " << p2 << "; " << p3 << endl;
 }
 
 
 /*** R
-test(c(-.3, .5), c(.5, 1.3))
+test(c(1, 1), c(2, 2), c(0, 2), c(3, 3))
 */

@@ -35,13 +35,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // test
-void test(const NumericVector& p1, const NumericVector& p2);
-RcppExport SEXP _isoband_test(SEXP p1SEXP, SEXP p2SEXP) {
+void test(const NumericVector& pll, const NumericVector& plr, const NumericVector& pul, const NumericVector& p);
+RcppExport SEXP _isoband_test(SEXP pllSEXP, SEXP plrSEXP, SEXP pulSEXP, SEXP pSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector& >::type p1(p1SEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type p2(p2SEXP);
-    test(p1, p2);
+    Rcpp::traits::input_parameter< const NumericVector& >::type pll(pllSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type plr(plrSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type pul(pulSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type p(pSEXP);
+    test(pll, plr, pul, p);
     return R_NilValue;
 END_RCPP
 }
@@ -64,7 +66,7 @@ RcppExport SEXP run_testthat_tests();
 static const R_CallMethodDef CallEntries[] = {
     {"_isoband_isobands_impl", (DL_FUNC) &_isoband_isobands_impl, 5},
     {"_isoband_isolines_impl", (DL_FUNC) &_isoband_isolines_impl, 4},
-    {"_isoband_test", (DL_FUNC) &_isoband_test, 2},
+    {"_isoband_test", (DL_FUNC) &_isoband_test, 4},
     {"_isoband_separate_polygons", (DL_FUNC) &_isoband_separate_polygons, 3},
     {"run_testthat_tests",         (DL_FUNC) &run_testthat_tests,         0},
     {NULL, NULL, 0}
