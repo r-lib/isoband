@@ -14,16 +14,16 @@ point entry_intersection(const point &p1, const point &p2) {
   // p1 is to the left of box
   if (p1.x <= 0) {
     // intersection with left boundary
-    double t = (p1.x - p2.x)/p1.x;
+    double t = p1.x/(p1.x - p2.x);
     double yint = p1.y + t*(p2.y - p1.y);
     double xint = 0;
 
     if (yint < 0) { // actually need intersection with lower boundary
-      t = (p1.y - p2.y)/p1.y;
+      t = p1.y/(p1.y - p2.y);
       xint = p1.x + t*(p2.x - p1.x);
       yint = 0;
     } else if (yint > 1) { // actually need intersection with upper boundary
-      t = (p2.y - p1.y)/(1-p1.y);
+      t = (1-p1.y)/(p2.y - p1.y);
       xint = p1.x + t*(p2.x - p1.x);
       yint = 1;
     }
@@ -34,16 +34,16 @@ point entry_intersection(const point &p1, const point &p2) {
   // p1 is to the right of box
   if (p1.x >= 1) {
     // intersection with right boundary
-    double t = (p2.x - p1.x)/(1 - p1.x);
+    double t = (1 - p1.x)/(p2.x - p1.x);
     double yint = p1.y + t*(p2.y - p1.y);
     double xint = 1;
 
     if (yint < 0) { // actually need intersection with lower boundary
-      t = (p1.y - p2.y)/p1.y;
+      t = p1.y/(p1.y - p2.y);
       xint = p1.x + t*(p2.x - p1.x);
       yint = 0;
     } else if (yint > 1) { // actually need intersection with upper boundary
-      t = (p2.y - p1.y)/(1-p1.y);
+      t = (1-p1.y)/(p2.y - p1.y);
       xint = p1.x + t*(p2.x - p1.x);
       yint = 1;
     }
@@ -54,14 +54,14 @@ point entry_intersection(const point &p1, const point &p2) {
   // directly below
   if (p1.y <= 0) {
     // intersection with lower boundary
-    double t = (p1.y - p2.y)/p1.y;
+    double t = p1.y/(p1.y - p2.y);
     double xint = p1.x + t*(p2.x - p1.x);
     double yint = 0;
     return point(xint, yint);
   }
 
   // intersection with upper boundary
-  double t = (p2.y - p1.y)/(1-p1.y);
+  double t = (1-p1.y)/(p2.y - p1.y);
   double xint = p1.x + t*(p2.x - p1.x);
   double yint = 1;
   return point(xint, yint);
@@ -132,6 +132,5 @@ test(c(.2, .3), c(.4, .5))
 test(c(-.2, .3), c(.4, -.5))
 test(c(-.2, -.3), c(-.4, -.5))
 test(c(.2, .3), c(1.5, .5))
-test(c(1.5, .5), c(.5, .5))
-test(c(.5, .5), c(1.5, 1.5))
+test(c(.5, .5), c(1.2, 1.2))
 */
