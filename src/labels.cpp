@@ -258,6 +258,9 @@ List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
   // upper right point
   point ul(ll.x - height*sin(theta), ll.y + height*cos(theta));
 
+  //cout << "c(" << p_mid[0] << ", " << ll.x << ", " << lr.x << ", " << ul.x << ")/5, c(" <<
+  //  p_mid[1] << ", " << ll.y << ", " << lr.y << ", " << ul.y << ")/5" << endl;
+
   unitbox_transformer t(ll, lr, ul);
 
   // output variables
@@ -336,6 +339,13 @@ List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
 
 
 /*** R
+# TODO:
+# 1. rename file?
+# 2. check jumps in calculated id column
+# 3. regression tests
+# 4. properly catch empty or single-point input data
+# 5. debug clipping for rotated boxes (seems to work, problem is rotated viewports in grid)
+
 x <- c(0, 0, 1, 1, 0, 2, 3, 2.5, 2)
 y <- c(0, 1, 1, 0, 0, 2, 2, 3, 2)
 id <- c(1, 1, 1, 1, 1, 2, 2, 2, 2)
