@@ -4,7 +4,8 @@
 #' Clip lines to the outside of a box
 #'
 #' Clip lines to the outside of a box. The box is specified via midpoint, width,
-#' height, and a rotation angle in radians.
+#' height, and a rotation angle in radians. This is used to create space within
+#' isolines for text labels or other annotations.
 #'
 #' @param x Numeric vector of x coordinates
 #' @param y Numeric vector of y coordinates
