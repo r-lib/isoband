@@ -5,7 +5,7 @@ using namespace Rcpp;
 #include <cmath>
 using namespace std;
 
-#include "labels.h"
+#include "clip-lines.h"
 
 
 // calculates the intersection point of a line segment and
@@ -217,8 +217,11 @@ void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id
                    const point &p1, const point &p2, int &cur_id_out,
                    bool &p1_recorded, bool &p2_recorded, bool &new_line_segment) {
   if (new_line_segment) {
-    cur_id_out++;
-    new_line_segment = false;
+    // start a new line segment, but defer if nothing to record
+    if (!p1_recorded || !p2_recorded) {
+      cur_id_out++;
+      new_line_segment = false;
+    }
   }
 
   if (!p1_recorded) {
@@ -236,8 +239,22 @@ void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id
   }
 }
 
+
+//' Clip lines to the outside of a box
+//'
+//' Clip lines to the outside of a box. The box is specified via midpoint, width,
+//' height, and a rotation angle in radians.
+//'
+//' @param x Numeric vector of x coordinates
+//' @param y Numeric vector of y coordinates
+//' @param id Integer vector of id numbers indicating which lines are connected
+//' @param p_mid Numeric vector specifying x and y position of the box midpoint
+//' @param width Box width
+//' @param height Box height
+//' @param theta Box angle, in radians
+//' @export
 // [[Rcpp::export]]
-List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
+List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
                 const NumericVector &p_mid, const double width, const double height, const double theta) {
   if (x.size() != y.size()) {
     stop("Number of x and y coordinates must match.");
@@ -340,16 +357,13 @@ List crop_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
 
 /*** R
 # TODO:
-# 1. rename file?
-# 2. check jumps in calculated id column
-# 3. regression tests
-# 4. properly catch empty or single-point input data
-# 5. debug clipping for rotated boxes (seems to work, problem is rotated viewports in grid)
+# 1. regression tests
+# 2. properly catch empty or single-point input data
 
 x <- c(0, 0, 1, 1, 0, 2, 3, 2.5, 2)
 y <- c(0, 1, 1, 0, 0, 2, 2, 3, 2)
 id <- c(1, 1, 1, 1, 1, 2, 2, 2, 2)
-out <- crop_lines(x, y, id, c(1, 1), 1, 1, 0)
+out <- clip_lines(x, y, id, c(1, 1), 1, 1, 0)
 grid.newpage()
 grid.polyline(x = out$x/5, y = out$y/5, id = out$id)
 */

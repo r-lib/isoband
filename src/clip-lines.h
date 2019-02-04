@@ -1,5 +1,5 @@
-#ifndef LABELS_H
-#define LABELS_H
+#ifndef CLIP_LINES_H
+#define CLIP_LINES_H
 
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -77,4 +77,4 @@ public:
 
 };
 
-#endif // LABELS_H
+#endif // CLIP_LINES_H

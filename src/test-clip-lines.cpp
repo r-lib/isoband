@@ -1,7 +1,7 @@
 #include <testthat.h>
 
 #include "polygon.h"
-#include "labels.h"
+#include "clip-lines.h"
 
 #include <cmath>
 
