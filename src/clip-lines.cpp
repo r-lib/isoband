@@ -212,6 +212,12 @@ segment_crop_type crop_to_unit_box(const point &p1, const point &p2, point &crop
   return none;
 }
 
+// helper function for crop_lines(); checks whether a single point is inside the unit box
+bool in_unit_box(const point &p) {
+  if (p.x > 0 && p.x < 1 && p.y > 0 && p.y < 1) return true;
+  return false;
+}
+
 // helper function for crop_lines()
 void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id_out,
                    const point &p1, const point &p2, int &cur_id_out,
@@ -257,6 +263,11 @@ void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id
 // [[Rcpp::export]]
 List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
                 const NumericVector &p_mid, const double width, const double height, const double theta) {
+  // output variables
+  NumericVector x_out, y_out;
+  IntegerVector id_out;
+
+  // input checks
   if (x.size() != y.size()) {
     stop("Number of x and y coordinates must match.");
   }
@@ -266,6 +277,11 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
   if (p_mid.size() != 2) {
     stop("Box midpoint needs to be a vector of 2 numeric values.");
   }
+  if (x.size() == 0) {
+    // empty input, return empty output
+    return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id_out);
+  }
+
 
   // set up transformation
   // lower left point of cropping rectangle
@@ -281,28 +297,31 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
 
   unitbox_transformer t(ll, lr, ul);
 
-  // output variables
-  NumericVector x_out, y_out;
-  IntegerVector id_out;
-
   // crop
   int cur_id = id[0]; // TODO: need to check that it exists, return early if input is length 0 or 1
   int cur_id_out = 0; // first output id - 1
-  bool p1_recorded = false;
-  bool p2_recorded = false;
-  bool new_line_segment = true;
   point p1, p2, p1t, p2t;
   point crop1, crop2;
   p1 = point(x[0], y[0]);
   p1t = t.transform(p1);
+
+  bool p1_recorded = in_unit_box(p1t); // record only if not in unit box, catches singlets
+  bool p2_recorded = true; // when we first enter the loop, have only p1 unrecorded
+  bool new_line_segment = true;
+
   uint i = 1;
   while(i < x.size()) {
     if (cur_id != id[i]) {
       // id mismatch means we are starting a new line segment
+
+      // first record any points that haven't been recorded yet. catches singlets
+      record_points(x_out, y_out, id_out, p1, p2, cur_id_out,
+                    p1_recorded, p2_recorded, new_line_segment);
+      // now set up next line segment
       p1 = point(x[i], y[i]);
       p1t = t.transform(p1);
       cur_id = id[i];
-      p1_recorded = false;
+      p1_recorded = in_unit_box(p1t); // record only if not in unit box, catches singlets
       new_line_segment = true;
       i++;
       continue;
@@ -351,6 +370,9 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
     p1t = p2t;
     i++;
   }
+  // record any remaining points; catches singlets
+  record_points(x_out, y_out, id_out, p1, p2, cur_id_out,
+                p1_recorded, p2_recorded, new_line_segment);
 
   return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id_out);
 }
@@ -358,8 +380,9 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
 
 /*** R
 # TODO:
-# 1. regression tests
-# 2. properly catch empty or single-point input data
+# 1. regression tests:
+#    - rotated clipping area for non-45 degree angle
+# 2. clipping to multiple boxes at once
 
 x <- c(0, 0, 1, 1, 0, 2, 3, 2.5, 2)
 y <- c(0, 1, 1, 0, 0, 2, 2, 3, 2)
