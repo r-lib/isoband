@@ -5,20 +5,19 @@
 #' @param lines Isolines, as produced by the [`isolines()`] function.
 #' @param gp Grid graphical parameters.
 #' @examples
-#' m <- matrix(c(0, 0, 0, 0, 0, 0,
-#'               0, 0, 0, 1, 1, 0,
-#'               0, 0, 1, 2, 1, 0,
-#'               0, 1, 2, 0, 0, 0,
-#'               0, 0, 0, 3, 0, 0,
-#'               0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
-#'
-#' lines <- isolines(
-#'   (1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1),
-#'   m, c(0.5, 1.5, 2.5, 3.5)
-#' )
+#' x <- (1:ncol(volcano))/(ncol(volcano)+1)
+#' y <- (nrow(volcano):1)/(nrow(volcano)+1)
+#' lines <- isolines(x, y, volcano, 10*(10:18))
 #'
 #' library(grid)
 #' grid.newpage()
+#'
+#' # make some colored background
+#' grid.rect(width = .7, height = .7, gp = gpar(fill = "cornsilk1", col = NA))
+#' grid.rect(width = .5, height = .5, gp = gpar(fill = "cornsilk2", col = NA))
+#' grid.rect(width = .3, height = .3, gp = gpar(fill = "cornsilk3", col = NA))
+#'
+#' # draw labeled lines
 #' grid.draw(isolines_grob(lines))
 #' @export
 isolines_grob <- function(lines, gp = gpar()) {
@@ -42,38 +41,46 @@ labeled_polyline_grob <- function(data, label) {
     return(NULL)
   }
 
+  # calculate label width and height in npc units
+  label_width <- convertWidth(stringWidth(label), "npc", valueOnly = TRUE)
+  label_height <- convertHeight(stringHeight(label) + stringDescent(label), "npc", valueOnly = TRUE)
+
+  # find minimum in contour line
   idx <- which(data$y == min(data$y))[1]
 
+  # calculate label position
+  pos <- label_position(data, idx, 1)
+  clipped <- clip_lines(
+    data$x, data$y, data$id, pos$center,
+    label_width, label_height, pos$theta
+  )
+
+  rot <- 360*pos$theta/(2*pi)
+
+  if (rot <= -90) {
+    rot <- 180 + rot
+  } else if (rot > 90) {
+    rot <- rot - 180
+  }
+
   grobTree(
-    polylineGrob(data$x, data$y, data$id),
-    textGrob(label, data$x[idx], data$y[idx])
+    polylineGrob(clipped$x, clipped$y, clipped$id),
+    textGrob(label, pos$center[1], pos$center[2], rot = rot)
   )
 }
 
-
-
-# Test code ---------------------------------------------------------------
-# Some test code, to be deleted eventually
-# Demonstrates how we can obtain the size of a text label relative to
-# the size of the viewport in which it is drawn
-
-test_grob <- function(label, gp = gpar()) {
-  gTree(label = label, gp = gp, cl = "test_grob")
+# Calculate the position and rotation of a label based
+# on the x,y data and the index position in the data.
+# The variable `n` sets the neighborhood size, n = 2 means
+# two points in either direction are used.
+label_position <- function(data, idx, n = 2) {
+  imin <- max(idx - n, 1)
+  imax <- min(idx + n, length(data$x))
+  x <- data$x[imin:imax]
+  y <- data$y[imin:imax]
+  xave <- mean(x)
+  yave <- mean(y)
+  m <- cbind(x - xave, y - yave)
+  v <- svd(m)$v
+  list(center = c(xave, yave), theta = atan2(v[2], v[1]))
 }
-
-makeContent.test_grob <- function(x) {
-  grob_width_in <- convertWidth(unit(1, "npc"), "in", valueOnly = TRUE)
-  grob_height_in <- convertHeight(unit(1, "npc"), "in", valueOnly = TRUE)
-
-  label_width_in <- convertWidth(stringWidth(x$label), "in", valueOnly = TRUE)
-  label_height_in <- convertHeight(stringHeight(x$label) + stringDescent(x$label), "in", valueOnly = TRUE)
-
-  #print(glue::glue("grob: ({grob_width_in}, {grob_height_in}); label: ({label_width_in}, {label_height_in})"))
-  textGrob(x$label)
-}
-
-#grid.newpage()
-#grid.draw(test_grob("hello!"))
-#grid.draw(test_grob("world", gp = gpar(fontsize = 24)))
-
-

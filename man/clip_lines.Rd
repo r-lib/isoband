@@ -23,5 +23,6 @@ clip_lines(x, y, id, p_mid, width, height, theta)
 }
 \description{
 Clip lines to the outside of a box. The box is specified via midpoint, width,
-height, and a rotation angle in radians.
+height, and a rotation angle in radians. This is used to create space within
+isolines for text labels or other annotations.
 }

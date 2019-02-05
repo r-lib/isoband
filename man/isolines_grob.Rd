@@ -15,19 +15,18 @@ isolines_grob(lines, gp = gpar())
 This function generates a grid grob that represents labeled isolines.
 }
 \examples{
-m <- matrix(c(0, 0, 0, 0, 0, 0,
-              0, 0, 0, 1, 1, 0,
-              0, 0, 1, 2, 1, 0,
-              0, 1, 2, 0, 0, 0,
-              0, 0, 0, 3, 0, 0,
-              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
-
-lines <- isolines(
-  (1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1),
-  m, c(0.5, 1.5, 2.5, 3.5)
-)
+x <- (1:ncol(volcano))/(ncol(volcano)+1)
+y <- (nrow(volcano):1)/(nrow(volcano)+1)
+lines <- isolines(x, y, volcano, 10*(10:18))
 
 library(grid)
 grid.newpage()
+
+# make some colored background
+grid.rect(width = .7, height = .7, gp = gpar(fill = "cornsilk1", col = NA))
+grid.rect(width = .5, height = .5, gp = gpar(fill = "cornsilk2", col = NA))
+grid.rect(width = .3, height = .3, gp = gpar(fill = "cornsilk3", col = NA))
+
+# draw labeled lines
 grid.draw(isolines_grob(lines))
 }
