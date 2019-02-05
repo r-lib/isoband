@@ -3,6 +3,8 @@
 
 # isoband
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/isoband)](https://cran.r-project.org/package=isoband)
 [![Build
 Status](https://travis-ci.org/clauswilke/isoband.svg?branch=master)](https://travis-ci.org/clauswilke/isoband)
 [![Coverage
@@ -13,10 +15,16 @@ regularly spaced grids containing elevation data.
 
 ## Installation
 
-Install from github with:
+Install the latest official release from CRAN via:
 
 ``` r
-devtools::install_github("clauswilke/isoband")
+install.packages("isoband")
+```
+
+Install the current development from github via:
+
+``` r
+remotes::install_github("clauswilke/isoband")
 ```
 
 ## Examples
@@ -238,7 +246,7 @@ microbenchmark::microbenchmark(
 #>                               isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (10:18))
 #>             isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (9:17),      10 * (10:18))
 #>       min       lq     mean   median       uq       max neval
-#>  1.623163 1.754017 2.316944 1.892529 2.178831 10.729141   100
-#>  1.750317 1.857125 2.276085 1.947959 2.359221  9.654656   100
-#>  4.382390 4.625374 5.072554 4.800300 5.340838  9.739161   100
+#>  1.612395 1.695477 1.960857 1.794610 2.054721  3.850897   100
+#>  1.664843 1.773456 2.164519 1.851443 2.182441  7.377072   100
+#>  4.138349 4.398549 4.937179 4.530082 5.032601 11.194105   100
 ```
