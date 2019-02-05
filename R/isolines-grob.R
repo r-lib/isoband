@@ -12,10 +12,12 @@
 #' library(grid)
 #' grid.newpage()
 #'
-#' # make some colored background
-#' grid.rect(width = .7, height = .7, gp = gpar(fill = "cornsilk1", col = NA))
-#' grid.rect(width = .5, height = .5, gp = gpar(fill = "cornsilk2", col = NA))
-#' grid.rect(width = .3, height = .3, gp = gpar(fill = "cornsilk3", col = NA))
+#' # create a colored background
+#' grid.newpage()
+#' grid.rect(width = .8, height = .8, gp = gpar(fill = "azure1", col = NA))
+#' grid.rect(width = .6, height = .6, gp = gpar(fill = "cornsilk1", col = NA))
+#' grid.rect(width = .4, height = .4, gp = gpar(fill = "cornsilk2", col = NA))
+#' grid.rect(width = .2, height = .2, gp = gpar(fill = "cornsilk3", col = NA))
 #'
 #' # draw labeled lines
 #' grid.draw(isolines_grob(lines))
@@ -24,6 +26,7 @@ isolines_grob <- function(lines, gp = gpar()) {
   gTree(lines = lines, gp = gp, cl = "isolines_grob")
 }
 
+#' @export
 makeContent.isolines_grob <- function(x) {
   grobs <- mapply(
     labeled_polyline_grob,
