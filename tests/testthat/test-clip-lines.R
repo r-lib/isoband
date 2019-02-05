@@ -152,4 +152,8 @@ test_that("empty or incorrect input", {
     clip_lines(numeric(1), numeric(0), integer(0), c(3, 2), .1, .1, 0),
     "must match"
   )
+  expect_error(
+    clip_lines(numeric(0), numeric(0), integer(0), c(3, 2, 1), .1, .1, 0),
+    "vector of 2"
+  )
 })
