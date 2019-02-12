@@ -77,6 +77,8 @@ labeled_polyline_grob <- function(data, label) {
 # The variable `n` sets the neighborhood size, n = 2 means
 # two points in either direction are used.
 label_position <- function(data, idx, n = 2) {
+  # need a better way of handling running past the end when the line wraps
+  # something like: ((idx-n):idx) %% length
   imin <- max(idx - n, 1)
   imax <- min(idx + n, length(data$x))
   x <- data$x[imin:imax]

@@ -3,6 +3,7 @@ using namespace Rcpp;
 
 #include <iostream>
 #include <cmath>
+#include <cstddef>  // for size_t
 using namespace std;
 
 #include "clip-lines.h"
@@ -298,7 +299,7 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
   unitbox_transformer t(ll, lr, ul);
 
   // crop
-  int cur_id = id[0]; // TODO: need to check that it exists, return early if input is length 0 or 1
+  int cur_id = id[0];
   int cur_id_out = 0; // first output id - 1
   point p1, p2, p1t, p2t;
   point crop1, crop2;
@@ -309,7 +310,7 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
   bool p2_recorded = true; // when we first enter the loop, have only p1 unrecorded
   bool new_line_segment = true;
 
-  uint i = 1;
+  size_t i = 1;
   while(i < x.size()) {
     if (cur_id != id[i]) {
       // id mismatch means we are starting a new line segment
