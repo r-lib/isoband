@@ -262,8 +262,9 @@ void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id
 //' @param theta Box angle, in radians
 //' @export
 // [[Rcpp::export]]
-List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
-                const NumericVector &p_mid, const double width, const double height, const double theta) {
+List clip_lines_impl(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
+                     const double p_mid_x, const double p_mid_y, const double width,
+                     const double height, const double theta) {
   // output variables
   NumericVector x_out, y_out;
   IntegerVector id_out;
@@ -275,9 +276,6 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
   if (x.size() != id.size()) {
     stop("Number of x coordinates and id values must match.");
   }
-  if (p_mid.size() != 2) {
-    stop("Box midpoint needs to be a vector of 2 numeric values.");
-  }
   if (x.size() == 0) {
     // empty input, return empty output
     return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id_out);
@@ -286,8 +284,8 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
 
   // set up transformation
   // lower left point of cropping rectangle
-  point ll(p_mid[0] - width*cos(theta)/2 + height*sin(theta)/2,
-           p_mid[1] - width*sin(theta)/2 - height*cos(theta)/2);
+  point ll(p_mid_x - width*cos(theta)/2 + height*sin(theta)/2,
+           p_mid_y - width*sin(theta)/2 - height*cos(theta)/2);
   // lower right point
   point lr(ll.x + width*cos(theta), ll.y + width*sin(theta));
   // upper right point
@@ -388,7 +386,7 @@ List clip_lines(const NumericVector &x, const NumericVector &y, const IntegerVec
 x <- c(0, 0, 1, 1, 0, 2, 3, 2.5, 2)
 y <- c(0, 1, 1, 0, 0, 2, 2, 3, 2)
 id <- c(1, 1, 1, 1, 1, 2, 2, 2, 2)
-out <- clip_lines(x, y, id, c(1, 1), 1, 1, 0)
+out <- clip_lines_impl(x, y, id, 1, 1, 1, 1, 0)
 grid.newpage()
 grid.polyline(x = out$x/5, y = out$y/5, id = out$id)
 */

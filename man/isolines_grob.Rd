@@ -4,12 +4,19 @@
 \alias{isolines_grob}
 \title{Render labeled isolines}
 \usage{
-isolines_grob(lines, gp = gpar())
+isolines_grob(lines, gp = gpar(), breaks = NULL, labels = NULL)
 }
 \arguments{
 \item{lines}{Isolines, as produced by the \code{\link[=isolines]{isolines()}} function.}
 
 \item{gp}{Grid graphical parameters.}
+
+\item{breaks}{Character vector specifying the isolines that should be
+labeled. If \code{NULL}, labels all isolines.}
+
+\item{labels}{Character vector specifying the labels for each break.
+If \code{NULL}, uses the breaks as labels. The number of labels provided
+must match the number of breaks provided.}
 }
 \description{
 This function generates a grid grob that represents labeled isolines.

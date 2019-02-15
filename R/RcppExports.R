@@ -15,8 +15,8 @@
 #' @param height Box height
 #' @param theta Box angle, in radians
 #' @export
-clip_lines <- function(x, y, id, p_mid, width, height, theta) {
-    .Call(`_isoband_clip_lines`, x, y, id, p_mid, width, height, theta)
+clip_lines_impl <- function(x, y, id, p_mid_x, p_mid_y, width, height, theta) {
+    .Call(`_isoband_clip_lines_impl`, x, y, id, p_mid_x, p_mid_y, width, height, theta)
 }
 
 isobands_impl <- function(x, y, z, value_low, value_high) {

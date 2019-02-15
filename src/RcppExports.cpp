@@ -5,20 +5,21 @@
 
 using namespace Rcpp;
 
-// clip_lines
-List clip_lines(const NumericVector& x, const NumericVector& y, const IntegerVector& id, const NumericVector& p_mid, const double width, const double height, const double theta);
-RcppExport SEXP _isoband_clip_lines(SEXP xSEXP, SEXP ySEXP, SEXP idSEXP, SEXP p_midSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP thetaSEXP) {
+// clip_lines_impl
+List clip_lines_impl(const NumericVector& x, const NumericVector& y, const IntegerVector& id, const double p_mid_x, const double p_mid_y, const double width, const double height, const double theta);
+RcppExport SEXP _isoband_clip_lines_impl(SEXP xSEXP, SEXP ySEXP, SEXP idSEXP, SEXP p_mid_xSEXP, SEXP p_mid_ySEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP thetaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const NumericVector& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type y(ySEXP);
     Rcpp::traits::input_parameter< const IntegerVector& >::type id(idSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type p_mid(p_midSEXP);
+    Rcpp::traits::input_parameter< const double >::type p_mid_x(p_mid_xSEXP);
+    Rcpp::traits::input_parameter< const double >::type p_mid_y(p_mid_ySEXP);
     Rcpp::traits::input_parameter< const double >::type width(widthSEXP);
     Rcpp::traits::input_parameter< const double >::type height(heightSEXP);
     Rcpp::traits::input_parameter< const double >::type theta(thetaSEXP);
-    rcpp_result_gen = Rcpp::wrap(clip_lines(x, y, id, p_mid, width, height, theta));
+    rcpp_result_gen = Rcpp::wrap(clip_lines_impl(x, y, id, p_mid_x, p_mid_y, width, height, theta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -68,7 +69,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_isoband_clip_lines", (DL_FUNC) &_isoband_clip_lines, 7},
+    {"_isoband_clip_lines_impl", (DL_FUNC) &_isoband_clip_lines_impl, 8},
     {"_isoband_isobands_impl", (DL_FUNC) &_isoband_isobands_impl, 5},
     {"_isoband_isolines_impl", (DL_FUNC) &_isoband_isolines_impl, 4},
     {"_isoband_separate_polygons", (DL_FUNC) &_isoband_separate_polygons, 3},
