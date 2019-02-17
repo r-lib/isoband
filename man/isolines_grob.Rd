@@ -40,20 +40,33 @@ different alpha values.}
 This function generates a grid grob that represents labeled isolines.
 }
 \examples{
+library(grid)
+
+viridis_pal <- colorRampPalette(
+  c("#440154", "#414487", "#2A788E", "#22A884", "#7AD151", "#FDE725"),
+  space = "Lab"
+)
+
 x <- (1:ncol(volcano))/(ncol(volcano)+1)
 y <- (nrow(volcano):1)/(nrow(volcano)+1)
-lines <- isolines(x, y, volcano, 10*(10:18))
+lines <- isolines(x, y, volcano, 5*(19:38))
+bands <- isobands(x, y, volcano, 5*(18:38), 5*(19:39))
 
-library(grid)
+b <- isobands_grob(
+  bands,
+  gp = gpar(col = NA, fill = viridis_pal(21), alpha = 0.4)
+)
+l <- isolines_grob(
+  lines, breaks = 20*(5:10),
+  gp = gpar(
+    lwd = c(.3, 1, .3, .3)
+  )
+)
+
 grid.newpage()
-
-# create a colored background
-grid.newpage()
-grid.rect(width = .8, height = .8, gp = gpar(fill = "azure1", col = NA))
-grid.rect(width = .6, height = .6, gp = gpar(fill = "cornsilk1", col = NA))
-grid.rect(width = .4, height = .4, gp = gpar(fill = "cornsilk2", col = NA))
-grid.rect(width = .2, height = .2, gp = gpar(fill = "cornsilk3", col = NA))
-
-# draw labeled lines
-grid.draw(isolines_grob(lines))
+grid.draw(b)
+grid.draw(l)
+}
+\seealso{
+See \code{\link[=isobands_grob]{isobands_grob()}} for drawing of isobands.
 }
