@@ -52,13 +52,37 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL) {
   )
   labels_data <- Reduce(rbind, rows)
 
-  gTree(lines = lines, labels_data = labels_data, gp = gp, cl = "isolines_grob")
+  gTree(lines = lines, labels_data = labels_data, gp_combined = gp, cl = "isolines_grob")
+}
+
+#' @export
+makeContext.isolines_grob <- function(x) {
+  # store current graphics parameters for later
+  x$gp_cur <- get.gpar()
+
+  # we need to set up the gp slot for text labels, so font calculations work
+  gp <- modifyList(x$gp_cur, x$gp_combined)
+
+  # map graphics parameters to duplicated labels
+  # first, color and alpha
+  n <- length(x$lines)
+  col <- rep_len(gp$col, n)[x$labels_data$index]
+  alpha <- rep_len(gp$alpha, n)[x$labels_data$index]
+  # now, font parameters
+  ## TODO, current implementation is incomplete
+  # ...
+  ##
+  x$gp <- gpar(
+    col = col, alpha = alpha, cex = gp$cex, fontsize = gp$fontsize,
+    lineheight = gp$lineheight, fontfamily = gp$fontfamily, fontface = gp$fontface
+  )
+
+  x
 }
 
 #' @export
 makeContent.isolines_grob <- function(x) {
   labels_data <- x$labels_data
-  #print(labels_data)
 
   # calculate label widths and heights in npc units
   label_widths <- convertWidth(stringWidth(labels_data$label), "npc", valueOnly = TRUE)
@@ -88,8 +112,8 @@ makeContent.isolines_grob <- function(x) {
     )
   }
 
-  # get current graphical parameters so we can redistribute among isolevels
-  gp <- get.gpar()
+  # merge current and grob-specific graphical parameters so we can redistribute among isolevels
+  gp <- modifyList(x$gp_cur, x$gp_combined)
   n <- length(x$lines)
 
   lines_grobs <- mapply(
