@@ -247,20 +247,20 @@ void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id
 }
 
 
-//' Clip lines to the outside of a box
-//'
-//' Clip lines to the outside of a box. The box is specified via midpoint, width,
-//' height, and a rotation angle in radians. This is used to create space within
-//' isolines for text labels or other annotations.
-//'
-//' @param x Numeric vector of x coordinates
-//' @param y Numeric vector of y coordinates
-//' @param id Integer vector of id numbers indicating which lines are connected
-//' @param p_mid_x, p_mid_y Numeric values specifying the x and y position of the box midpoint
-//' @param width Box width
-//' @param height Box height
-//' @param theta Box angle, in radians
-//' @export
+// Clip lines to the outside of a box
+//
+// Clip lines to the outside of a box. The box is specified via midpoint, width,
+// height, and a rotation angle in radians. This is used to create space within
+// isolines for text labels or other annotations.
+//
+// @param x Numeric vector of x coordinates
+// @param y Numeric vector of y coordinates
+// @param id Integer vector of id numbers indicating which lines are connected
+// @param p_mid_x,p_mid_y Numeric values specifying the x and y position of the box midpoint
+// @param width Box width
+// @param height Box height
+// @param theta Box angle, in radians
+// @export
 // [[Rcpp::export]]
 List clip_lines_impl(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
                      const double p_mid_x, const double p_mid_y, const double width,
