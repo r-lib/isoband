@@ -47,6 +47,7 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL) {
     lines[breaks],
     breaks,
     labels,
+    match(breaks, names(lines)), # index of labeled lines in original list of lines, for matching of graphical parameters
     SIMPLIFY = FALSE
   )
   labels_data <- Reduce(rbind, rows)
@@ -57,6 +58,7 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL) {
 #' @export
 makeContent.isolines_grob <- function(x) {
   labels_data <- x$labels_data
+  #print(labels_data)
 
   # calculate label widths and heights in npc units
   label_widths <- convertWidth(stringWidth(labels_data$label), "npc", valueOnly = TRUE)
@@ -72,15 +74,37 @@ makeContent.isolines_grob <- function(x) {
     theta = labels_data$theta
   )
 
-  make_lines_grobs <- function(data) {
+  make_lines_grobs <- function(data, col, alpha, lty, lwd, lex, lineend, linejoin, linemitre) {
     if (length(data$x) == 0) {
       return(NULL)
     }
     clipped <- clip_lines(data$x, data$y, data$id, clip_boxes)
-    polylineGrob(clipped$x, clipped$y, clipped$id)
+    polylineGrob(
+      clipped$x, clipped$y, clipped$id,
+      gp = gpar(
+        col = col, alpha = alpha, lty = lty, lwd = lwd, lex = lex,
+        lineend = lineend, linejoin = linejoin, linemitre = linemitre
+      )
+    )
   }
 
-  lines_grobs <- lapply(x$lines, make_lines_grobs)
+  # get current graphical parameters so we can redistribute among isolevels
+  gp <- get.gpar()
+  n <- length(x$lines)
+
+  lines_grobs <- mapply(
+    make_lines_grobs,
+    x$lines,
+    rep_len(gp$col, n),
+    rep_len(gp$alpha, n),
+    rep_len(gp$lty, n),
+    rep_len(gp$lwd, n),
+    rep_len(gp$lex, n),
+    rep_len(gp$lineend, n),
+    rep_len(gp$linejoin, n),
+    rep_len(gp$linemitre, n),
+    SIMPLIFY = FALSE
+  )
 
   # calculate rotation angles for text labels
   rot <- 360*labels_data$theta/(2*pi)
@@ -94,11 +118,12 @@ makeContent.isolines_grob <- function(x) {
 }
 
 
-place_labels <- function(line_data, break_id, label) {
+place_labels <- function(line_data, break_id, label, index) {
   # return empty row if either missing line data or missing label
   if (length(line_data$x) == 0 || is.na(label)) {
     return(
       data.frame(
+        index = integer(0),
         break_id = character(0), label = character(0),
         x = numeric(0), y = numeric(0), theta = numeric(0),
         stringsAsFactors = FALSE
@@ -117,6 +142,7 @@ place_labels <- function(line_data, break_id, label) {
 
   # return results
   data.frame(
+    index = index, # index in original list of all isolines
     break_id = break_id,
     label = label,
     x = pos$x, y = pos$y, theta = pos$theta,
