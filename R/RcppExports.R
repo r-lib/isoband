@@ -10,7 +10,7 @@
 #' @param x Numeric vector of x coordinates
 #' @param y Numeric vector of y coordinates
 #' @param id Integer vector of id numbers indicating which lines are connected
-#' @param p_mid Numeric vector specifying x and y position of the box midpoint
+#' @param p_mid_x, p_mid_y Numeric values specifying the x and y position of the box midpoint
 #' @param width Box width
 #' @param height Box height
 #' @param theta Box angle, in radians

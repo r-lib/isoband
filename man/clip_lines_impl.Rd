@@ -13,13 +13,13 @@ clip_lines_impl(x, y, id, p_mid_x, p_mid_y, width, height, theta)
 
 \item{id}{Integer vector of id numbers indicating which lines are connected}
 
+\item{p_mid_x, }{p_mid_y Numeric values specifying the x and y position of the box midpoint}
+
 \item{width}{Box width}
 
 \item{height}{Box height}
 
 \item{theta}{Box angle, in radians}
-
-\item{p_mid}{Numeric vector specifying x and y position of the box midpoint}
 }
 \description{
 Clip lines to the outside of a box. The box is specified via midpoint, width,

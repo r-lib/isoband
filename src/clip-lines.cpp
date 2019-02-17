@@ -256,7 +256,7 @@ void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id
 //' @param x Numeric vector of x coordinates
 //' @param y Numeric vector of y coordinates
 //' @param id Integer vector of id numbers indicating which lines are connected
-//' @param p_mid Numeric vector specifying x and y position of the box midpoint
+//' @param p_mid_x, p_mid_y Numeric values specifying the x and y position of the box midpoint
 //' @param width Box width
 //' @param height Box height
 //' @param theta Box angle, in radians
@@ -381,7 +381,6 @@ List clip_lines_impl(const NumericVector &x, const NumericVector &y, const Integ
 # TODO:
 # 1. regression tests:
 #    - rotated clipping area for non-45 degree angle
-# 2. clipping to multiple boxes at once
 
 x <- c(0, 0, 1, 1, 0, 2, 3, 2.5, 2)
 y <- c(0, 1, 1, 0, 0, 2, 2, 3, 2)
