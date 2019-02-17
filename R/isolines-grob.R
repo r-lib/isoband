@@ -15,6 +15,8 @@
 #' @param labels Character vector specifying the labels for each break.
 #'   If `NULL`, uses the breaks as labels. The number of labels provided
 #'   must match the number of breaks provided.
+#' @param units A character string specifying the units in which to
+#'   interpret the isolines coordinates. Defaults to `"npc"`.
 #' @param label_col Color applied to labels. Can be used to override the
 #'   color provided in `gp`, in case labels and lines should have different
 #'   colors.
@@ -40,7 +42,7 @@
 #' grid.draw(isolines_grob(lines))
 #' @export
 isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
-                          label_col = NULL, label_alpha = NULL) {
+                          units = "npc", label_col = NULL, label_alpha = NULL) {
   if (is.null(breaks)) {
     breaks <- names(lines)
   } else {
@@ -74,6 +76,7 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
     gp_combined = gp,
     label_col = label_col,
     label_alpha = label_alpha,
+    units = units,
     cl = "isolines_grob"
   )
 }
@@ -123,10 +126,10 @@ makeContent.isolines_grob <- function(x) {
   labels_data <- x$labels_data
 
   # calculate label widths and heights in npc units
-  label_widths <- convertWidth(stringWidth(labels_data$label), "npc", valueOnly = TRUE)
+  label_widths <- convertWidth(stringWidth(labels_data$label), x$units, valueOnly = TRUE)
   label_heights <- convertHeight(
     stringHeight(labels_data$label) + stringDescent(labels_data$label),
-    "npc", valueOnly = TRUE
+    x$units, valueOnly = TRUE
   )
 
   # calculate the clip box for each label
@@ -143,6 +146,7 @@ makeContent.isolines_grob <- function(x) {
     clipped <- clip_lines(data$x, data$y, data$id, clip_boxes)
     polylineGrob(
       clipped$x, clipped$y, clipped$id,
+      default.units = x$units,
       gp = gpar(
         col = col, alpha = alpha, lty = lty, lwd = lwd, lex = lex,
         lineend = lineend, linejoin = linejoin, linemitre = linemitre
@@ -188,6 +192,7 @@ makeContent.isolines_grob <- function(x) {
 
   labels_grob <- textGrob(
     labels_data$label, labels_data$x, labels_data$y, rot = rot,
+    default.units = x$units,
     gp = gpar(col = col, alpha = alpha)
   )
 

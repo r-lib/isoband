@@ -5,7 +5,7 @@
 \title{Render labeled isolines}
 \usage{
 isolines_grob(lines, gp = gpar(), breaks = NULL, labels = NULL,
-  label_col = NULL, label_alpha = NULL)
+  units = "npc", label_col = NULL, label_alpha = NULL)
 }
 \arguments{
 \item{lines}{Isolines, as produced by the \code{\link[=isolines]{isolines()}} function.}
@@ -24,6 +24,9 @@ labeled. If \code{NULL}, labels all isolines.}
 \item{labels}{Character vector specifying the labels for each break.
 If \code{NULL}, uses the breaks as labels. The number of labels provided
 must match the number of breaks provided.}
+
+\item{units}{A character string specifying the units in which to
+interpret the isolines coordinates. Defaults to \code{"npc"}.}
 
 \item{label_col}{Color applied to labels. Can be used to override the
 color provided in \code{gp}, in case labels and lines should have different
