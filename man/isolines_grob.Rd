@@ -4,12 +4,19 @@
 \alias{isolines_grob}
 \title{Render labeled isolines}
 \usage{
-isolines_grob(lines, gp = gpar(), breaks = NULL, labels = NULL)
+isolines_grob(lines, gp = gpar(), breaks = NULL, labels = NULL,
+  label_col = NULL, label_alpha = NULL)
 }
 \arguments{
 \item{lines}{Isolines, as produced by the \code{\link[=isolines]{isolines()}} function.}
 
-\item{gp}{Grid graphical parameters.}
+\item{gp}{Grid graphical parameters. Parameters applying to lines
+(such as \code{col}, \code{lwd}, \code{lty}, etc.) are recycled among the total
+number of lines drawn. Parameters applying only to labels (such
+as \code{fontfamily}, \code{fontsize}) are recycled among the specified
+breaks only. The two parameters \code{col} and \code{alpha} are also applied
+to labels, unless overridden (see \code{label_col} and \code{label_alpha}),
+but are matched to the corresponding lines.}
 
 \item{breaks}{Character vector specifying the isolines that should be
 labeled. If \code{NULL}, labels all isolines.}
@@ -17,6 +24,14 @@ labeled. If \code{NULL}, labels all isolines.}
 \item{labels}{Character vector specifying the labels for each break.
 If \code{NULL}, uses the breaks as labels. The number of labels provided
 must match the number of breaks provided.}
+
+\item{label_col}{Color applied to labels. Can be used to override the
+color provided in \code{gp}, in case labels and lines should have different
+colors.}
+
+\item{label_alpha}{Alpha applied to labels. Can be used to override the
+alpha value provided in \code{gp}, in case labels and lines should have
+different alpha values.}
 }
 \description{
 This function generates a grid grob that represents labeled isolines.
