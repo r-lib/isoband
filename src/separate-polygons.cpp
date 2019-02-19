@@ -247,6 +247,21 @@ public:
   }
 };
 
+
+bool is_valid_ring(const polygon &poly) {
+  if (poly.size() < 4) return false; // any polygon with fewer than four points is not a valid ring
+
+  const point &p1 = poly.front();
+  auto it = poly.begin();
+  for (it++; it != poly.end(); it++) {
+    if (!(p1 == *it)) {
+      return true; // at least one point is different; we call it a valid ring
+    }
+  }
+
+  return false; // degenerate polygon; we ignore it
+}
+
 NumericMatrix polygon_as_matrix(polygon p, bool reverse = false) {
   int n = p.size();
 
@@ -329,19 +344,30 @@ List separate_polygons(const NumericVector &x, const NumericVector &y, const Int
     if (i % 1000 == 0) checkUserInterrupt();
     i++;
 
+    // collect all the rings belonging to this polygon
     List rings;
-    rings.push_back(polygon_as_matrix(polys[next_poly]));
-    // cout << "top-level polygon: " << next_poly << endl;
+    // for simplicity, we collect the rings even if the polygon
+    // is not valid; we just keep track of this and ignore it at
+    // the end; this reduces the risk of bugs
+    bool valid_poly = is_valid_ring(polys[next_poly]);
 
+    // collect the outer ring
+    rings.push_back(polygon_as_matrix(polys[next_poly]));
+
+    // collect the holes, if any
     set<int> holes = hi.collect_holes(next_poly);
     for (auto it = holes.begin(); it != holes.end(); it++) {
-      // we reverse holes so they run in the same direction as outer polygons
-      rings.push_back(polygon_as_matrix(polys[*it], true));
-      //cout << "  hole: " << (*it) << endl;
+      if (is_valid_ring(polys[*it])) {
+        // we reverse holes so they run in the same direction as outer polygons
+        rings.push_back(polygon_as_matrix(polys[*it], true));
+      }
     }
-    out.push_back(rings);
+
+    // record the polygon if valid
+    if (valid_poly) {
+      out.push_back(rings);
+    }
     next_poly = hi.top_level_poly();
-    //hi.print();
   }
 
   // set sf classes

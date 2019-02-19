@@ -25,4 +25,9 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly);
  */
 in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference, bool fast = true);
 
+/* Test whether a polygon represents a valid ring (at least 4 points,
+ * not all of which are the same).
+ */
+bool is_valid_ring(const polygon &poly);
+
 #endif
