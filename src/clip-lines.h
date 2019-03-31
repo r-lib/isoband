@@ -38,29 +38,21 @@ public:
       stop("singular transformation due to invalid box extent");
     }
 
-    m00 = x0/(x0*x0 + y0*y0);
-    m01 = y0/(x0*x0 + y0*y0);
-    m10 = x1/(x1*x1 + y1*y1);
-    m11 = y1/(x1*x1 + y1*y1);
+    double denominator = y0*x1 - y1*x0;
 
-    double det = m01*m10 - m11*m00;
-
-    if (det == 0) {
+    if (denominator == 0) {
       stop("singular transformation due to invalid box extent");
     }
 
-    mi00 = -m11/det;
-    mi01 = m01/det;
-    mi10 = m10/det;
-    mi11 = -m00/det;
+    m00 = -y1/denominator;
+    m01 = x1/denominator;
+    m10 = y0/denominator;
+    m11 = -x0/denominator;
 
-    /*
-    cout << "base: " << base << endl;
-    cout << "M:\t" << m00 << "\t" << m01 << endl;
-    cout << "\t" << m10 << "\t" << m11 << endl;
-    cout << "Minv:\t" << mi00 << "\t" << mi01 << endl;
-    cout << "\t" << mi10 << "\t" << mi11 << endl;
-    */
+    mi00 = x0;
+    mi01 = x1;
+    mi10 = y0;
+    mi11 = y1;
   }
 
   point transform(const point &p) {

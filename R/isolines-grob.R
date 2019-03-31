@@ -149,7 +149,7 @@ makeContent.isolines_grob <- function(x) {
 
   # get viewport aspect ratio to correct clipping for rotated labels
   asp <- convertHeight(unit(1, "pt"), x$units, valueOnly = TRUE) / convertWidth(unit(1, "pt"), x$units, valueOnly = TRUE)
-  print(asp)
+  #print(asp)
 
   # calculate the clip box for each label
   clip_boxes <- data.frame(
@@ -162,7 +162,7 @@ makeContent.isolines_grob <- function(x) {
     if (length(data$x) == 0) {
       return(NULL)
     }
-    clipped <- clip_lines(data$x, data$y, data$id, clip_boxes, asp = 1)
+    clipped <- clip_lines(data$x, data$y, data$id, clip_boxes, asp = asp)
     polylineGrob(
       clipped$x, clipped$y, clipped$id,
       default.units = x$units,

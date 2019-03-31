@@ -4,7 +4,7 @@
 \alias{clip_lines}
 \title{Clip lines so they don't run into a set of boxes.}
 \usage{
-clip_lines(x, y, id, clip_boxes)
+clip_lines(x, y, id, clip_boxes, asp = 1)
 }
 \arguments{
 \item{x}{Numeric vector of x coordinates}
@@ -18,6 +18,9 @@ Should have five columns, named \code{x}, \code{y}, \code{width}, \code{height},
 specify the x and y positions of each box midpoint, as well as the box width,
 box height, and box angle in radians. Each box is specified by one data
 row.}
+
+\item{asp}{Aspect ratio (width/height) of the target canvas. This is used to convert
+widths to heights and vice versa for rotated boxes}
 }
 \description{
 Clip lines so they don't run into a set of boxes. Useful for labeling isolines,

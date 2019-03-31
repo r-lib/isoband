@@ -290,11 +290,8 @@ List clip_lines_impl(const NumericVector &x, const NumericVector &y, const Integ
            p_mid_y - asp*width*sin(theta)/2 - height*cos(theta)/2);
   // lower right point
   point lr(ll.x + width*cos(theta), ll.y + asp*width*sin(theta));
-  // upper right point
+  // upper left point
   point ul(ll.x - (height/asp)*sin(theta), ll.y + height*cos(theta));
-
-  //cout << "c(" << p_mid[0] << ", " << ll.x << ", " << lr.x << ", " << ul.x << ")/5, c(" <<
-  //  p_mid[1] << ", " << ll.y << ", " << lr.y << ", " << ul.y << ")/5" << endl;
 
   unitbox_transformer t(ll, lr, ul);
 

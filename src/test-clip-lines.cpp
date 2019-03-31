@@ -351,6 +351,24 @@ context("Transform to unit box") {
     expect_true(near_equal(p2.y, 3));
   }
 
+  test_that("Transformations from/to rhomboid work") {
+    unitbox_transformer t(point(1, 1), point(2, 1), point(2, 2));
+
+    point p = t.transform(point(2, 2));
+    point p2 = t.inv_transform(p);
+    expect_true(near_equal(p.x, 0));
+    expect_true(near_equal(p.y, 1));
+    expect_true(near_equal(p2.x, 2));
+    expect_true(near_equal(p2.y, 2));
+
+    p = t.transform(point(3, 2));
+    p2 = t.inv_transform(p);
+    expect_true(near_equal(p.x, 1));
+    expect_true(near_equal(p.y, 1));
+    expect_true(near_equal(p2.x, 3));
+    expect_true(near_equal(p2.y, 2));
+  }
+
   test_that("Singular transformations are caught") {
     expect_error(
       // box without width
