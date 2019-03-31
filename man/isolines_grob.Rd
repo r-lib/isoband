@@ -5,8 +5,9 @@
 \title{Render labeled isolines}
 \usage{
 isolines_grob(lines, gp = gpar(), breaks = NULL, labels = NULL,
-  units = "npc", label_col = NULL, label_alpha = NULL,
-  label_placer = label_placer_minmax())
+  margin = unit(c(1, 1, 1, 1), "pt"), label_col = NULL,
+  label_alpha = NULL, label_placer = label_placer_minmax(),
+  units = "npc")
 }
 \arguments{
 \item{lines}{Isolines, as produced by the \code{\link[=isolines]{isolines()}} function.}
@@ -26,8 +27,9 @@ labeled. If \code{NULL}, labels all isolines.}
 If \code{NULL}, uses the breaks as labels. The number of labels provided
 must match the number of breaks provided.}
 
-\item{units}{A character string specifying the units in which to
-interpret the isolines coordinates. Defaults to \code{"npc"}.}
+\item{margin}{Unit object of length 4 specifying the top, right, bottom,
+and left margins around each text label. The same margins are applied
+to all labels.}
 
 \item{label_col}{Color applied to labels. Can be used to override the
 color provided in \code{gp}, in case labels and lines should have different
@@ -39,6 +41,9 @@ different alpha values.}
 
 \item{label_placer}{Function that controls how labels are placed along
 the isolines. Uses \code{\link[=label_placer_minmax]{label_placer_minmax()}} by default.}
+
+\item{units}{A character string specifying the units in which to
+interpret the isolines coordinates. Defaults to \code{"npc"}.}
 }
 \description{
 This function generates a grid grob that represents labeled isolines.

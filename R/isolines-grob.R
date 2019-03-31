@@ -15,8 +15,9 @@
 #' @param labels Character vector specifying the labels for each break.
 #'   If `NULL`, uses the breaks as labels. The number of labels provided
 #'   must match the number of breaks provided.
-#' @param units A character string specifying the units in which to
-#'   interpret the isolines coordinates. Defaults to `"npc"`.
+#' @param margin Unit object of length 4 specifying the top, right, bottom,
+#'   and left margins around each text label. The same margins are applied
+#'   to all labels.
 #' @param label_col Color applied to labels. Can be used to override the
 #'   color provided in `gp`, in case labels and lines should have different
 #'   colors.
@@ -25,6 +26,8 @@
 #'   different alpha values.
 #' @param label_placer Function that controls how labels are placed along
 #'   the isolines. Uses [`label_placer_minmax()`] by default.
+#' @param units A character string specifying the units in which to
+#'   interpret the isolines coordinates. Defaults to `"npc"`.
 #' @seealso
 #' See [`isobands_grob()`] for drawing of isobands. See [`label_placer_minmax()`] for
 #' label placement strategies.
@@ -57,7 +60,8 @@
 #' grid.draw(l)
 #' @export
 isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
-                          units = "npc", label_col = NULL, label_alpha = NULL, label_placer = label_placer_minmax()) {
+                          margin = unit(c(1, 1, 1, 1), "pt"), label_col = NULL, label_alpha = NULL,
+                          label_placer = label_placer_minmax(), units = "npc") {
   if (is.null(breaks)) {
     breaks <- names(lines)
   } else {
@@ -70,6 +74,10 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
     stop("Number of labels must match the number of breaks.", call. = FALSE)
   } else {
     labels <- as.character(labels)
+  }
+
+  if (length(margin) != 4 || !is.unit(margin)) {
+    stop("The `margin` parameter must be a unit object of length four.", call. = FALSE)
   }
 
   # calculate the position of all labels via the `place_labels()` function
@@ -91,6 +99,7 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
     labels = labels,
     labels_data = labels_data,
     gp_combined = gp,
+    margin = margin,
     label_col = label_col,
     label_alpha = label_alpha,
     label_placer = label_placer,
@@ -154,10 +163,22 @@ makeContent.isolines_grob <- function(x) {
   asp <- convertHeight(unit(1, "pt"), x$units, valueOnly = TRUE) / convertWidth(unit(1, "pt"), x$units, valueOnly = TRUE)
   #print(asp)
 
+  # calculate margins in npc units
+  margin_rl <- convertWidth(x$margin[c(2, 4)], x$units, valueOnly = TRUE)
+  margin_tb <- convertHeight(x$margin[c(1, 3)], x$units, valueOnly = TRUE)
+  margin_w <- sum(margin_rl)
+  margin_h <- sum(margin_tb)
+  margin_wdiff <- margin_rl[2] - margin_rl[1]
+  margin_hdiff <- margin_rl[1] - margin_rl[2]
+
   # calculate the clip box for each label
+  # xoff and yoff are needed to correct for uneven label margins
+  xoff <- -margin_wdiff*cos(labels_data$theta)/2 + (margin_hdiff/asp)*sin(labels_data$theta)/2
+  yoff <- -margin_wdiff*sin(labels_data$theta)/2 - margin_hdiff*cos(labels_data$theta)/2
+
   clip_boxes <- data.frame(
-    x = labels_data$x, y = labels_data$y,
-    width = label_widths, height = label_heights,
+    x = labels_data$x + xoff, y = labels_data$y + yoff,
+    width = label_widths + margin_w, height = label_heights + margin_h,
     theta = labels_data$theta
   )
 
