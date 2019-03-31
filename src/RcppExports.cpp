@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // clip_lines_impl
-List clip_lines_impl(const NumericVector& x, const NumericVector& y, const IntegerVector& id, const double p_mid_x, const double p_mid_y, const double width, const double height, const double theta);
-RcppExport SEXP _isoband_clip_lines_impl(SEXP xSEXP, SEXP ySEXP, SEXP idSEXP, SEXP p_mid_xSEXP, SEXP p_mid_ySEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP thetaSEXP) {
+List clip_lines_impl(const NumericVector& x, const NumericVector& y, const IntegerVector& id, const double p_mid_x, const double p_mid_y, const double width, const double height, const double theta, const double asp);
+RcppExport SEXP _isoband_clip_lines_impl(SEXP xSEXP, SEXP ySEXP, SEXP idSEXP, SEXP p_mid_xSEXP, SEXP p_mid_ySEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP thetaSEXP, SEXP aspSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double >::type width(widthSEXP);
     Rcpp::traits::input_parameter< const double >::type height(heightSEXP);
     Rcpp::traits::input_parameter< const double >::type theta(thetaSEXP);
-    rcpp_result_gen = Rcpp::wrap(clip_lines_impl(x, y, id, p_mid_x, p_mid_y, width, height, theta));
+    Rcpp::traits::input_parameter< const double >::type asp(aspSEXP);
+    rcpp_result_gen = Rcpp::wrap(clip_lines_impl(x, y, id, p_mid_x, p_mid_y, width, height, theta, asp));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -69,7 +70,7 @@ END_RCPP
 RcppExport SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_isoband_clip_lines_impl", (DL_FUNC) &_isoband_clip_lines_impl, 8},
+    {"_isoband_clip_lines_impl", (DL_FUNC) &_isoband_clip_lines_impl, 9},
     {"_isoband_isobands_impl", (DL_FUNC) &_isoband_isobands_impl, 5},
     {"_isoband_isolines_impl", (DL_FUNC) &_isoband_isolines_impl, 4},
     {"_isoband_separate_polygons", (DL_FUNC) &_isoband_separate_polygons, 3},

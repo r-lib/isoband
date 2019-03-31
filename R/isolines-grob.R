@@ -54,7 +54,7 @@
 #' grid.draw(l)
 #' @export
 isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
-                          units = "npc", label_col = NULL, label_alpha = NULL) {
+                          units = "npc", label_col = NULL, label_alpha = NULL, label_placer = label_placer_minmax()) {
   if (is.null(breaks)) {
     breaks <- names(lines)
   } else {
@@ -77,6 +77,7 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
     labels,
     match(breaks, names(lines)), # index of labeled lines in original list of lines, for matching of graphical parameters
     1:length(breaks), # index into original list of breaks, for matching graphical parameters
+    MoreArgs = list(label_placer = label_placer),
     SIMPLIFY = FALSE
   )
   labels_data <- Reduce(rbind, rows)
@@ -89,6 +90,7 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
     gp_combined = gp,
     label_col = label_col,
     label_alpha = label_alpha,
+    label_placer = label_placer,
     units = units,
     cl = "isolines_grob"
   )
@@ -145,6 +147,10 @@ makeContent.isolines_grob <- function(x) {
     x$units, valueOnly = TRUE
   )
 
+  # get viewport aspect ratio to correct clipping for rotated labels
+  asp <- convertHeight(unit(1, "pt"), x$units, valueOnly = TRUE) / convertWidth(unit(1, "pt"), x$units, valueOnly = TRUE)
+  print(asp)
+
   # calculate the clip box for each label
   clip_boxes <- data.frame(
     x = labels_data$x, y = labels_data$y,
@@ -156,7 +162,7 @@ makeContent.isolines_grob <- function(x) {
     if (length(data$x) == 0) {
       return(NULL)
     }
-    clipped <- clip_lines(data$x, data$y, data$id, clip_boxes)
+    clipped <- clip_lines(data$x, data$y, data$id, clip_boxes, asp = 1)
     polylineGrob(
       clipped$x, clipped$y, clipped$id,
       default.units = x$units,
@@ -185,11 +191,6 @@ makeContent.isolines_grob <- function(x) {
     SIMPLIFY = FALSE
   )
 
-  # calculate rotation angles for text labels
-  rot <- 360*labels_data$theta/(2*pi)
-  rot <- ifelse(rot <= -90, 180 + rot, rot)
-  rot <- ifelse(rot > 90, rot - 180, rot)
-
   # calculate color and alpha for text labels
   if (is.null(x$label_col)) {
     col <- rep_len(gp$col, length(x$lines))[x$labels_data$index]
@@ -204,11 +205,52 @@ makeContent.isolines_grob <- function(x) {
   }
 
   labels_grob <- textGrob(
-    labels_data$label, labels_data$x, labels_data$y, rot = rot,
+    labels_data$label, labels_data$x, labels_data$y, rot = 360*labels_data$theta/(2*pi),
     default.units = x$units,
     gp = gpar(col = col, alpha = alpha)
   )
 
   children <- do.call(gList, c(lines_grobs, list(labels_grob)))
   setChildren(x, children)
+}
+
+# Calculate the label position for one set of isolines (one level). Used by
+# `isolines_grob()` to place labels.
+#
+# @param line_data line segments, specified as list of x, y, id
+# @param break_id character vector specifying the break identifier
+# @param label character vector specifying the label that will be printed
+#   instead of the break identifier
+# @param index index into original list of all isolines
+# @param break_index index into original list of breaks
+#
+# The parameters `break_id`, `label`, `index`, and `break_index` are provided
+# simply so they can be added to the resulting data frame holding
+# label positions
+place_labels <- function(line_data, break_id, label, index, break_index, label_placer) {
+  # return empty row if either missing line data or missing label
+  if (length(line_data$x) == 0 || is.na(label)) {
+    return(
+      data.frame(
+        index = integer(0),
+        break_index = integer(0),
+        break_id = character(0), label = character(0),
+        x = numeric(0), y = numeric(0), theta = numeric(0),
+        stringsAsFactors = FALSE
+      )
+    )
+  }
+
+  # calculate label position
+  pos <- label_placer(line_data)
+
+  # return results
+  data.frame(
+    index = index, # index into original list of all isolines
+    break_index = break_index, # index into original list of breaks
+    break_id = break_id,
+    label = label,
+    x = pos$x, y = pos$y, theta = pos$theta,
+    stringsAsFactors = FALSE
+  )
 }

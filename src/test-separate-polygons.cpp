@@ -295,3 +295,37 @@ context("Polygon in polygon") {
     expect_true(polygon_in_polygon(p1, p1) == undetermined);
   }
 }
+
+
+context("is_valid_ring()") {
+  test_that("valid ring") {
+    point p(0, 0);
+    polygon poly;
+
+    expect_false(is_valid_ring(poly));
+
+    poly.push_back(p);
+    expect_false(is_valid_ring(poly));
+
+    poly.push_back(p);
+    expect_false(is_valid_ring(poly));
+
+    poly.push_back(p);
+    expect_false(is_valid_ring(poly));
+
+    poly.push_back(p);
+    expect_false(is_valid_ring(poly));
+
+    poly.push_back(point(1, 1));
+    expect_true(is_valid_ring(poly));
+
+    polygon poly2 = {
+      point(0, 0),
+      point(0, 2),
+      point(2, 2),
+      point(2, 0),
+      point(0, 0)
+    };
+    expect_true(is_valid_ring(poly2));
+  }
+}

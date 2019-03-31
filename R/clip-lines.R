@@ -10,14 +10,17 @@
 #'   specify the x and y positions of each box midpoint, as well as the box width,
 #'   box height, and box angle in radians. Each box is specified by one data
 #'   row.
+#' @param asp Aspect ratio (width/height) of the target canvas. This is used to convert
+#'   widths to heights and vice versa for rotated boxes
 #' @export
-clip_lines <- function(x, y, id, clip_boxes) {
+clip_lines <- function(x, y, id, clip_boxes, asp = 1) {
   out = list(x = x, y = y, id = id)
   for (i in 1:nrow(clip_boxes)) {
     box <- clip_boxes[i, ]
     out <- clip_lines_impl(
       out$x, out$y, out$id,
-      box$x, box$y, box$width, box$height, box$theta
+      box$x, box$y, box$width, box$height, box$theta,
+      asp
     )
   }
 

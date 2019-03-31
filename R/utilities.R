@@ -6,3 +6,7 @@
     x
   }
 }
+
+# evaluates all arguments
+# (simpler than forcing each argument individually)
+force_all <- function(...) list(...)

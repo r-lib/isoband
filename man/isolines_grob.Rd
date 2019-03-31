@@ -5,7 +5,8 @@
 \title{Render labeled isolines}
 \usage{
 isolines_grob(lines, gp = gpar(), breaks = NULL, labels = NULL,
-  units = "npc", label_col = NULL, label_alpha = NULL)
+  units = "npc", label_col = NULL, label_alpha = NULL,
+  label_placer = label_placer_minmax())
 }
 \arguments{
 \item{lines}{Isolines, as produced by the \code{\link[=isolines]{isolines()}} function.}

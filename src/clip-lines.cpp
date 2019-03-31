@@ -260,11 +260,13 @@ void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id
 // @param width Box width
 // @param height Box height
 // @param theta Box angle, in radians
+// @param asp Aspect ratio (width/height) of the target canvas. This is used to convert widths
+//  to heights and vice versa for rotated boxes
 // @export
 // [[Rcpp::export]]
 List clip_lines_impl(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
                      const double p_mid_x, const double p_mid_y, const double width,
-                     const double height, const double theta) {
+                     const double height, const double theta, const double asp = 1) {
   // output variables
   NumericVector x_out, y_out;
   IntegerVector id_out;
@@ -284,12 +286,12 @@ List clip_lines_impl(const NumericVector &x, const NumericVector &y, const Integ
 
   // set up transformation
   // lower left point of cropping rectangle
-  point ll(p_mid_x - width*cos(theta)/2 + height*sin(theta)/2,
-           p_mid_y - width*sin(theta)/2 - height*cos(theta)/2);
+  point ll(p_mid_x - width*cos(theta)/2 + (height/asp)*sin(theta)/2,
+           p_mid_y - asp*width*sin(theta)/2 - height*cos(theta)/2);
   // lower right point
-  point lr(ll.x + width*cos(theta), ll.y + width*sin(theta));
+  point lr(ll.x + width*cos(theta), ll.y + asp*width*sin(theta));
   // upper right point
-  point ul(ll.x - height*sin(theta), ll.y + height*cos(theta));
+  point ul(ll.x - (height/asp)*sin(theta), ll.y + height*cos(theta));
 
   //cout << "c(" << p_mid[0] << ", " << ll.x << ", " << lr.x << ", " << ul.x << ")/5, c(" <<
   //  p_mid[1] << ", " << ll.y << ", " << lr.y << ", " << ul.y << ")/5" << endl;
