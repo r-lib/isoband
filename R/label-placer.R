@@ -9,18 +9,18 @@
 #' @param n Size of the point neighborhood over which the rotation angle should be
 #' calculated.
 #' @export
-label_placer_minmax <- function(placement = "tb", rot_adjuster = angle_halfcircle_bottom, n = 2) {
+label_placer_minmax <- function(placement = "tb", rot_adjuster = angle_halfcircle_bottom(), n = 2) {
   force_all(placement, rot_adjuster, n)
 
   function(line_data) {
     # find location for labels
-    idx <- na.omit(
+    idx <- stats::na.omit(
       c(
         which( # placement "top"
-          isTRUE(grepl("t", placement, fixed = TRUE)) & line_data$y == min(line_data$y)
+          isTRUE(grepl("t", placement, fixed = TRUE)) & line_data$y == max(line_data$y)
         )[1],
         which( # placement "bottom"
-          isTRUE(grepl("b", placement, fixed = TRUE)) & line_data$y == max(line_data$y)
+          isTRUE(grepl("b", placement, fixed = TRUE)) & line_data$y == min(line_data$y)
         )[1],
         which( # placement "left"
           isTRUE(grepl("l", placement, fixed = TRUE)) & line_data$x == min(line_data$x)
@@ -72,48 +72,58 @@ minmax_impl <- function(data, idx, n) {
 
 #' Standardize label angles
 #'
-#' Functions to standardize rotation angles to specific angle ranges.
+#' Function factories that return functions to standardize rotation angles to specific angle ranges.
 #'
 #' `angle_halfcircle_bottom()` standardizes angles to (-pi/2, pi/2].
 #' `angle_halfcircle_right()` standardizes angles to (0, pi].
-#' `angle_halfcircle_zero()` sets all angles to 0.
+#' `angle_fixed()` sets all angles to a fixed value (0 by default).
 #' `angle_identity()` does not modify any angles.
 #' @param theta Numeric vector of angles in radians.
 #' @export
-angle_halfcircle_bottom <- function(theta) {
-  ifelse(
-    theta <= -pi/2,
-    theta + pi,
+angle_halfcircle_bottom <- function() {
+  function(theta) {
     ifelse(
-      theta > pi/2,
-      theta - pi,
-      theta
+      theta <= -pi/2,
+      theta + pi,
+      ifelse(
+        theta > pi/2,
+        theta - pi,
+        theta
+      )
     )
-  )
+  }
 }
 
 #' @rdname angle_halfcircle_bottom
 #' @export
-angle_halfcircle_right <- function(theta) {
-  ifelse(
-    theta <= 0,
-    theta + pi,
+angle_halfcircle_right <- function() {
+  function(theta) {
     ifelse(
-      theta > pi,
-      theta - pi,
-      theta
+      theta <= 0,
+      theta + pi,
+      ifelse(
+        theta > pi,
+        theta - pi,
+        theta
+      )
     )
-  )
+  }
 }
 
 #' @rdname angle_halfcircle_bottom
 #' @export
-angle_zero <- function(theta) {
-  rep_len(0, length(theta))
+angle_fixed <- function(theta = 0) {
+  force(theta)
+
+  function(x) {
+    rep_len(theta, length(x))
+  }
 }
 
 #' @rdname angle_halfcircle_bottom
 #' @export
-angle_identity <- function(theta) {
-  theta
+angle_identity <- function() {
+  function(x) {
+    x
+  }
 }

@@ -3,27 +3,27 @@
 \name{angle_halfcircle_bottom}
 \alias{angle_halfcircle_bottom}
 \alias{angle_halfcircle_right}
-\alias{angle_zero}
+\alias{angle_fixed}
 \alias{angle_identity}
 \title{Standardize label angles}
 \usage{
-angle_halfcircle_bottom(theta)
+angle_halfcircle_bottom()
 
-angle_halfcircle_right(theta)
+angle_halfcircle_right()
 
-angle_zero(theta)
+angle_fixed(theta = 0)
 
-angle_identity(theta)
+angle_identity()
 }
 \arguments{
 \item{theta}{Numeric vector of angles in radians.}
 }
 \description{
-Functions to standardize rotation angles to specific angle ranges.
+Function factories that return functions to standardize rotation angles to specific angle ranges.
 }
 \details{
 \code{angle_halfcircle_bottom()} standardizes angles to (-pi/2, pi/2].
 \code{angle_halfcircle_right()} standardizes angles to (0, pi].
-\code{angle_halfcircle_zero()} sets all angles to 0.
+\code{angle_fixed()} sets all angles to a fixed value (0 by default).
 \code{angle_identity()} does not modify any angles.
 }

@@ -23,8 +23,11 @@
 #' @param label_alpha Alpha applied to labels. Can be used to override the
 #'   alpha value provided in `gp`, in case labels and lines should have
 #'   different alpha values.
+#' @param label_placer Function that controls how labels are placed along
+#'   the isolines. Uses [`label_placer_minmax()`] by default.
 #' @seealso
-#' See [`isobands_grob()`] for drawing of isobands.
+#' See [`isobands_grob()`] for drawing of isobands. See [`label_placer_minmax()`] for
+#' label placement strategies.
 #' @examples
 #' library(grid)
 #'

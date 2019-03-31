@@ -5,7 +5,7 @@
 \title{Set up a label placement strategy}
 \usage{
 label_placer_minmax(placement = "tb",
-  rot_adjuster = angle_halfcircle_bottom, n = 2)
+  rot_adjuster = angle_halfcircle_bottom(), n = 2)
 }
 \arguments{
 \item{placement}{String consisting of any combination of the letters

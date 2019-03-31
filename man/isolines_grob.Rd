@@ -36,6 +36,9 @@ colors.}
 \item{label_alpha}{Alpha applied to labels. Can be used to override the
 alpha value provided in \code{gp}, in case labels and lines should have
 different alpha values.}
+
+\item{label_placer}{Function that controls how labels are placed along
+the isolines. Uses \code{\link[=label_placer_minmax]{label_placer_minmax()}} by default.}
 }
 \description{
 This function generates a grid grob that represents labeled isolines.
@@ -69,5 +72,6 @@ grid.draw(b)
 grid.draw(l)
 }
 \seealso{
-See \code{\link[=isobands_grob]{isobands_grob()}} for drawing of isobands.
+See \code{\link[=isobands_grob]{isobands_grob()}} for drawing of isobands. See \code{\link[=label_placer_minmax]{label_placer_minmax()}} for
+label placement strategies.
 }
