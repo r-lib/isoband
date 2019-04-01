@@ -24,6 +24,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Suggests: 
     ggplot2,
+    lwgeom,
     sf,
     testthat,
     covr
