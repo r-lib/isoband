@@ -14,7 +14,7 @@ Convert isolines or isobands to an sf geometry collection (\code{sfg}) object. F
 processing needs to happen via the sf package.
 }
 \details{
-The function \code{iso_to_sfg()} is a generic that takes an object created either by \code{\link[=isolines]{isolines()}}
+The function \code{iso_to_sfg()} is a generic that takes an object created by either \code{\link[=isolines]{isolines()}}
 or \code{\link[=isobands]{isobands()}} and turns it into a simple features (sf) geometry collection. Importantly,
 the isobanding algorithm can produce polygons that do not represent valid simple features. This
 happens usually when the lower limit of an isoband is exactly equal to some data values (see

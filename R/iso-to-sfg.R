@@ -3,7 +3,7 @@
 #' Convert isolines or isobands to an sf geometry collection (`sfg`) object. Further downstream
 #' processing needs to happen via the sf package.
 #'
-#' The function `iso_to_sfg()` is a generic that takes an object created either by [`isolines()`]
+#' The function `iso_to_sfg()` is a generic that takes an object created by either [`isolines()`]
 #' or [`isobands()`] and turns it into a simple features (sf) geometry collection. Importantly,
 #' the isobanding algorithm can produce polygons that do not represent valid simple features. This
 #' happens usually when the lower limit of an isoband is exactly equal to some data values (see
