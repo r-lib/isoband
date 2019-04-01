@@ -1,14 +1,13 @@
 context("test-isolines-grob")
 
 test_that("basic functions", {
-  m <- matrix(c(0, 0, 0, 0, 0, 0,
-                0, 1, 1, 1, 1, 0,
-                0, 1, 2, 2, 1, 0,
-                0, 1, 2, 2, 1, 0,
-                0, 1, 1, 1, 1, 0,
-                0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
+  m <- matrix(c(0, 0, 0, 0, 0,
+                0, 0, 1, 0, 0,
+                0, 1, 2, 1, 0,
+                0, 0, 1, 0, 0,
+                0, 0, 0, 0, 0), 5, 5, byrow = TRUE)
 
-  l <- isolines((1:6)/7, (6:1)/7, m, c(.5, 1.5))
+  l <- isolines((1:5)/6, (5:1)/6, m, c(.5, 1.5))
 
   # incorrect number of labels
   expect_error(
@@ -27,7 +26,10 @@ test_that("basic functions", {
   )
 
   # default settings create two labels per line for this dataset
-  g <- isolines_grob(l)
+  g <- isolines_grob(l, label_placer = label_placer_minmax(n = 0))
   expect_equal(g$labels_data$break_id, c("0.5", "0.5", "1.5", "1.5"))
   expect_equal(g$labels_data$label, c("0.5", "0.5", "1.5", "1.5"))
+  expect_equal(g$labels_data$x, rep(0.5, 4))
+  expect_equal(g$labels_data$theta, rep(0, 4))
+  expect_true(all(abs(g$labels_data$y - c(0.75, 0.25, 0.5833333, 0.4166667)) < 1e-7))
 })
