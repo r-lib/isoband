@@ -377,14 +377,10 @@ List clip_lines_impl(const NumericVector &x, const NumericVector &y, const Integ
 
 
 /*** R
-# TODO:
-# 1. regression tests:
-#    - rotated clipping area for non-45 degree angle
-
 x <- c(0, 0, 1, 1, 0, 2, 3, 2.5, 2)
 y <- c(0, 1, 1, 0, 0, 2, 2, 3, 2)
 id <- c(1, 1, 1, 1, 1, 2, 2, 2, 2)
-out <- clip_lines_impl(x, y, id, 1, 1, 1, 1, 0)
+out <- clip_lines_impl(x, y, id, 1.5, 1.5, 2.5, 1, pi/4)
 grid.newpage()
 grid.polyline(x = out$x/5, y = out$y/5, id = out$id)
 */
