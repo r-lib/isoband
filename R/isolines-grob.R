@@ -80,7 +80,7 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
     stop("The `margin` parameter must be a unit object of length four.", call. = FALSE)
   }
 
-  # calculate the position of all labels via the `place_labels()` function
+  # first set up a data frame with all the label info
   labels_data <- data.frame(
     index = match(breaks, names(lines)), # index of labeled lines in original list of lines, for matching of graphical parameters
     break_index = 1:length(breaks), # index into original list of breaks, for matching graphical parameters
@@ -88,6 +88,7 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
     label = labels, # label for each break
     stringsAsFactors = FALSE
   )
+  # then calculate the position of all labels via the `label_placer()` function
   labels_data <- label_placer(lines, labels_data)
 
   gTree(
