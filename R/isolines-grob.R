@@ -81,17 +81,14 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
   }
 
   # calculate the position of all labels via the `place_labels()` function
-  rows <- mapply(
-    place_labels,
-    lines[breaks],
-    breaks,
-    labels,
-    match(breaks, names(lines)), # index of labeled lines in original list of lines, for matching of graphical parameters
-    1:length(breaks), # index into original list of breaks, for matching graphical parameters
-    MoreArgs = list(label_placer = label_placer),
-    SIMPLIFY = FALSE
+  labels_data <- data.frame(
+    index = match(breaks, names(lines)), # index of labeled lines in original list of lines, for matching of graphical parameters
+    break_index = 1:length(breaks), # index into original list of breaks, for matching graphical parameters
+    break_id = breaks, # identifier for each break (corresponds to the name in the lines column)
+    label = labels, # label for each break
+    stringsAsFactors = FALSE
   )
-  labels_data <- Reduce(rbind, rows)
+  labels_data <- label_placer(lines, labels_data)
 
   gTree(
     lines = lines,
@@ -238,43 +235,4 @@ makeContent.isolines_grob <- function(x) {
   setChildren(x, children)
 }
 
-# Calculate the label position for one set of isolines (one level). Used by
-# `isolines_grob()` to place labels.
-#
-# @param line_data line segments, specified as list of x, y, id
-# @param break_id character vector specifying the break identifier
-# @param label character vector specifying the label that will be printed
-#   instead of the break identifier
-# @param index index into original list of all isolines
-# @param break_index index into original list of breaks
-#
-# The parameters `break_id`, `label`, `index`, and `break_index` are provided
-# simply so they can be added to the resulting data frame holding
-# label positions
-place_labels <- function(line_data, break_id, label, index, break_index, label_placer) {
-  # return empty row if either missing line data or missing label
-  if (length(line_data$x) == 0 || is.na(label)) {
-    return(
-      data.frame(
-        index = integer(0),
-        break_index = integer(0),
-        break_id = character(0), label = character(0),
-        x = numeric(0), y = numeric(0), theta = numeric(0),
-        stringsAsFactors = FALSE
-      )
-    )
-  }
 
-  # calculate label position
-  pos <- label_placer(line_data)
-
-  # return results
-  data.frame(
-    index = index, # index into original list of all isolines
-    break_index = break_index, # index into original list of breaks
-    break_id = break_id,
-    label = label,
-    x = pos$x, y = pos$y, theta = pos$theta,
-    stringsAsFactors = FALSE
-  )
-}

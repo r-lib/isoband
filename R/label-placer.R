@@ -1,18 +1,84 @@
+#' Generic label placement function
+#'
+#' The simple label placer processes separate isolines independently and places
+#' labels for each line using a placer function that does the actual placement work.
+#' This label placer is not meant to be used by end users, but rather facilitates the
+#' development of new label placers, such as [`label_placer_minmax()`].
+#' @param lines Isolines object for which labels should be placed.
+#' @param labels_data A data frame containing information about which labels should
+#'   be placed.
+#' @param placer_fun A function that takes an individual isoline as input and returns
+#'   a data frame specifying label positions. The data frame should have three columns
+#'   called `x`, `y`, and `theta`. `x` and `y` specify the label position, and `theta`
+#'   specifies the label angle in radians. The data frame can have multiple rows, which
+#'   results in the same label being placed in multiple locations.
+#' @keywords internal
+#' @export
+label_placer_simple <- function(lines, labels_data, placer_fun) {
+  # Calculate the label position for one set of isolines (one level).
+  #
+  # The line data is specified as a list of x, y, id. The parameters `index`, `break_index`,
+  # `break_id`, and `label` are provided simply so they can be added to the resulting data
+  # frame holding label positions
+  place_labels_impl <- function(line_data, index, break_index, break_id, label, placer_fun) {
+    # return empty row if either missing line data or missing label
+    if (length(line_data$x) == 0 || is.na(label)) {
+      return(
+        data.frame(
+          index = integer(0),
+          break_index = integer(0),
+          break_id = character(0), label = character(0),
+          x = numeric(0), y = numeric(0), theta = numeric(0),
+          stringsAsFactors = FALSE
+        )
+      )
+    }
+
+    # calculate label position
+    pos <- placer_fun(line_data)
+
+    # return results
+    data.frame(
+      index = index,
+      break_index = break_index,
+      break_id = break_id,
+      label = label,
+      x = pos$x, y = pos$y, theta = pos$theta,
+      stringsAsFactors = FALSE
+    )
+  }
+
+  rows <- mapply(
+    place_labels_impl,
+    lines[labels_data$index],
+    labels_data$index, # index of labeled lines in original list of lines, for matching of graphical parameters
+    labels_data$break_index, # index into original list of breaks, for matching graphical parameters
+    labels_data$break_id,
+    labels_data$label,
+    MoreArgs = list(placer_fun = placer_fun),
+    SIMPLIFY = FALSE
+  )
+  Reduce(rbind, rows)
+}
+
+
+
 #' Set up a label placement strategy
 #'
-#' The position and rotation of labels is calculated based on the line
-#' data for individual isolines.
+#' The minmax label placer places labels at the horizontal or vertical minima or maxima of
+#' the respective isolines.
 #' @param placement String consisting of any combination of the letters
-#' "t", "r", "b", "l" indicating the placement of labels at the top,
-#' to the right, at the bottom, to the left of the isoline.
+#'   "t", "r", "b", "l" indicating the placement of labels at the top,
+#'   to the right, at the bottom, to the left of the isoline.
 #' @param rot_adjuster Function that standardizes the rotation angles of the labels.
+#'   See e.g. [`angle_halfcircle_bottom()`].
 #' @param n Size of the point neighborhood over which the rotation angle should be
-#' calculated.
+#'   calculated.
 #' @export
 label_placer_minmax <- function(placement = "tb", rot_adjuster = angle_halfcircle_bottom(), n = 2) {
   force_all(placement, rot_adjuster, n)
 
-  function(line_data) {
+  placer_fun <- function(line_data) {
     # find location for labels
     idx <- stats::na.omit(
       c(
@@ -41,6 +107,11 @@ label_placer_minmax <- function(placement = "tb", rot_adjuster = angle_halfcircl
     out$theta <- rot_adjuster(out$theta)
 
     out
+  }
+
+  # final placer function
+  function(lines, labels_data) {
+    label_placer_simple(lines, labels_data, placer_fun)
   }
 }
 
@@ -78,7 +149,7 @@ minmax_impl <- function(data, idx, n) {
 #' `angle_halfcircle_right()` standardizes angles to (0, pi].
 #' `angle_fixed()` sets all angles to a fixed value (0 by default).
 #' `angle_identity()` does not modify any angles.
-#' @param theta Numeric vector of angles in radians.
+#' @param theta Fixed angle, in radians.
 #' @export
 angle_halfcircle_bottom <- function() {
   function(theta) {

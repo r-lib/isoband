@@ -12,12 +12,13 @@ label_placer_minmax(placement = "tb",
 "t", "r", "b", "l" indicating the placement of labels at the top,
 to the right, at the bottom, to the left of the isoline.}
 
-\item{rot_adjuster}{Function that standardizes the rotation angles of the labels.}
+\item{rot_adjuster}{Function that standardizes the rotation angles of the labels.
+See e.g. \code{\link[=angle_halfcircle_bottom]{angle_halfcircle_bottom()}}.}
 
 \item{n}{Size of the point neighborhood over which the rotation angle should be
 calculated.}
 }
 \description{
-The position and rotation of labels is calculated based on the line
-data for individual isolines.
+The minmax label placer places labels at the horizontal or vertical minima or maxima of
+the respective isolines.
 }

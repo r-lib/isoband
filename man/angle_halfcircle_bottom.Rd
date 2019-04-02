@@ -16,7 +16,7 @@ angle_fixed(theta = 0)
 angle_identity()
 }
 \arguments{
-\item{theta}{Numeric vector of angles in radians.}
+\item{theta}{Fixed angle, in radians.}
 }
 \description{
 Function factories that return functions to standardize rotation angles to specific angle ranges.
