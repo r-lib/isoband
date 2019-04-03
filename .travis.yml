@@ -7,8 +7,22 @@ cache: packages
 after_success:
   - Rscript -e 'covr::codecov()'
 
-before_install:
-  - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable --yes
-  - sudo apt-get --yes --force-yes update -qq
-  - sudo apt-get install --yes libudunits2-dev libproj-dev libgeos-dev libgdal-dev
-  - Rscript -e 'update.packages(ask = FALSE)'
+#before_install:
+#  - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable --yes
+#  - sudo apt-get --yes --force-yes update -qq
+#  - sudo apt-get install --yes libudunits2-dev libproj-dev libgeos-dev libgdal-dev
+#  - Rscript -e 'update.packages(ask = FALSE)'
+
+# needed to install the magick package
+addons:
+  apt:
+    update: true
+    sources:
+      - sourceline: 'ppa:opencpu/imagemagick'
+      - sourceline: 'ppa:ubuntugis/ubuntugis-unstable'
+    packages:
+      - libmagick++-dev
+      - libudunits2-dev
+      - libproj-dev
+      - libgeos-dev
+      - libgdal-dev
