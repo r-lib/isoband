@@ -7,11 +7,12 @@
 #' @param lines Isolines object for which labels should be placed.
 #' @param labels_data A data frame containing information about which labels should
 #'   be placed.
-#' @param placer_fun A function that takes an individual isoline as input and returns
-#'   a data frame specifying label positions. The data frame should have three columns
-#'   called `x`, `y`, and `theta`. `x` and `y` specify the label position, and `theta`
-#'   specifies the label angle in radians. The data frame can have multiple rows, which
-#'   results in the same label being placed in multiple locations.
+#' @param placer_fun A function that takes an individual isoline plus its associated
+#'   break id as input and returns a data frame specifying label positions. The data
+#'   frame should have three columns called `x`, `y`, and `theta`. `x` and `y` specify
+#'   the label position, and `theta` specifies the label angle in radians. The data
+#'   frame can have multiple rows, which results in the same label being placed in
+#'   multiple locations.
 #' @keywords internal
 #' @export
 label_placer_simple <- function(lines, labels_data, placer_fun) {
@@ -35,17 +36,28 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
     }
 
     # calculate label position
-    pos <- placer_fun(line_data)
+    pos <- placer_fun(line_data, break_id)
 
     # return results
-    data.frame(
-      index = index,
-      break_index = break_index,
-      break_id = break_id,
-      label = label,
-      x = pos$x, y = pos$y, theta = pos$theta,
-      stringsAsFactors = FALSE
-    )
+    if (nrow(pos) > 0) {
+      data.frame(
+        index = index,
+        break_index = break_index,
+        break_id = break_id,
+        label = label,
+        x = pos$x, y = pos$y, theta = pos$theta,
+        stringsAsFactors = FALSE
+      )
+    } else {
+      data.frame(
+        index = integer(0),
+        break_index = integer(0),
+        break_id = character(0),
+        label = character(0),
+        x = numeric(0), y = numeric(0), theta = numeric(0),
+        stringsAsFactors = FALSE
+      )
+    }
   }
 
   rows <- mapply(
@@ -65,8 +77,15 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
 
 #' Set up a label placement strategy
 #'
-#' The minmax label placer places labels at the horizontal or vertical minima or maxima of
+#' These functions set up various label placement strategies.
+#'
+#' `label_placer_minmax()` places labels at the horizontal or vertical minima or maxima of
 #' the respective isolines.
+#'
+#' `label_placer_none()` places no labels at all.
+#'
+#' `label_placer_manual()` places labels at manually defined locations.
+#'
 #' @param placement String consisting of any combination of the letters
 #'   "t", "r", "b", "l" indicating the placement of labels at the top,
 #'   to the right, at the bottom, to the left of the isoline.
@@ -74,11 +93,12 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
 #'   See e.g. [`angle_halfcircle_bottom()`].
 #' @param n Size of the point neighborhood over which the rotation angle should be
 #'   calculated.
+#' @rdname label_placer
 #' @export
 label_placer_minmax <- function(placement = "tb", rot_adjuster = angle_halfcircle_bottom(), n = 2) {
   force_all(placement, rot_adjuster, n)
 
-  placer_fun <- function(line_data) {
+  placer_fun <- function(line_data, ...) {
     # find location for labels
     idx <- stats::na.omit(
       c(
@@ -140,14 +160,57 @@ minmax_impl <- function(data, idx, n) {
   list(x = xave, y = yave, theta = atan2(v[2], v[1]))
 }
 
+#' @rdname label_placer
+#' @export
+label_placer_none <- function() {
+  function(...) {
+    data.frame(
+      index = integer(0),
+      break_index = integer(0),
+      break_id = character(0), label = character(0),
+      x = numeric(0), y = numeric(0), theta = numeric(0),
+      stringsAsFactors = FALSE
+    )
+  }
+}
+
+#' @param breaks Character vector specifying the isolines to be labeled,
+#'   as in [`isolines_grob()`].
+#' @param x,y,theta Numeric vectors specifying the x and y positions and
+#'   angles (in radians) for each label corresponding to each break.
+#' @rdname label_placer
+#' @export
+label_placer_manual <- function(breaks, x, y, theta) {
+  # recycle all inputs to the same length
+  # also has the side effect of forcing them
+  n <- max(length(breaks), length(x), length(y), length(theta))
+  breaks <- rep_len(breaks, n)
+  x <- rep_len(x, n)
+  y <- rep_len(y, n)
+  theta <- rep_len(theta, n)
+
+  placer_fun <- function(line_data, break_id) {
+    idx <- (breaks == break_id)
+    data.frame(x = x[idx], y = y[idx], theta = theta[idx])
+  }
+
+  # final placer function
+  function(lines, labels_data) {
+    label_placer_simple(lines, labels_data, placer_fun)
+  }
+}
+
 
 #' Standardize label angles
 #'
 #' Function factories that return functions to standardize rotation angles to specific angle ranges.
 #'
 #' `angle_halfcircle_bottom()` standardizes angles to (-pi/2, pi/2].
+#'
 #' `angle_halfcircle_right()` standardizes angles to (0, pi].
+#'
 #' `angle_fixed()` sets all angles to a fixed value (0 by default).
+#'
 #' `angle_identity()` does not modify any angles.
 #' @param theta Fixed angle, in radians.
 #' @export

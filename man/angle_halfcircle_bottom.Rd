@@ -23,7 +23,10 @@ Function factories that return functions to standardize rotation angles to speci
 }
 \details{
 \code{angle_halfcircle_bottom()} standardizes angles to (-pi/2, pi/2].
+
 \code{angle_halfcircle_right()} standardizes angles to (0, pi].
+
 \code{angle_fixed()} sets all angles to a fixed value (0 by default).
+
 \code{angle_identity()} does not modify any angles.
 }

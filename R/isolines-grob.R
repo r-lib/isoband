@@ -111,6 +111,11 @@ makeContext.isolines_grob <- function(x) {
   # store current graphics parameters for later
   x$gp_cur <- get.gpar()
 
+  # if we have no labels then nothing else needs to be done
+  if (nrow(x$labels_data) == 0) {
+    return(x)
+  }
+
   # we need to set up the gp slot for text labels, so font calculations work
   gp <- modifyList(x$gp_cur, x$gp_combined)
 
@@ -149,6 +154,11 @@ makeContext.isolines_grob <- function(x) {
 #' @export
 makeContent.isolines_grob <- function(x) {
   labels_data <- x$labels_data
+
+  if (nrow(labels_data) == 0) {
+    # no labels to be drawn, nothing to be done
+    return(isolines_grob_makeContent_nolabels(x))
+  }
 
   # calculate label widths and heights in npc units
   label_widths <- convertWidth(stringWidth(labels_data$label), x$units, valueOnly = TRUE)
@@ -236,4 +246,41 @@ makeContent.isolines_grob <- function(x) {
   setChildren(x, children)
 }
 
+isolines_grob_makeContent_nolabels <- function(x) {
+  make_lines_grobs <- function(data, col, alpha, lty, lwd, lex, lineend, linejoin, linemitre) {
+    if (length(data$x) == 0) {
+      return(NULL)
+    }
+
+    polylineGrob(
+      data$x, data$y, data$id,
+      default.units = x$units,
+      gp = gpar(
+        col = col, alpha = alpha, lty = lty, lwd = lwd, lex = lex,
+        lineend = lineend, linejoin = linejoin, linemitre = linemitre
+      )
+    )
+  }
+
+  # merge current and grob-specific graphical parameters so we can redistribute among isolevels
+  gp <- modifyList(x$gp_cur, x$gp_combined)
+  n <- length(x$lines)
+
+  lines_grobs <- mapply(
+    make_lines_grobs,
+    x$lines,
+    rep_len(gp$col, n),
+    rep_len(gp$alpha, n),
+    rep_len(gp$lty, n),
+    rep_len(gp$lwd, n),
+    rep_len(gp$lex, n),
+    rep_len(gp$lineend, n),
+    rep_len(gp$linejoin, n),
+    rep_len(gp$linemitre, n),
+    SIMPLIFY = FALSE
+  )
+
+  children <- do.call(gList, lines_grobs)
+  setChildren(x, children)
+}
 

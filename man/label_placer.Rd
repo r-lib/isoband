@@ -2,10 +2,16 @@
 % Please edit documentation in R/label-placer.R
 \name{label_placer_minmax}
 \alias{label_placer_minmax}
+\alias{label_placer_none}
+\alias{label_placer_manual}
 \title{Set up a label placement strategy}
 \usage{
 label_placer_minmax(placement = "tb",
   rot_adjuster = angle_halfcircle_bottom(), n = 2)
+
+label_placer_none()
+
+label_placer_manual(breaks, x, y, theta)
 }
 \arguments{
 \item{placement}{String consisting of any combination of the letters
@@ -17,8 +23,21 @@ See e.g. \code{\link[=angle_halfcircle_bottom]{angle_halfcircle_bottom()}}.}
 
 \item{n}{Size of the point neighborhood over which the rotation angle should be
 calculated.}
+
+\item{breaks}{Character vector specifying the isolines to be labeled,
+as in \code{\link[=isolines_grob]{isolines_grob()}}.}
+
+\item{x, y, theta}{Numeric vectors specifying the x and y positions and
+angles (in radians) for each label corresponding to each break.}
 }
 \description{
-The minmax label placer places labels at the horizontal or vertical minima or maxima of
+These functions set up various label placement strategies.
+}
+\details{
+\code{label_placer_minmax()} places labels at the horizontal or vertical minima or maxima of
 the respective isolines.
+
+\code{label_placer_none()} places no labels at all.
+
+\code{label_placer_manual()} places labels at manually defined locations.
 }

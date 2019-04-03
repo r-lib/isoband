@@ -12,11 +12,12 @@ label_placer_simple(lines, labels_data, placer_fun)
 \item{labels_data}{A data frame containing information about which labels should
 be placed.}
 
-\item{placer_fun}{A function that takes an individual isoline as input and returns
-a data frame specifying label positions. The data frame should have three columns
-called \code{x}, \code{y}, and \code{theta}. \code{x} and \code{y} specify the label position, and \code{theta}
-specifies the label angle in radians. The data frame can have multiple rows, which
-results in the same label being placed in multiple locations.}
+\item{placer_fun}{A function that takes an individual isoline plus its associated
+break id as input and returns a data frame specifying label positions. The data
+frame should have three columns called \code{x}, \code{y}, and \code{theta}. \code{x} and \code{y} specify
+the label position, and \code{theta} specifies the label angle in radians. The data
+frame can have multiple rows, which results in the same label being placed in
+multiple locations.}
 }
 \description{
 The simple label placer processes separate isolines independently and places
