@@ -1,0 +1,93 @@
+---
+title: "3. Labeled isolines"
+author: "Claus O. Wilke"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{3. Labeled isolines}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r}
+library(isoband)
+library(grid)
+
+x <- (1:ncol(volcano))/(ncol(volcano)+1)
+y <- (nrow(volcano):1)/(nrow(volcano)+1)
+lines <- isolines(x, y, volcano, 5*(20:38))
+
+g <- isolines_grob(
+  lines, breaks = 20*(5:10),
+  gp = gpar(
+    fontsize = 12,
+    lwd = c(2, 1, 1, 1),
+    col = c("grey20", "grey50", "grey50", "grey50")
+  )
+)
+
+grid.newpage()
+grid.draw(g)
+```
+
+```{r}
+g <- isolines_grob(
+  lines, breaks = 20*(5:10),
+  gp = gpar(
+    fontsize = 12,
+    lwd = c(2, 1, 1, 1),
+    col = c("grey20", "grey50", "grey50", "grey50")
+  ),
+  label_placer = label_placer_minmax(
+    placement = "rl",
+    rot_adjuster = angle_fixed(pi/2)
+  )
+)
+
+grid.newpage()
+grid.draw(g)
+```
+
+
+```{r}
+g <- isolines_grob(
+  lines, breaks = 20*(5:10),
+  gp = gpar(
+    fontsize = 12,
+    lwd = c(2, 1, 1, 1),
+    col = c("grey20", "grey50", "grey50", "grey50")
+  ),
+  label_placer = label_placer_none()
+)
+
+grid.newpage()
+grid.draw(g)
+```
+
+```{r}
+g <- isolines_grob(
+  lines, breaks = 20*(5:10),
+  gp = gpar(
+    fontsize = 12,
+    lwd = c(2, 1, 1, 1),
+    col = c("grey20", "grey50", "grey50", "grey50")
+  ),
+  label_placer = label_placer_manual(
+    breaks = c("120", "160"),
+    x = c(0.1, 0.5),
+    y = c(0.2, 0.5),
+    theta = 0
+  )
+)
+
+grid.newpage()
+grid.draw(g)
+```

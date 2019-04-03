@@ -1,0 +1,63 @@
+---
+title: "1. Generating isolines and isobands"
+author: "Claus O. Wilke"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{1. Generating isolines and isobands}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+library(isoband)
+
+m <- matrix(
+  c(0, 0, 0, 0, 0,
+    0, 1, 2, 1, 0,
+    0, 1, 2, 0, 0,
+    0, 1, 0, 1, 0,
+    0, 0, 0, 0, 0),
+  5, 5, byrow = TRUE
+)
+
+isolines(x = 1:ncol(m), y = 1:nrow(m), z = m, 0.5)
+
+isobands(x = 1:ncol(m), y = 1:nrow(m), z = m, 0.5, 1.5)
+
+```
+
+```{r}
+plot_iso(m, 0.5, 1.5)
+```
+
+```{r}
+m <- matrix(
+  c(NA, NA, NA, 0, 0, 0,
+    NA, NA, NA, 1, 1, 0,
+     0,  0,  1, 1, 1, 0,
+     0,  1,  1, 0, 0, 0,
+     0,  0,  0, 1, 0, 0,
+     0,  0,  0, 0, 0, 0),
+  6, 6, byrow = TRUE
+)
+plot_iso(m, 0.5, 1.5)
+```
+
+```{r}
+m <- matrix(
+  c(0, 0, 1, 1,
+    0, 1, 1, 1,
+    1, 1, 0, 0,
+    0, 0, 0.8, 0),
+  4, 4, byrow = TRUE
+)
+plot_iso(m, 0.5, 1.5)
+```

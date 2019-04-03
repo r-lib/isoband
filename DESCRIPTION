@@ -27,5 +27,8 @@ Suggests:
     lwgeom,
     sf,
     testthat,
-    covr
+    covr,
+    knitr,
+    rmarkdown
 SystemRequirements: C++11
+VignetteBuilder: knitr
