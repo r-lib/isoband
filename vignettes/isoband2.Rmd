@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 ```{r}
 library(isoband)
 library(ggplot2)
-library(sf)
+suppressMessages(library(sf))
 
 m <- volcano
 
@@ -48,13 +48,70 @@ ggplot() +
 ```
 
 ```{r}
-m <- matrix(c(1.5, 1.5, 1.5, 1.5, 0.6,
-              0.5, 1.5, 1.5,   0,   0,
-                0,   1,   0,   1,   1,
-                0,   1,   0, 0.7,   0,
-              0.9, 1.3, 1.8, 1.4, 0.4), 5, 5, byrow = TRUE)
+suppressMessages(library(magick))
 
-raw <- isobands(1:5, 5:1, m, levels_low = 0:1, levels_high = 1:2)
+# helper function to convert a raster image into isobands
+sf_from_image <- function(image) {
+  image_gray <- image %>% image_quantize(colorspace = "gray")
+  image_raster <- as.raster(image_gray)
+  d <- dim(image_raster)
+  m <- matrix(c((255-col2rgb(image_raster)[1,])), nrow = d[1], ncol = d[2], byrow = TRUE)
+  b <- isobands(1:d[2], d[1]:1, m, 20*(0:13), 20*(1:14))
+  bands <- iso_to_sfg(b)
+  data <- st_sf(
+    level = letters[1:length(bands)],
+    geometry = st_sfc(bands)
+  )
+}
+
+# load the image, convert, and plot
+img <- image_resize(image_read(system.file("extdata", "ocean-cat.jpg", package = "isoband")), "200x200")
+img_sf <- sf_from_image(img)
+
+ggplot(img_sf) + 
+  geom_sf(color = "blue", fill = NA, size = 0.05) + 
+  coord_sf(expand = FALSE) +
+  theme_gray() +
+  theme(
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    axis.ticks.length = grid::unit(0, "pt"),
+    plot.margin = margin(0, 0, 0, 0)
+  )
+
+
+ggplot(img_sf) + 
+  geom_sf(aes(fill = level, color = level)) + 
+  coord_sf(expand = FALSE) +
+  theme_void() + 
+  scale_fill_viridis_d(
+    aesthetics = c("color", "fill"), option = "B", guide = "none",
+    direction = -1
+  )
+```
+
+## Invalid geometries
+
+Consider the following example, which creates some isobands with zero extent.
+```{r}
+m <- matrix(
+  c(1.5, 1.5, 1.5, 1.5, 0.6, 0,
+    0.5, 1.5, 1.5,   0,   0, 0,
+      0,   1,   0,   1,   1, 0,
+      0,   1,   0, 0.7,   0, 0,
+    0.9, 1.3, 1.8, 1.4, 0.4, 0
+  ),
+  nrow = 5, ncol = 6, byrow = TRUE
+)
+
+plot_iso(m, 1, 2)
+```
+
+If we convert the isobands for this example into simple features, we end up with geometries that are not considered valid.
+
+```{r}
+raw <- isobands(x = 1:6, y = 5:1, z = m, levels_low = 0:1, levels_high = 1:2)
 bands <- iso_to_sfg(raw)
 
 iso <- st_sf(
@@ -62,23 +119,37 @@ iso <- st_sf(
   geometry = st_sfc(bands)
 )
 
-# the geometries are not valid
-st_is_valid(iso, reason = TRUE)
-# this doesn't prevent us from plotting them
-ggplot(iso, aes(fill = id)) + geom_sf()
-
-# make all geometries valid
-iso2 <- lwgeom::st_make_valid(iso)
-st_is_valid(iso2, reason=TRUE)
-# the plot looks unchanged (this is not always the case)
-ggplot(iso2, aes(fill = id)) + geom_sf()
-
-# alternatively, if we shift all data values by a tiny
-# amount (here, 1e-10) so they don't coincide with the band
-# limits, no invalid geometries are generated.
-raw <- isobands(1:5, 5:1, m + 1e-10, levels_low = 0:1, levels_high = 1:2)
-bands <- iso_to_sfg(raw)
-iso <- st_sf(id = factor(1:length(bands)), geometry = st_sfc(bands))
 st_is_valid(iso, reason = TRUE)
 ```
 
+However, this doesn't prevent us from plotting them with `geom_sf()`.
+```{r}
+ggplot(iso, aes(fill = id)) + 
+  geom_sf() +
+  theme(legend.position = "bottom")
+```
+
+We can make the geometries valid with the `st_make_valid()` function from the `lwgeom` package.
+```{r}
+iso_valid <- lwgeom::st_make_valid(iso)
+st_is_valid(iso_valid, reason=TRUE)
+```
+
+The resulting plot is unchanged. (This is not always the case; sometimes single lines between two polygons are eliminated by `lwgeom::st_make_valid()`.)
+```{r}
+ggplot(iso_valid, aes(fill = id)) +
+  geom_sf() +
+  theme(legend.position = "bottom")
+```
+
+Alternatively, if we shift all data values by a tiny amount (here, 1e-10) so they don't coincide with the band limits, no invalid geometries are generated. The resulting plot again looks visually unchanged.
+```{r}
+raw <- isobands(x = 1:6, y = 5:1, z = m + 1e-10, levels_low = 0:1, levels_high = 1:2)
+bands <- iso_to_sfg(raw)
+iso <- st_sf(id = factor(1:length(bands)), geometry = st_sfc(bands))
+st_is_valid(iso, reason = TRUE)
+
+ggplot(iso, aes(fill = id)) +
+  geom_sf() +
+  theme(legend.position = "bottom")
+```
