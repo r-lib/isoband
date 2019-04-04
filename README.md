@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# isoband
+# isoband <img src="man/figures/isoband-logo.png" align="right" style="padding-left:10px;background-color:white;width:120px" />
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/isoband)](https://cran.r-project.org/package=isoband)
@@ -91,86 +91,18 @@ plot_iso(m, 0.5, 1.5)
 
 <img src="man/figures/README-basic-example-plot-1.png" width="50%" />
 
-A few more simple examples. Missing values and disconnected areas are
-all handled correctly.
-
-``` r
-m <- matrix(c(0, 0, 0, 0, 0, 0,
-              0, 0, 0, 1, 1, 0,
-              0, 0, 1, 1, 1, 0,
-              0, 1, 1, 0, 0, 0,
-              0, 0, 0, 1, 0, 0,
-              0, 0, 0, 0, 0, 0), 6, 6, byrow = TRUE)
-plot_iso(m, 0.5, 1.5)
-```
-
-<img src="man/figures/README-basic-plotting-1.png" width="50%" />
-
-``` r
-
-m <- matrix(c(NA, NA, NA, 0, 0, 0,
-              NA, NA, NA, 1, 1, 0,
-               0,  0,  1, 1, 1, 0,
-               0,  1,  1, 0, 0, 0,
-               0,  0,  0, 1, 0, 0,
-               0,  0,  0, 0, 0, 0), 6, 6, byrow = TRUE)
-plot_iso(m, 0.5, 1.5)
-```
-
-<img src="man/figures/README-basic-plotting-2.png" width="50%" />
-
-``` r
-
-m <- matrix(c(0, 0, 1, 1,
-              0, 1, 1, 1,
-              1, 1, 0, 0,
-              0, 0, 0.8, 0), 4, 4, byrow = TRUE)
-plot_iso(m, 0.5, 1.5)
-```
-
-<img src="man/figures/README-basic-plotting-3.png" width="50%" />
-
-The algorithm has no problem with larger datasets. Let’s calculate
-isolines and isobands for the volcano dataset, convert to sf, and plot
-with ggplot2.
-
-``` r
-library(ggplot2)
-library(sf)
-#> Linking to GEOS 3.6.1, GDAL 2.1.3, PROJ 4.9.3
-
-m <- volcano
-b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(9:19), 10*(10:20))
-l <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(10:19))
-
-bands <- iso_to_sfg(b)
-data_bands <- st_sf(
-  level = 1:length(bands),
-  geometry = st_sfc(bands)
-)
-lines <- iso_to_sfg(l)
-data_lines <- st_sf(
-  level = 2:(length(lines)+1),
-  geometry = st_sfc(lines)
-)
-
-ggplot() +
-  geom_sf(data = data_bands, aes(fill = level), color = NA, alpha = 0.7) +
-  geom_sf(data = data_lines, color = "black") +
-  scale_fill_viridis_c(guide = "none") +
-  coord_sf(expand = FALSE)
-```
-
-<img src="man/figures/README-volcano-1.png" width="75%" />
-
-We can also use this approach to convert bitmap images into polygons and
-plot with ggplot2.
+The isolining and isobanding algorithms have no problem with larger
+datasets. Let’s calculate isolines and isobands for a photographic
+image, convert to sf, and plot with ggplot2.
 
 ``` r
 library(magick)
 #> Linking to ImageMagick 6.9.9.39
 #> Enabled features: cairo, fontconfig, freetype, lcms, pango, rsvg, webp
 #> Disabled features: fftw, ghostscript, x11
+library(sf)
+#> Linking to GEOS 3.6.1, GDAL 2.1.3, PROJ 4.9.3
+library(ggplot2)
 
 sf_from_image <- function(image) {
   image_gray <- image %>% image_quantize(colorspace = "gray")
@@ -185,7 +117,7 @@ sf_from_image <- function(image) {
   )
 }
 
-img <- image_resize(image_read("https://pbs.twimg.com/profile_images/905186381995147264/7zKAG5sY_400x400.jpg"), "200x200")
+img <- image_resize(image_read(system.file("extdata", "ocean-cat.jpg", package = "isoband")), "200x200")
 img_sf <- sf_from_image(img)
 
 p1 <- ggplot(img_sf) + 
@@ -226,27 +158,4 @@ cowplot::plot_grid(
 )
 ```
 
-![](man/figures/README-polygon-hadley-1.png)<!-- -->
-
-## Performance
-
-The code is written in C++ and performance is generally good. Isolining
-is about as fast as `grDevices::contourLines()`, isobanding is
-approximately 2.5 times slower.
-
-``` r
-microbenchmark::microbenchmark(
-  grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano, levels = 10*(10:18)),
-  isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(10:18)),
-  isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(9:17), 10*(10:18))
-)
-#> Unit: milliseconds
-#>                                                                                            expr
-#>  grDevices::contourLines(1:ncol(volcano), 1:nrow(volcano), volcano,      levels = 10 * (10:18))
-#>                               isolines(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (10:18))
-#>             isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10 * (9:17),      10 * (10:18))
-#>       min       lq     mean   median       uq       max neval
-#>  1.612395 1.695477 1.960857 1.794610 2.054721  3.850897   100
-#>  1.664843 1.773456 2.164519 1.851443 2.182441  7.377072   100
-#>  4.138349 4.398549 4.937179 4.530082 5.032601 11.194105   100
-```
+![](man/figures/README-polygon-cat-1.png)<!-- -->
