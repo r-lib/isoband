@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+For geospatial applications, it may be convenient to convert isolines and isobands into simple features. This can be done with the function `iso_to_sfg()`, which converts an isolines or isobands object into an sf geometry collection. This converted object can then be further processed with functions from the `sf` package. For example, we can add them to an sf data frame and plot with ggplot2. 
+
+
 ```{r}
 library(isoband)
 library(ggplot2)
@@ -46,6 +49,8 @@ ggplot() +
   scale_fill_viridis_c(guide = "none") +
   coord_sf(expand = FALSE)
 ```
+
+As a second application of this feature, we will take a photograph and convert it into a set of polygons that we plot with false colors.
 
 ```{r}
 suppressMessages(library(magick))
@@ -93,7 +98,7 @@ ggplot(img_sf) +
 
 # Invalid geometries
 
-Consider the following example, which creates some isobands with zero extent.
+When converting isolines or isobands into simple features, we can end up with geometries that are considered invalid. These are generally cases where isobands have portions with zero width or height, for example because a set of values in a single row or column is exactly equal to the lower boundary of an isoband. (The lower boundary of an isoband is included in that band, while the upper boundary is excluded.) As an example, consider the following elevation matrix, which yields one isoband with zero width and one with zero height.
 ```{r}
 m <- matrix(
   c(1.5, 1.5, 1.5, 1.5, 0.6, 0,
@@ -108,11 +113,11 @@ m <- matrix(
 plot_iso(m, 1, 2)
 ```
 
-If we convert the isobands for this example into simple features, we end up with geometries that are not considered valid.
+The isobands are correct, but conversion into simple features yields invalid geometries.
 
 ```{r}
-raw <- isobands(x = 1:6, y = 5:1, z = m, levels_low = 0:1, levels_high = 1:2)
-bands <- iso_to_sfg(raw)
+b <- isobands(x = 1:6, y = 5:1, z = m, levels_low = 0:1, levels_high = 1:2)
+bands <- iso_to_sfg(b)
 
 iso <- st_sf(
   id = factor(1:length(bands)),
@@ -122,14 +127,14 @@ iso <- st_sf(
 st_is_valid(iso, reason = TRUE)
 ```
 
-However, this doesn't prevent us from plotting them with `geom_sf()`.
+Invalid geometries can cause problems in some applications, even though they usually can be plotted with `geom_sf()`.
 ```{r}
 ggplot(iso, aes(fill = id)) + 
   geom_sf() +
   theme(legend.position = "bottom")
 ```
 
-We can make the geometries valid with the `st_make_valid()` function from the `lwgeom` package.
+We can repair invalid geometries using the the `st_make_valid()` function from the `lwgeom` package.
 ```{r}
 iso_valid <- lwgeom::st_make_valid(iso)
 st_is_valid(iso_valid, reason=TRUE)
@@ -142,10 +147,10 @@ ggplot(iso_valid, aes(fill = id)) +
   theme(legend.position = "bottom")
 ```
 
-Alternatively, if we shift all data values by a tiny amount (here, 1e-10) so they don't coincide with the band limits, no invalid geometries are generated. The resulting plot again looks visually unchanged.
+Alternatively, we can avoid invalid geometries if we can guarantee that no elevation value ever is exactly equal to an isoband boundary. For example, if we shift all data values by a tiny amount (here, 1e-10) so they don't coincide with the band limits, no invalid geometries are generated. The resulting plot again looks visually unchanged.
 ```{r}
-raw <- isobands(x = 1:6, y = 5:1, z = m + 1e-10, levels_low = 0:1, levels_high = 1:2)
-bands <- iso_to_sfg(raw)
+b <- isobands(x = 1:6, y = 5:1, z = m + 1e-10, levels_low = 0:1, levels_high = 1:2)
+bands <- iso_to_sfg(b)
 iso <- st_sf(id = factor(1:length(bands)), geometry = st_sfc(bands))
 st_is_valid(iso, reason = TRUE)
 

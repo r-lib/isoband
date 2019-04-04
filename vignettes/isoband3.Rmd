@@ -66,8 +66,8 @@ g <- isolines_grob(
     col = c("grey50", "grey20", "grey50", "grey50")
   ),
   label_placer = label_placer_minmax(
-    placement = "rl",
-    rot_adjuster = angle_fixed(pi/2)
+    placement = "rl", # place labels right and left, i.e., min and max x
+    rot_adjuster = angle_fixed(pi/2) # set fixed angle of 90 degrees
   )
 )
 
