@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# isoband <img src="man/figures/isoband-logo.png" align="right" style="padding-left:10px;background-color:white;width:120px" />
+# isoband <img src="man/figures/isoband-logo.png" align="right" style="padding-left:10px;background-color:white;" />
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/isoband)](https://cran.r-project.org/package=isoband)
