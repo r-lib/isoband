@@ -23,13 +23,14 @@ Imports:
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Suggests: 
+    covr,
     ggplot2,
+    knitr,
     lwgeom,
     magick,
+    microbenchmark,
+    rmarkdown,
     sf,
-    testthat,
-    covr,
-    knitr,
-    rmarkdown
+    testthat
 SystemRequirements: C++11
 VignetteBuilder: knitr

@@ -91,7 +91,7 @@ ggplot(img_sf) +
   )
 ```
 
-## Invalid geometries
+# Invalid geometries
 
 Consider the following example, which creates some isobands with zero extent.
 ```{r}
