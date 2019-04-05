@@ -6,9 +6,9 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/isoband)](https://cran.r-project.org/package=isoband)
 [![Build
-Status](https://travis-ci.org/clauswilke/isoband.svg?branch=master)](https://travis-ci.org/clauswilke/isoband)
+Status](https://travis-ci.org/wilkelab/isoband.svg?branch=master)](https://travis-ci.org/wilkelab/isoband)
 [![Coverage
-Status](https://img.shields.io/codecov/c/github/clauswilke/isoband/master.svg)](https://codecov.io/github/clauswilke/isoband?branch=master)
+Status](https://img.shields.io/codecov/c/github/wilkelab/isoband/master.svg)](https://codecov.io/github/wilkelab/isoband?branch=master)
 
 Generate contour lines (isolines) and contour polygons (isobands) from
 regularly spaced grids containing elevation data.
@@ -24,7 +24,7 @@ install.packages("isoband")
 Install the current development from github via:
 
 ``` r
-remotes::install_github("clauswilke/isoband")
+remotes::install_github("wilkelab/isoband")
 ```
 
 ## Examples
