@@ -1,5 +1,5 @@
-This package provides a fast C++ implementation to turn raster data into
-polygons, with minimal external dependencies.
+The previous submission was larger than 5 MB and had clang-UBSAN issues. Both
+of these issues have been fixed.
 
 ## Test environment
 * R devel on win-builder

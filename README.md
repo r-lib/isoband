@@ -92,70 +92,35 @@ plot_iso(m, 0.5, 1.5)
 <img src="man/figures/README-basic-example-plot-1.png" width="50%" />
 
 The isolining and isobanding algorithms have no problem with larger
-datasets. Let’s calculate isolines and isobands for a photographic
-image, convert to sf, and plot with ggplot2.
+datasets. The algorithm has no problem with larger datasets. Let’s
+calculate isolines and isobands for the volcano dataset, convert to sf,
+and plot with ggplot2.
 
 ``` r
-library(magick)
-#> Linking to ImageMagick 6.9.9.39
-#> Enabled features: cairo, fontconfig, freetype, lcms, pango, rsvg, webp
-#> Disabled features: fftw, ghostscript, x11
+library(ggplot2)
 library(sf)
 #> Linking to GEOS 3.6.1, GDAL 2.1.3, PROJ 4.9.3
-library(ggplot2)
 
-sf_from_image <- function(image) {
-  image_gray <- image %>% image_quantize(colorspace = "gray")
-  image_raster <- as.raster(image_gray)
-  d <- dim(image_raster)
-  m <- matrix(c((255-col2rgb(image_raster)[1,])), nrow = d[1], ncol = d[2], byrow = TRUE)
-  b <- isobands(1:d[2], d[1]:1, m, 20*(0:13), 20*(1:14))
-  bands <- iso_to_sfg(b)
-  data <- st_sf(
-    level = letters[1:length(bands)],
-    geometry = st_sfc(bands)
-  )
-}
+m <- volcano
+b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(9:19), 10*(10:20))
+l <- isolines((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(10:19))
 
-img <- image_resize(image_read(system.file("extdata", "ocean-cat.jpg", package = "isoband")), "200x200")
-img_sf <- sf_from_image(img)
-
-p1 <- ggplot(img_sf) + 
-  geom_sf(color = "gray10", fill = NA, size = 0.05) + 
-  coord_sf(expand = FALSE) +
-  theme_gray() +
-  theme(
-    axis.ticks = element_blank(),
-    axis.text = element_blank(),
-    axis.title = element_blank(),
-    axis.ticks.length = grid::unit(0, "pt"),
-    plot.margin = margin(0, 0, 0, 0)
-  )
-
-p2 <- ggplot(img_sf) + 
-  geom_sf(aes(fill = level, color = level)) + 
-  coord_sf(expand = FALSE) +
-  theme_void()
-
-p3 <- ggplot(img_sf) + 
-  geom_sf(aes(fill = level), color = "gray30", size = 0.1) + 
-  scale_fill_hue(aesthetics = c("color", "fill"), guide = "none", direction = -1) +
-  coord_sf(expand = FALSE) +
-  theme_void()
-
-cowplot::plot_grid(
-  p1,
-  p2 + scale_fill_viridis_d(
-    aesthetics = c("color", "fill"), option = "B", guide = "none",
-    direction = -1
-  ),
-  p2 + scale_fill_viridis_d(
-    aesthetics = c("color", "fill"), option = "D", guide = "none",
-    direction = -1
-  ),
-  p3,
-  scale = 0.9
+bands <- iso_to_sfg(b)
+data_bands <- st_sf(
+  level = 1:length(bands),
+  geometry = st_sfc(bands)
 )
+lines <- iso_to_sfg(l)
+data_lines <- st_sf(
+  level = 2:(length(lines)+1),
+  geometry = st_sfc(lines)
+)
+
+ggplot() +
+  geom_sf(data = data_bands, aes(fill = level), color = NA, alpha = 0.7) +
+  geom_sf(data = data_lines, color = "black") +
+  scale_fill_viridis_c(guide = "none") +
+  coord_sf(expand = FALSE)
 ```
 
-![](man/figures/README-polygon-cat-1.png)<!-- -->
+<img src="man/figures/README-volcano-1.png" width="50%" />
