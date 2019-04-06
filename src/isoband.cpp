@@ -306,12 +306,14 @@ public:
 
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
-        int index = 27*ternarized(r, c) + 9*ternarized(r, c + 1) + 3*ternarized(r + 1, c + 1) + ternarized(r + 1, c);
+        int index;
         if (NumericMatrix::is_na(grid_z(r, c)) || NumericMatrix::is_na(grid_z(r, c + 1)) ||
             NumericMatrix::is_na(grid_z(r + 1, c)) || NumericMatrix::is_na(grid_z(r + 1, c + 1))) {
-              // we don't draw any contours if at least one of the corners is NA
-              index = 0;
-            }
+          // we don't draw any contours if at least one of the corners is NA
+          index = 0;
+        } else {
+          index = 27*ternarized(r, c) + 9*ternarized(r, c + 1) + 3*ternarized(r + 1, c + 1) + ternarized(r + 1, c);
+        }
         cells(r, c) = index;
         //cout << index << " ";
       }
@@ -1406,17 +1408,26 @@ public:
     // clear polygon grid and associated internal variables
     reset_grid();
 
-    // setup matrix of ternarized cell representations
-    LogicalMatrix binarized(nrow, ncol, static_cast<LogicalVector>(grid_z >= vlo).begin());
+    // setup matrix of binarized cell representations
+    IntegerVector v(nrow*ncol);
+    IntegerVector::iterator iv = v.begin();
+    for (NumericMatrix::const_iterator it = grid_z.begin(); it != grid_z.end(); it++) {
+      *iv = (*it >= vlo);
+      iv++;
+    }
+
+    IntegerMatrix binarized(nrow, ncol, v.begin());
     IntegerMatrix cells(nrow - 1, ncol - 1);
 
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
-        int index = 8*binarized(r, c) + 4*binarized(r, c + 1) + 2*binarized(r+1, c+1) + 1*binarized(r + 1, c);
+        int index;
         if (NumericMatrix::is_na(grid_z(r, c)) || NumericMatrix::is_na(grid_z(r, c + 1)) ||
             NumericMatrix::is_na(grid_z(r + 1, c)) || NumericMatrix::is_na(grid_z(r + 1, c + 1))) {
           // we don't draw any contour lines if at least one of the corners is NA
           index = 0;
+        } else {
+          index = 8*binarized(r, c) + 4*binarized(r, c + 1) + 2*binarized(r+1, c+1) + 1*binarized(r + 1, c);
         }
 
         // two-segment saddles
