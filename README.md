@@ -92,9 +92,8 @@ plot_iso(m, 0.5, 1.5)
 <img src="man/figures/README-basic-example-plot-1.png" width="50%" />
 
 The isolining and isobanding algorithms have no problem with larger
-datasets. The algorithm has no problem with larger datasets. Let’s
-calculate isolines and isobands for the volcano dataset, convert to sf,
-and plot with ggplot2.
+datasets. Let’s calculate isolines and isobands for the volcano dataset,
+convert to sf, and plot with ggplot2.
 
 ``` r
 library(ggplot2)
