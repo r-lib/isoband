@@ -7,8 +7,7 @@ polygons, with minimal external dependencies.
 * R version 3.5.0 on x86_64-apple-darwin15.6.0 (64-bit) (local install)
 
 ## R CMD check results
-There were no ERRORs or WARNINGs. There was one NOTE, about possible misspellings
-of the words "isoline" and "isoband". Both words are spelled correctly.
+There were no ERRORs, WARNINGs, or NOTEs.
 
 ## Downstream dependencies
 No problems.
