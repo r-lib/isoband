@@ -3,8 +3,7 @@ Title: Generate Isolines and Isobands from Regularly Spaced Elevation Grids
 Version: 0.2.0.9000
 Authors@R: 
     person(
-      given = "Claus",
-      middle = "O.",  
+      given = "Claus O.",
       family = "Wilke",
       role = c("aut", "cre"),
       email = "wilke@austin.utexas.edu",

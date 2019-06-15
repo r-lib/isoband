@@ -74,7 +74,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_isoband_isobands_impl", (DL_FUNC) &_isoband_isobands_impl, 5},
     {"_isoband_isolines_impl", (DL_FUNC) &_isoband_isolines_impl, 4},
     {"_isoband_separate_polygons", (DL_FUNC) &_isoband_separate_polygons, 3},
-    {"run_testthat_tests",         (DL_FUNC) &run_testthat_tests,         0},
+    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 0},
     {NULL, NULL, 0}
 };
 
