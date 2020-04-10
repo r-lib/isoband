@@ -164,19 +164,19 @@ bool double_intersection(const point &p1, const point &p2, point &ip1, point &ip
     switch(b[1]) {
     case 0: // top
       ip1 = point(p1.x + t[1]*dx, 1);
-      if (ip1.x < 0 || ip1.x > 1) result = false;
+      if (ip1.x < -1e-10 || ip1.x > 1+1e-10) result = false;
       break;
     case 1: // right
       ip1 = point(1, p1.y + t[1]*dy);
-      if (ip1.y < 0 || ip1.y > 1) result = false;
+      if (ip1.y < -1e-10 || ip1.y > 1+1e-10) result = false;
       break;
     case 2: // bottom
       ip1 = point(p1.x + t[1]*dx, 0);
-      if (ip1.x < 0 || ip1.x > 1) result = false;
+      if (ip1.x < -1e-10 || ip1.x > 1+1e-10) result = false;
       break;
     case 3: // left
       ip1 = point(0, p1.y + t[1]*dy);
-      if (ip1.y < 0 || ip1.y > 1) result = false;
+      if (ip1.y < -1e-10 || ip1.y > 1+1e-10) result = false;
       break;
     default: // should never go here
       result = false;
@@ -185,19 +185,19 @@ bool double_intersection(const point &p1, const point &p2, point &ip1, point &ip
     switch(b[2]) {
     case 0: // top
       ip2 = point(p1.x + t[2]*dx, 1);
-      if (ip2.x < 0 || ip2.x > 1) result = false;
+      if (ip2.x < -1e-10 || ip2.x > 1+1e-10) result = false;
       break;
     case 1: // right
       ip2 = point(1, p1.y + t[2]*dy);
-      if (ip2.y < 0 || ip2.y > 1) result = false;
+      if (ip2.y < -1e-10 || ip2.y > 1+1e-10) result = false;
       break;
     case 2: // bottom
       ip2 = point(p1.x + t[2]*dx, 0);
-      if (ip2.x < 0 || ip2.x > 1) result = false;
+      if (ip2.x < -1e-10 || ip2.x > 1+1e-10) result = false;
       break;
     case 3: // left
       ip2 = point(0, p1.y + t[2]*dy);
-      if (ip2.y < 0 || ip2.y > 1) result = false;
+      if (ip2.y < -1e-10 || ip2.y > 1+1e-10) result = false;
       break;
     default: // should never go here
       result = false;
