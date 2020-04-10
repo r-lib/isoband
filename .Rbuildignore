@@ -8,3 +8,4 @@
 ^isoband\.Rproj$
 ^\.Rproj\.user$
 ^cran-comments\.md$
+^appveyor\.yml$
