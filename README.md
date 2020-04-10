@@ -3,12 +3,19 @@
 
 # isoband <img width="120px" alt="isoband logo" align="right" src="man/figures/isoband-logo.png">
 
-[![CRAN
-status](https://www.r-pkg.org/badges/version/isoband)](https://cran.r-project.org/package=isoband)
+<!-- badges: start -->
+
 [![Build
 Status](https://travis-ci.org/wilkelab/isoband.svg?branch=master)](https://travis-ci.org/wilkelab/isoband)
+[![AppVeyor build
+status](https://ci.appveyor.com/api/projects/status/github/wilkelab/isoband?branch=master&svg=true)](https://ci.appveyor.com/project/clauswilke/isoband)
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/wilkelab/isoband/master.svg)](https://codecov.io/github/wilkelab/isoband?branch=master)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/isoband)](https://cran.r-project.org/package=isoband)
+[![Lifecycle:
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+<!-- badges: end -->
 
 Generate contour lines (isolines) and contour polygons (isobands) from
 regularly spaced grids containing elevation data.
@@ -50,12 +57,12 @@ m <- matrix(c(0, 0, 0, 0, 0,
 isolines(1:ncol(m), 1:nrow(m), m, 0.5)
 #> $`0.5`
 #> $`0.5`$x
-#>  [1] 4.00 3.50 3.00 2.50 2.00 1.50 1.50 1.50 2.00 3.00 4.00 4.50 4.00 3.75
-#> [15] 4.00 4.50 4.00
+#>  [1] 4.00 3.50 3.00 2.50 2.00 1.50 1.50 1.50 2.00 3.00 4.00 4.50 4.00 3.75 4.00
+#> [16] 4.50 4.00
 #> 
 #> $`0.5`$y
-#>  [1] 4.50 4.00 3.75 4.00 4.50 4.00 3.00 2.00 1.50 1.25 1.50 2.00 2.50 3.00
-#> [15] 3.50 4.00 4.50
+#>  [1] 4.50 4.00 3.75 4.00 4.50 4.00 3.00 2.00 1.50 1.25 1.50 2.00 2.50 3.00 3.50
+#> [16] 4.00 4.50
 #> 
 #> $`0.5`$id
 #>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
@@ -67,12 +74,12 @@ isolines(1:ncol(m), 1:nrow(m), m, 0.5)
 isobands(1:ncol(m), 1:nrow(m), m, 0.5, 1.5)
 #> $`0.5:1.5`
 #> $`0.5:1.5`$x
-#>  [1] 2.50 2.00 1.50 1.50 1.50 2.00 3.00 4.00 4.50 4.00 3.75 4.00 4.50 4.00
-#> [15] 3.50 3.00 3.00 3.25 3.50 3.00 2.50 2.50
+#>  [1] 2.50 2.00 1.50 1.50 1.50 2.00 3.00 4.00 4.50 4.00 3.75 4.00 4.50 4.00 3.50
+#> [16] 3.00 3.00 3.25 3.50 3.00 2.50 2.50
 #> 
 #> $`0.5:1.5`$y
-#>  [1] 4.00 4.50 4.00 3.00 2.00 1.50 1.25 1.50 2.00 2.50 3.00 3.50 4.00 4.50
-#> [15] 4.00 3.75 3.25 3.00 2.00 1.75 2.00 3.00
+#>  [1] 4.00 4.50 4.00 3.00 2.00 1.50 1.25 1.50 2.00 2.50 3.00 3.50 4.00 4.50 4.00
+#> [16] 3.75 3.25 3.00 2.00 1.75 2.00 3.00
 #> 
 #> $`0.5:1.5`$id
 #>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2
@@ -98,7 +105,7 @@ convert to sf, and plot with ggplot2.
 ``` r
 library(ggplot2)
 library(sf)
-#> Linking to GEOS 3.6.1, GDAL 2.1.3, PROJ 4.9.3
+#> Linking to GEOS 3.7.2, GDAL 2.4.2, PROJ 5.2.0
 
 m <- volcano
 b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(9:19), 10*(10:20))
