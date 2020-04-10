@@ -109,74 +109,47 @@ bool double_intersection(const point &p1, const point &p2, point &ip1, point &ip
   } else {
     // in the general case, we need to calculate the intersection points with all four edges
     // we start at the top and go around clockwise, top, right, bottom, left
-    double t1 = (1 - p1.y)/dy;
-    double x1 = p1.x + t1*dx;
-    double t2 = (1 - p1.x)/dx;
-    double y2 = p1.y + t2*dy;
-    double t3 = -1*p1.y/dy;
-    double x3 = p1.x + t3*dx;
-    double t4 = -1*p1.x/dx;
-    double y4 = p1.y + t4*dy;
+    double t[4]; // linear parameters defining intersection points
+    t[0] = (1 - p1.y)/dy; // top
+    t[1] = (1 - p1.x)/dx; // right
+    t[2] = -1*p1.y/dy; // bottom
+    t[3] = -1*p1.x/dx; // left
 
-    int score = 8*(x1 > 0 && x1 <= 1) + 4*(y2 >= 0 && y2 < 1) + 2*(x3 >= 0 && x3 < 1) + (y4 > 0 && y4 <= 1);
-    switch(score) {
-    case 5: // 0101  line through left and right
-      if (t4 < t2) {
-        ip1 = point(0, y4);
-        ip2 = point(1, y2);
-      } else {
-        ip1 = point(1, y2);
-        ip2 = point(0, y4);
+    // now we need to sort the t values, we don't need
+    // a complex algorithm here since it's so few cases
+    for (int i = 1; i < 4; i++) { // find minimum
+      if (t[0] > t[i]) {
+        double temp = t[0];
+        t[0] = t[i];
+        t[i] = temp;
       }
-      return true;
-    case 10: // 1010  line through bottom and top
-      if (t3 < t1) {
-        ip1 = point(x3, 0);
-        ip2 = point(x1, 1);
-      } else {
-        ip1 = point(x1, 1);
-        ip2 = point(x3, 0);
-      }
-      return true;
-    case 12: // 1100  line through top right
-      if (t2 < t1) {
-        ip1 = point(1, y2);
-        ip2 = point(x1, 1);
-      } else {
-        ip1 = point(x1, 1);
-        ip2 = point(1, y2);
-      }
-      return true;
-    case 6: // 0110  line through bottom right
-      if (t3 < t2) {
-        ip1 = point(x3, 0);
-        ip2 = point(1, y2);
-      } else {
-        ip1 = point(1, y2);
-        ip2 = point(x3, 0);
-      }
-      return true;
-    case 3: // 0011  line through bottom left
-      if (t4 < t3) {
-        ip1 = point(0, y4);
-        ip2 = point(x3, 0);
-      } else {
-        ip1 = point(x3, 0);
-        ip2 = point(0, y4);
-      }
-      return true;
-    case 9: // 1001  line through top left
-      if (t4 < t1) {
-        ip1 = point(0, y4);
-        ip2 = point(x1, 1);
-      } else {
-        ip1 = point(x1, 1);
-        ip2 = point(0, y4);
-      }
-      return true;
-    default:
-      return false;
     }
+
+    for (int i = 2; i < 4; i++) { // find next larger value
+      if (t[1] > t[i]) {
+        double temp = t[1];
+        t[1] = t[i];
+        t[i] = temp;
+      }
+    }
+
+    for (int i = 3; i < 4; i++) { // find next larger value
+      if (t[2] > t[i]) {
+        double temp = t[1];
+        t[2] = t[i];
+        t[i] = temp;
+      }
+    }
+
+    // t[1] and t[2] are the two inner-most intersections, which
+    // define the two clipping points
+    ip1 = point(p1.x + t[1]*dx, p1.y + t[1]*dy);
+    ip2 = point(p1.x + t[2]*dx, p1.y + t[2]*dy);
+
+    // check if intersection points lie on unit box
+    if (ip1.x < 0 || ip1.x > 1 || ip1.y < 0 || ip1.y > 1 ||
+        ip2.x < 0 || ip2.x > 1 || ip2.y < 0 || ip2.y > 1) return false;
+    else return true;
   }
 }
 
