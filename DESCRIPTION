@@ -29,11 +29,11 @@ Suggests:
     covr,
     ggplot2,
     knitr,
-    lwgeom,
     magick,
     microbenchmark,
     rmarkdown,
     sf,
+    lwgeom,
     testthat
 SystemRequirements: C++11
 VignetteBuilder: knitr

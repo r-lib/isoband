@@ -134,9 +134,9 @@ ggplot(iso, aes(fill = id)) +
   theme(legend.position = "bottom")
 ```
 
-We can repair invalid geometries using the the `st_make_valid()` function from the `lwgeom` package.
+We can repair invalid geometries using `st_make_valid()`:
 ```{r}
-iso_valid <- lwgeom::st_make_valid(iso)
+iso_valid <- st_make_valid(iso)
 st_is_valid(iso_valid, reason=TRUE)
 ```
 
