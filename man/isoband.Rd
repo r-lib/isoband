@@ -3,7 +3,6 @@
 \docType{package}
 \name{isoband}
 \alias{isoband}
-\alias{isoband-package}
 \title{Generate isolines and isobands}
 \description{
 Generate isolines and isobands

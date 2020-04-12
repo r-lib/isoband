@@ -22,7 +22,7 @@ For geospatial applications, it may be convenient to convert isolines and isoban
 ```{r}
 library(isoband)
 library(ggplot2)
-suppressMessages(library(sf))
+suppressWarnings(library(sf))
 
 m <- volcano
 

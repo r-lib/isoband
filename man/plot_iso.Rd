@@ -4,9 +4,18 @@
 \alias{plot_iso}
 \title{Visualize a single isoband}
 \usage{
-plot_iso(m, vlo, vhi, fill_lo = "gray95", fill_mid = "gray50",
-  fill_hi = "black", fill_band = "cornsilk", col_lo = "black",
-  col_hi = "black", newpage = TRUE)
+plot_iso(
+  m,
+  vlo,
+  vhi,
+  fill_lo = "gray95",
+  fill_mid = "gray50",
+  fill_hi = "black",
+  fill_band = "cornsilk",
+  col_lo = "black",
+  col_hi = "black",
+  newpage = TRUE
+)
 }
 \arguments{
 \item{m}{input matrix}

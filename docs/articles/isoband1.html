@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">isoband</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -89,7 +89,7 @@
       <h1>1. Generating isolines and isobands</h1>
                         <h4 class="author">Claus O. Wilke</h4>
             
-            <h4 class="date">2019-04-06</h4>
+            <h4 class="date">2020-04-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/wilkelab/isoband/blob/master/vignettes/isoband1.Rmd"><code>vignettes/isoband1.Rmd</code></a></small>
       <div class="hidden name"><code>isoband1.Rmd</code></div>
@@ -205,18 +205,19 @@
 <a class="sourceLine" id="cb6-15" data-line-number="15"></a>
 <a class="sourceLine" id="cb6-16" data-line-number="16">microbenchmark<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/microbenchmark/topics/microbenchmark">microbenchmark</a></span>(<span class="kw">fn_contourLines</span>(), <span class="kw">fn_isolines</span>(), <span class="kw">fn_isobands</span>())</a>
 <a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt; Unit: milliseconds</span></a>
-<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt;               expr      min       lq     mean   median       uq       max</span></a>
-<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt;  fn_contourLines() 1.579667 1.769457 2.767097 2.237954 3.106195 21.062027</span></a>
-<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt;      fn_isolines() 1.596317 1.688121 2.004069 1.787301 2.116949  4.763769</span></a>
-<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt;      fn_isobands() 4.192810 4.429876 5.218986 4.753836 5.172797 16.415709</span></a>
-<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt;  neval</span></a>
-<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="co">#&gt;    100</span></a>
-<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="co">#&gt;    100</span></a>
-<a class="sourceLine" id="cb6-25" data-line-number="25"><span class="co">#&gt;    100</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt;               expr      min       lq     mean   median       uq       max neval</span></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt;  fn_contourLines() 1.401219 1.651503 2.287851 1.757071 2.259728 20.500585   100</span></a>
+<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt;      fn_isolines() 1.450988 1.498700 1.766143 1.648455 1.760705  7.499279   100</span></a>
+<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt;      fn_isobands() 3.547891 3.663721 4.198323 3.903971 4.269896 13.789017   100</span></a>
+<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt;  cld</span></a>
+<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="co">#&gt;   b </span></a>
+<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="co">#&gt;  a  </span></a>
+<a class="sourceLine" id="cb6-25" data-line-number="25"><span class="co">#&gt;    c</span></a></code></pre></div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -230,7 +231,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Claus Wilke.</p>
+  <p>Developed by Claus O. Wilke.</p>
 </div>
 
 <div class="pkgdown">

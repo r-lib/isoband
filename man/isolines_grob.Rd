@@ -4,10 +4,17 @@
 \alias{isolines_grob}
 \title{Render labeled isolines}
 \usage{
-isolines_grob(lines, gp = gpar(), breaks = NULL, labels = NULL,
-  margin = unit(c(1, 1, 1, 1), "pt"), label_col = NULL,
-  label_alpha = NULL, label_placer = label_placer_minmax(),
-  units = "npc")
+isolines_grob(
+  lines,
+  gp = gpar(),
+  breaks = NULL,
+  labels = NULL,
+  margin = unit(c(1, 1, 1, 1), "pt"),
+  label_col = NULL,
+  label_alpha = NULL,
+  label_placer = label_placer_minmax(),
+  units = "npc"
+)
 }
 \arguments{
 \item{lines}{Isolines, as produced by the \code{\link[=isolines]{isolines()}} function.}
