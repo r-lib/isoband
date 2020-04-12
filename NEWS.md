@@ -1,5 +1,7 @@
-isoband 0.2.0.9000
+isoband 0.2.1
 ----------------------------------------
+- Improved clipping algorithm for `clip_lines()`, less likely to
+  experience numerical instabilities.
 
 
 isoband 0.2.0
