@@ -9,7 +9,7 @@
 #' happens usually when the lower limit of an isoband is exactly equal to some data values (see
 #' examples for a demonstration). This can be worked around either by slightly shifting the data
 #' or band limits (e.g., round all data values and then shift them by a value smaller than the
-#' rounding error) or by fixing the geometries using the function [`lwgeom::st_make_valid()`].
+#' rounding error) or by fixing the geometries using the function `st_make_valid()`.
 #' @param x The object to convert.
 #' @examples
 #' library(sf)
@@ -55,11 +55,11 @@
 #' # this doesn't prevent us from plotting them
 #' ggplot(iso, aes(fill = id)) + geom_sf()
 #'
-#' # make all geometries valid
-#' iso2 <- lwgeom::st_make_valid(iso)
-#' st_is_valid(iso2, reason=TRUE)
-#' # the plot looks unchanged (this is not always the case)
-#' ggplot(iso2, aes(fill = id)) + geom_sf()
+#' ## make all geometries valid
+#' #iso2 <- st_make_valid(iso)
+#' #st_is_valid(iso2, reason=TRUE)
+#' ## the plot looks unchanged (this is not always the case)
+#' #ggplot(iso2, aes(fill = id)) + geom_sf()
 #'
 #' # alternatively, if we shift all data values by a tiny
 #' # amount (here, 1e-10) so they don't coincide with the band

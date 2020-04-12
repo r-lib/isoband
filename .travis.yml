@@ -4,6 +4,11 @@ language: R
 sudo: false
 cache: packages
 
+matrix:
+  include:
+  - r: devel
+  - r: release
+
 after_success:
   - Rscript -e 'covr::codecov()'
 
@@ -22,4 +27,3 @@ addons:
       - libproj-dev
       - libgeos-dev
       - libgdal-dev
-      - liblwgeom-dev
