@@ -104,7 +104,7 @@ convert to sf, and plot with ggplot2.
 
 ``` r
 library(ggplot2)
-library(sf)
+suppressWarnings(library(sf))
 #> Linking to GEOS 3.7.2, GDAL 2.4.2, PROJ 5.2.0
 
 m <- volcano
