@@ -194,9 +194,12 @@ rounding error) or by fixing the geometries using the function <code><a href='ht
 <span class='fu'><a href='https://www.rdocumentation.org/packages/sf/topics/geos_query'>st_is_valid</a></span>(<span class='no'>iso</span>, <span class='kw'>reason</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "Self-intersection[2 2]"                   
 #&gt; [2] "Too few points in geometry component[4 3]"</div><div class='input'><span class='co'># this doesn't prevent us from plotting them</span>
 <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span>(<span class='no'>iso</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(<span class='kw'>fill</span> <span class='kw'>=</span> <span class='no'>id</span>)) + <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsf.html'>geom_sf</a></span>()</div><div class='img'><img src='iso_to_sfg-3.png' alt='' width='700' height='433' /></div><div class='input'>
-</div><div class='input'><span class='co'># make all geometries valid</span>
-<span class='no'>iso2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/sf/topics/valid'>st_make_valid</a></span>(<span class='no'>iso</span>)</div><div class='output co'>#&gt; <span class='error'>Error: 'lwgeom_make_valid' is not an exported object from 'namespace:lwgeom'</span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/sf/topics/geos_query'>st_is_valid</a></span>(<span class='no'>iso2</span>, <span class='kw'>reason</span><span class='kw'>=</span><span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='error'>Error in st_geometry(x): object 'iso2' not found</span></div><div class='input'><span class='co'># the plot looks unchanged (this is not always the case)</span>
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span>(<span class='no'>iso2</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(<span class='kw'>fill</span> <span class='kw'>=</span> <span class='no'>id</span>)) + <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsf.html'>geom_sf</a></span>()</div><div class='output co'>#&gt; <span class='error'>Error in ggplot(iso2, aes(fill = id)): object 'iso2' not found</span></div><div class='input'>
+<span class='co'>## make all geometries valid</span>
+<span class='co'>#iso2 &lt;- st_make_valid(iso)</span>
+<span class='co'>#st_is_valid(iso2, reason=TRUE)</span>
+<span class='co'>## the plot looks unchanged (this is not always the case)</span>
+<span class='co'>#ggplot(iso2, aes(fill = id)) + geom_sf()</span>
+
 <span class='co'># alternatively, if we shift all data values by a tiny</span>
 <span class='co'># amount (here, 1e-10) so they don't coincide with the band</span>
 <span class='co'># limits, no invalid geometries are generated.</span>
