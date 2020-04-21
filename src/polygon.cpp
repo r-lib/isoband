@@ -1,6 +1,3 @@
-#include <Rcpp.h>
-using namespace Rcpp;
-
 #include <iostream>
 using namespace std;
 

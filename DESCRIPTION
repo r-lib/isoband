@@ -17,10 +17,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 LinkingTo: 
-    Rcpp,
     testthat
 Imports: 
-    Rcpp,
     grid,
     utils
 Roxygen: list(markdown = TRUE)

@@ -96,3 +96,19 @@ isolines <- function(x, y, z, levels) {
     class = c("isolines", "iso")
   )
 }
+
+isobands_impl <- function(x, y, z, value_low, value_high) {
+  mode(z) <- "numeric"
+  .Call(
+    `isobands_impl_c`, as.numeric(x), as.numeric(y), z,
+    as.numeric(value_low), as.numeric(value_high), PACKAGE = "isoband"
+  )
+}
+
+isolines_impl <- function(x, y, z, value) {
+  mode(z) <- "numeric"
+  .Call(
+    `isolines_impl_c`, as.numeric(x), as.numeric(y), z,
+    as.numeric(value), PACKAGE = "isoband"
+  )
+}

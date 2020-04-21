@@ -3,9 +3,10 @@
 // Includes merging of line segments and polygons.
 // Written by Claus O. Wilke
 
-// [[Rcpp::plugins(cpp11)]]
-#include <Rcpp.h>
-using namespace Rcpp;
+#define R_NO_REMAP
+
+#include <R.h>
+#include <Rinternals.h>
 
 #include <iostream>
 #include <vector>
@@ -14,6 +15,7 @@ using namespace Rcpp;
 using namespace std;
 
 #include "polygon.h" // for point
+#include "utils.h"
 
 // point in abstract grid space
 enum point_type {
@@ -77,8 +79,8 @@ ostream & operator<<(ostream &out, const point_connect &pc) {
 class isobander {
 protected:
   int nrow, ncol; // numbers of rows and columns
-  const NumericVector &grid_x,&grid_y;
-  const NumericMatrix &grid_z;
+  SEXP grid_x, grid_y, grid_z;
+  double *grid_x_p, *grid_y_p, *grid_z_p;
   double vlo, vhi; // low and high cutoff values
   grid_point tmp_poly[8]; // temp storage for elementary polygons; none has more than 8 vertices
   point_connect tmp_point_connect[8];
@@ -98,7 +100,7 @@ protected:
   // internal member functions
 
   double central_value(int r, int c) {// calculates the central value of a given cell
-    return (grid_z(r, c) + grid_z(r, c + 1) + grid_z(r + 1, c) + grid_z(r + 1, c + 1))/4;
+    return (grid_z_p[r + c * nrow] + grid_z_p[r + (c + 1) * nrow] + grid_z_p[r + 1 + c * nrow] + grid_z_p[r + 1 + (c + 1) * nrow])/4;
   }
 
   void poly_start(int r, int c, point_type type) { // start a new elementary polygon
@@ -213,7 +215,7 @@ protected:
             tmp_point_connect[i].altpoint = true;
             break;
           default:
-            stop("undefined merging configuration: %i\n", score);
+            Rf_error("undefined merging configuration: %i\n", score);
           }
         }
       }
@@ -257,29 +259,30 @@ protected:
   point calc_point_coords(const grid_point &p) {
     switch(p.type) {
     case grid:
-      return point(grid_x[p.c], grid_y[p.r]);
+      return point(grid_x_p[p.c], grid_y_p[p.r]);
     case hintersect_lo: // intersection with horizontal edge, low value
-      return point(interpolate(grid_x[p.c], grid_x[p.c+1], grid_z(p.r, p.c), grid_z(p.r, p.c+1), vlo), grid_y[p.r]);
+      return point(interpolate(grid_x_p[p.c], grid_x_p[p.c+1], grid_z_p[p.r + p.c * nrow], grid_z_p[p.r + (p.c + 1) * nrow], vlo), grid_y_p[p.r]);
     case hintersect_hi: // intersection with horizontal edge, high value
-      return point(interpolate(grid_x[p.c], grid_x[p.c+1], grid_z(p.r, p.c), grid_z(p.r, p.c+1), vhi), grid_y[p.r]);
+      return point(interpolate(grid_x_p[p.c], grid_x_p[p.c+1], grid_z_p[p.r + p.c * nrow], grid_z_p[p.r + (p.c + 1) * nrow], vhi), grid_y_p[p.r]);
     case vintersect_lo: // intersection with vertical edge, low value
-      return point(grid_x[p.c], interpolate(grid_y[p.r], grid_y[p.r+1], grid_z(p.r, p.c), grid_z(p.r+1, p.c), vlo));
+      return point(grid_x_p[p.c], interpolate(grid_y_p[p.r], grid_y_p[p.r+1], grid_z_p[p.r + p.c * nrow], grid_z_p[p.r + 1 + p.c * nrow], vlo));
     case vintersect_hi: // intersection with vertical edge, high value
-      return point(grid_x[p.c], interpolate(grid_y[p.r], grid_y[p.r+1], grid_z(p.r, p.c), grid_z(p.r+1, p.c), vhi));
+      return point(grid_x_p[p.c], interpolate(grid_y_p[p.r], grid_y_p[p.r+1], grid_z_p[p.r + p.c * nrow], grid_z_p[p.r + 1 + p.c * nrow], vhi));
     default:
       return point(0, 0); // should never get here
     }
   }
 
 public:
-  isobander(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value_low = 0, double value_high = 0) :
-    grid_x(x), grid_y(y), grid_z(z), vlo(value_low), vhi(value_high)
+  isobander(SEXP x, SEXP y, SEXP z, double value_low = 0, double value_high = 0) :
+    grid_x(x), grid_y(y), grid_z(z), grid_x_p(REAL(x)), grid_y_p(REAL(y)),
+    grid_z_p(REAL(z)), vlo(value_low), vhi(value_high)
   {
-    nrow = grid_z.nrow();
-    ncol = grid_z.ncol();
+    nrow = Rf_nrows(grid_z);
+    ncol = Rf_ncols(grid_z);
 
-    if (grid_x.size() != ncol) {stop("Number of x coordinates must match number of columns in density matrix.");}
-    if (grid_y.size() != nrow) {stop("Number of y coordinates must match number of rows in density matrix.");}
+    if (Rf_length(grid_x) != ncol) {Rf_error("Number of x coordinates must match number of columns in density matrix.");}
+    if (Rf_length(grid_y) != nrow) {Rf_error("Number of y coordinates must match number of rows in density matrix.");}
   }
 
   virtual ~isobander() {}
@@ -294,38 +297,37 @@ public:
     reset_grid();
 
     // setup matrix of ternarized cell representations
-    IntegerVector v(nrow*ncol);
-    IntegerVector::iterator iv = v.begin();
-    for (NumericMatrix::const_iterator it = grid_z.begin(); it != grid_z.end(); it++) {
-      *iv = (*it >= vlo && *it < vhi) + 2*(*it >= vhi);
+    vector<int> ternarized(nrow*ncol);
+    vector<int>::iterator iv = ternarized.begin();
+    for (int i = 0; i < nrow * ncol; ++i) {
+      *iv = (grid_z_p[i] >= vlo && grid_z_p[i] < vhi) + 2*(grid_z_p[i] >= vhi);
       iv++;
     }
 
-    IntegerMatrix ternarized(nrow, ncol, v.begin());
-    IntegerMatrix cells(nrow - 1, ncol - 1);
+    vector<int> cells((nrow - 1) * (ncol - 1));
 
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         int index;
-        if (NumericMatrix::is_na(grid_z(r, c)) || NumericMatrix::is_na(grid_z(r, c + 1)) ||
-            NumericMatrix::is_na(grid_z(r + 1, c)) || NumericMatrix::is_na(grid_z(r + 1, c + 1))) {
+        if (grid_z_p[r + c * nrow] == R_NaReal || grid_z_p[r + (c + 1) * nrow] == R_NaReal ||
+            grid_z_p[r + 1 + c * nrow] == R_NaReal || grid_z_p[r + 1 + (c + 1) * nrow] == R_NaReal) {
           // we don't draw any contours if at least one of the corners is NA
           index = 0;
         } else {
-          index = 27*ternarized(r, c) + 9*ternarized(r, c + 1) + 3*ternarized(r + 1, c + 1) + ternarized(r + 1, c);
+          index = 27*ternarized[r + c * nrow] + 9*ternarized[r + (c + 1) * nrow] + 3*ternarized[r + 1 + (c + 1) * nrow] + ternarized[r + 1 + c * nrow];
         }
-        cells(r, c) = index;
+        cells[r + c * (nrow - 1)] = index;
         //cout << index << " ";
       }
       //cout << endl;
     }
-    checkUserInterrupt();
+    // checkUserInterrupt(); TODO
 
     // all polygons must be drawn clockwise for proper merging
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         //cout << r << " " << c << " " << cells(r, c) << endl;
-        switch(cells(r, c)) {
+        switch(cells[r + c * (nrow - 1)]) {
         // doing cases out of order, sorted by type, is easier to keep track of
 
         // no contour
@@ -1217,7 +1219,7 @@ public:
     }
   }
 
-  virtual List collect() {
+  virtual SEXP collect() {
     // make polygons
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for the polygon lines
@@ -1264,11 +1266,34 @@ public:
           cur = newcur;
         }
         i++;
-        if (i % 100000 == 0)
-          checkUserInterrupt();
+        //if (i % 100000 == 0)
+        //  checkUserInterrupt(); TODO
       } while (!(cur == start)); // keep going until we reach the start point again
     }
-    return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
+    // output variable
+    SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
+    SEXP names = PROTECT(Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("x"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("y"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("id"));
+    Rf_setAttrib(res, Rf_install("names"), names);
+
+    int final_size = x_out.size();
+    SEXP x_final = SET_VECTOR_ELT(res, 0, Rf_allocVector(REALSXP, final_size));
+    double* x_final_p = REAL(x_final);
+    SEXP y_final = SET_VECTOR_ELT(res, 1, Rf_allocVector(REALSXP, final_size));
+    double* y_final_p = REAL(y_final);
+    SEXP id_final = SET_VECTOR_ELT(res, 2, Rf_allocVector(INTSXP, final_size));
+    int* id_final_p = INTEGER(id_final);
+
+    for (int i = 0; i < final_size; ++i) {
+      x_final_p[i] = x_out[i];
+      y_final_p[i] = y_out[i];
+      id_final_p[i] = id[i];
+    }
+
+    UNPROTECT(2);
+    return res;
   }
 };
 
@@ -1311,7 +1336,7 @@ protected:
         polygon_grid[tmp_poly[1]].next = tmp_poly[0];
       } else {
         // should never go here
-        stop("cannot merge line segment at interior of existing line segment");
+        Rf_error("cannot merge line segment at interior of existing line segment");
       }
       break;
     case 2: // only second point connects
@@ -1323,7 +1348,7 @@ protected:
         polygon_grid[tmp_poly[0]].next = tmp_poly[1];
       } else {
         // should never go here
-        stop("cannot merge line segment at interior of existing line segment");
+        Rf_error("cannot merge line segment at interior of existing line segment");
       }
       break;
     case 3: // two-way merge
@@ -1359,8 +1384,8 @@ protected:
               polygon_grid[cur].next = tmp;
               cur = tmp;
               i++;
-              if (i % 100000 == 0)
-                checkUserInterrupt();
+              //if (i % 100000 == 0)
+              //  checkUserInterrupt(); TODO
             } while (!(cur == grid_point()));
           }
           break;
@@ -1378,18 +1403,18 @@ protected:
               polygon_grid[cur].prev = tmp;
               cur = tmp;
               i++;
-              if (i % 100000 == 0)
-                checkUserInterrupt();
+              // if (i % 100000 == 0)
+              //   checkUserInterrupt(); TODO
             } while (!(cur == grid_point()));
           }
           break;
         default:  // should never go here
-          stop("cannot merge line segment at interior of existing line segment");
+          Rf_error("cannot merge line segment at interior of existing line segment");
         }
       }
     break;
     default:
-      stop("unknown merge state");
+      Rf_error("unknown merge state");
     }
 
     //cout << "new grid:" << endl;
@@ -1397,7 +1422,7 @@ protected:
   }
 
 public:
-  isoliner(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, double value = 0) :
+  isoliner(SEXP x, SEXP y, SEXP z, double value = 0) :
     isobander(x, y, z, value, 0) {}
 
   void set_value(double value) {
@@ -1409,25 +1434,24 @@ public:
     reset_grid();
 
     // setup matrix of binarized cell representations
-    IntegerVector v(nrow*ncol);
-    IntegerVector::iterator iv = v.begin();
-    for (NumericMatrix::const_iterator it = grid_z.begin(); it != grid_z.end(); it++) {
-      *iv = (*it >= vlo);
+    vector<int> binarized(nrow*ncol);
+    vector<int>::iterator iv = binarized.begin();
+    for (int i = 0; i < nrow * ncol; ++i) {
+      *iv = (grid_z_p[i] >= vlo);
       iv++;
     }
 
-    IntegerMatrix binarized(nrow, ncol, v.begin());
-    IntegerMatrix cells(nrow - 1, ncol - 1);
+    vector<int> cells((nrow - 1) * (ncol - 1));
 
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         int index;
-        if (NumericMatrix::is_na(grid_z(r, c)) || NumericMatrix::is_na(grid_z(r, c + 1)) ||
-            NumericMatrix::is_na(grid_z(r + 1, c)) || NumericMatrix::is_na(grid_z(r + 1, c + 1))) {
-          // we don't draw any contour lines if at least one of the corners is NA
+        if (grid_z_p[r + c * nrow] == R_NaReal || grid_z_p[r + (c + 1) * nrow] == R_NaReal ||
+            grid_z_p[r + 1 + c * nrow] == R_NaReal || grid_z_p[r + 1 + (c + 1) * nrow] == R_NaReal) {
+          // we don't draw any contours if at least one of the corners is NA
           index = 0;
         } else {
-          index = 8*binarized(r, c) + 4*binarized(r, c + 1) + 2*binarized(r+1, c+1) + 1*binarized(r + 1, c);
+          index = 8*binarized[r + c * nrow] + 4*binarized[r + (c + 1) * nrow] + 2*binarized[r + 1 + (c + 1) * nrow] + 1*binarized[r + 1 + c * nrow];
         }
 
         // two-segment saddles
@@ -1437,15 +1461,15 @@ public:
           index = 5;
         }
 
-        cells(r, c) = index;
+        cells[r + c * (nrow - 1)] = index;
       }
     }
 
-    checkUserInterrupt();
+    //checkUserInterrupt(); TODO
 
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
-        switch(cells(r, c)) {
+        switch(cells[r + c * (nrow - 1)]) {
         case 0: break;
         case 1:
           line_start(r, c, vintersect_lo);
@@ -1533,7 +1557,7 @@ public:
     }
   }
 
-  virtual List collect() {
+  virtual SEXP collect() {
     // make line segments
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for individual line segments
@@ -1557,8 +1581,8 @@ public:
         do {
           cur = polygon_grid[cur].prev;
           i++;
-          if (i % 100000 == 0)
-            checkUserInterrupt();
+          //if (i % 100000 == 0)
+          //  checkUserInterrupt(); TODO
         } while (!(cur == start || polygon_grid[cur].prev == grid_point()));
       }
 
@@ -1575,8 +1599,8 @@ public:
         polygon_grid[cur].collected = true;
         cur = polygon_grid[cur].next;
         i++;
-        if (i % 100000 == 0)
-          checkUserInterrupt();
+        //if (i % 100000 == 0)
+        //  checkUserInterrupt(); TODO
       } while (!(cur == start || cur == grid_point())); // keep going until we reach the start point again
       // if we're back to start, need to output that point one more time
       if (cur == start) {
@@ -1586,43 +1610,73 @@ public:
         id.push_back(cur_id);
       }
     }
-    return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id);
+    // output variable
+    SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
+    SEXP names = PROTECT(Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("x"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("y"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("id"));
+    Rf_setAttrib(res, Rf_install("names"), names);
+
+    int final_size = x_out.size();
+    SEXP x_final = SET_VECTOR_ELT(res, 0, Rf_allocVector(REALSXP, final_size));
+    double* x_final_p = REAL(x_final);
+    SEXP y_final = SET_VECTOR_ELT(res, 1, Rf_allocVector(REALSXP, final_size));
+    double* y_final_p = REAL(y_final);
+    SEXP id_final = SET_VECTOR_ELT(res, 2, Rf_allocVector(INTSXP, final_size));
+    int* id_final_p = INTEGER(id_final);
+
+    for (int i = 0; i < final_size; ++i) {
+      x_final_p[i] = x_out[i];
+      y_final_p[i] = y_out[i];
+      id_final_p[i] = id[i];
+    }
+
+    UNPROTECT(2);
+    return res;
   }
 };
 
-// [[Rcpp::export]]
-List isobands_impl(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, const NumericVector &value_low, const NumericVector &value_high) {
+SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value_high) {
+
+  BEGIN_CPP
   isobander ib(x, y, z);
 
-  if (value_low.size() != value_high.size()) {
-    stop("Vectors of low and high values must have the same number of elements.");
+  int n_bands = Rf_length(value_low);
+  if (n_bands != Rf_length(value_high)) {
+    Rf_error("Vectors of low and high values must have the same number of elements.");
   }
 
-  ib.calculate_contour();
-  List out;
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, n_bands));
 
-  auto ilo = value_low.begin();
-  for (auto ihi = value_high.begin(); ihi != value_high.end(); ) {
-    ib.set_value(*ilo, *ihi);
+  for (int i = 0; i < n_bands; ++i) {
+    ib.set_value(REAL(value_low)[i], REAL(value_high)[i]);
     ib.calculate_contour();
-    out.push_back(ib.collect());
-    ilo++; ihi++;
+    SET_VECTOR_ELT(out, i, ib.collect());
   }
 
+  UNPROTECT(1);
   return out;
+
+  END_CPP
 }
 
-// [[Rcpp::export]]
-List isolines_impl(const NumericVector &x, const NumericVector &y, const NumericMatrix &z, const NumericVector &value) {
+SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value) {
+
+  BEGIN_CPP
   isoliner il(x, y, z);
 
-  List out;
+  int n_lines = Rf_length(value);
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, n_lines));
 
-  for (auto it = value.begin(); it != value.end(); it++) {
-    il.set_value(*it);
+  for (int i = 0; i < n_lines; ++i) {
+    il.set_value(REAL(value)[i]);
     il.calculate_contour();
-    out.push_back(il.collect());
+    SET_VECTOR_ELT(out, i, il.collect());
   }
 
+  UNPROTECT(1);
   return out;
+
+  END_CPP
 }
