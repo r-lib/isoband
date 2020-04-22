@@ -292,7 +292,7 @@ void record_points(vector<double> x_out, vector<double> y_out, vector<int> id_ou
 // @param asp Aspect ratio (width/height) of the target canvas. This is used to convert widths
 //  to heights and vice versa for rotated boxes
 // @export
-SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_mid_y,
+extern "C" SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_mid_y,
                      SEXP _width, SEXP _height, SEXP _theta, SEXP _asp) {
 
   BEGIN_CPP
@@ -310,7 +310,7 @@ SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_mid_y,
 
   // output variable
   SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
-  SEXP names = PROTECT(Rf_allocVector(STRSXP, 6));
+  SEXP names = PROTECT(Rf_allocVector(STRSXP, 3));
   SET_STRING_ELT(names, 0, Rf_mkChar("x"));
   SET_STRING_ELT(names, 1, Rf_mkChar("y"));
   SET_STRING_ELT(names, 2, Rf_mkChar("id"));

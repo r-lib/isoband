@@ -286,7 +286,7 @@ SEXP polygon_as_matrix(polygon p, bool reverse = false) {
   return m;
 }
 
-SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
+extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
 
   BEGIN_CPP
   SEXP out; // final result

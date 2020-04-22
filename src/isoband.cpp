@@ -1272,7 +1272,7 @@ public:
     }
     // output variable
     SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
-    SEXP names = PROTECT(Rf_allocVector(STRSXP, 6));
+    SEXP names = PROTECT(Rf_allocVector(STRSXP, 3));
     SET_STRING_ELT(names, 0, Rf_mkChar("x"));
     SET_STRING_ELT(names, 1, Rf_mkChar("y"));
     SET_STRING_ELT(names, 2, Rf_mkChar("id"));
@@ -1446,8 +1446,8 @@ public:
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
         int index;
-        if (grid_z_p[r + c * nrow] == R_NaReal || grid_z_p[r + (c + 1) * nrow] == R_NaReal ||
-            grid_z_p[r + 1 + c * nrow] == R_NaReal || grid_z_p[r + 1 + (c + 1) * nrow] == R_NaReal) {
+        if (!R_finite(grid_z_p[r + c * nrow]) || !R_finite(grid_z_p[r + (c + 1) * nrow]) ||
+            !R_finite(grid_z_p[r + 1 + c * nrow]) || !R_finite(grid_z_p[r + 1 + (c + 1) * nrow])) {
           // we don't draw any contours if at least one of the corners is NA
           index = 0;
         } else {
@@ -1591,6 +1591,9 @@ public:
       do {
         //cout << cur << endl;
         point p = calc_point_coords(cur);
+
+        Rprintf("col: %i, row: %i, x: %f, y: %f\n", cur.c, cur.r, p.x, p.y);
+
         x_out.push_back(p.x);
         y_out.push_back(p.y);
         id.push_back(cur_id);
@@ -1612,7 +1615,7 @@ public:
     }
     // output variable
     SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
-    SEXP names = PROTECT(Rf_allocVector(STRSXP, 6));
+    SEXP names = PROTECT(Rf_allocVector(STRSXP, 3));
     SET_STRING_ELT(names, 0, Rf_mkChar("x"));
     SET_STRING_ELT(names, 1, Rf_mkChar("y"));
     SET_STRING_ELT(names, 2, Rf_mkChar("id"));
@@ -1637,7 +1640,7 @@ public:
   }
 };
 
-SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value_high) {
+extern "C" SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value_high) {
 
   BEGIN_CPP
   isobander ib(x, y, z);
@@ -1661,7 +1664,7 @@ SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value_high) {
   END_CPP
 }
 
-SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value) {
+extern "C" SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value) {
 
   BEGIN_CPP
   isoliner il(x, y, z);

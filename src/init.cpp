@@ -4,16 +4,16 @@
 #include <R_ext/Rdynload.h>
 
 // Defined in clip-lines.cpp
-SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_mid_y,
+extern "C" SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_mid_y,
                      SEXP _width, SEXP _height, SEXP _theta, SEXP _asp);
 // Defined in isobands.cpp
-SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value_high);
-SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value);
+extern "C" SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value_high);
+extern "C" SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value);
 // Defined in separate-polygons.cpp
-SEXP separate_polygons(SEXP x, SEXP y, SEXP id);
+extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id);
 
 // From testthat
-extern SEXP run_testthat_tests();
+extern "C" SEXP run_testthat_tests();
 
 static const R_CallMethodDef CallEntries[] = {
   {"clip_lines_impl_c", (DL_FUNC) &clip_lines_impl, 9},
