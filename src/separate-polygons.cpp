@@ -277,8 +277,8 @@ SEXP polygon_as_matrix(polygon p, bool reverse = false) {
     }
   } else {
     for (int i = 0; i < n; i++) {
-      m_p[n-i] = p[i].x;
-      m_p[n-i+n] = p[i].y;
+      m_p[i] = p[i].x;
+      m_p[i+n] = p[i].y;
     }
   }
 
@@ -364,10 +364,11 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
     // the end; this reduces the risk of bugs
     bool valid_poly = is_valid_ring(polys[next_poly]);
 
+    // collect the holes, if any
+    set<int> holes = hi.collect_holes(next_poly);
+
     // record the polygon if valid
     if (valid_poly) {
-      // collect the holes, if any
-      set<int> holes = hi.collect_holes(next_poly);
       // collect all the rings belonging to this polygon
       SEXP rings = PROTECT(Rf_allocVector(VECSXP, holes.size() + 1));
 
@@ -384,6 +385,8 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
         }
       }
 
+      // Shrink list to actual size because some holes may have been invalid
+      rings = PROTECT(Rf_lengthgets(rings, k));
       all_rings.push_back(rings);
     }
     next_poly = hi.top_level_poly();
@@ -395,7 +398,7 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
   }
   Rf_classgets(out, cl);
 
-  UNPROTECT(2 + all_rings.size());
+  UNPROTECT(2 + all_rings.size() * 2);
   return(out);
 
   END_CPP

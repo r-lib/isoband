@@ -249,7 +249,7 @@ bool in_unit_box(const point &p) {
 }
 
 // helper function for crop_lines()
-void record_points(vector<double> x_out, vector<double> y_out, vector<int> id_out,
+void record_points(vector<double> &x_out, vector<double> &y_out, vector<int> &id_out,
                    const point &p1, const point &p2, int &cur_id_out,
                    bool &p1_recorded, bool &p2_recorded, bool &new_line_segment) {
   if (new_line_segment) {
@@ -334,7 +334,6 @@ extern "C" SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_
     UNPROTECT(2);
     return res;
   }
-
 
   // set up transformation
   // lower left point of cropping rectangle
