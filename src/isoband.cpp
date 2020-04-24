@@ -1686,8 +1686,7 @@ extern "C" SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value
     ib.calculate_contour();
     SET_VECTOR_ELT(out, i, ib.collect());
     if (ib.was_interrupted()) {
-      UNPROTECT(1);
-      return rethrow_interrupt();
+      rethrow_interrupt();
     }
   }
 
@@ -1710,8 +1709,7 @@ extern "C" SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value) {
     il.calculate_contour();
     SET_VECTOR_ELT(out, i, il.collect());
     if (il.was_interrupted()) {
-      UNPROTECT(1);
-      return rethrow_interrupt();
+      rethrow_interrupt();
     }
   }
 

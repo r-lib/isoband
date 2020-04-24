@@ -23,15 +23,14 @@ static inline bool checkInterrupt() {
   return (R_ToplevelExec(chkIntFn, NULL) == FALSE);
 }
 
-static inline SEXP rethrow_interrupt() {
+[[ noreturn ]] static inline void rethrow_interrupt() {
   SEXP env = PROTECT(Rf_findVarInFrame(R_NamespaceRegistry, Rf_install("isoband")));
-  if (env != R_UnboundValue) {
-    SEXP call = PROTECT(Rf_lang1(Rf_install("rethrow_interrupt")));
-    Rf_eval(call, env);
-    UNPROTECT(1);
+  if (env == R_UnboundValue) {
+    Rf_error("isoband namespace could not be found");
   }
-  UNPROTECT(1);
-  return R_NilValue;
+  SEXP call = PROTECT(Rf_lang1(Rf_install("rethrow_interrupt")));
+  Rf_eval(call, env);
+  Rf_error("Interrupt failed to rethrow");
 }
 
 #endif
