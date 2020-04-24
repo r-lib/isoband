@@ -1,14 +1,17 @@
 Package: isoband
 Title: Generate Isolines and Isobands from Regularly Spaced Elevation Grids
-Version: 0.2.1
+Version: 0.2.1.9000
 Authors@R: 
-    person(
-      given = "Claus O.",
-      family = "Wilke",
-      role = c("aut", "cre"),
-      email = "wilke@austin.utexas.edu",
-      comment = c(ORCID = "0000-0002-7470-9261")
-    )
+    c(person(given = "Claus O.",
+             family = "Wilke",
+             role = c("aut", "cre"),
+             email = "wilke@austin.utexas.edu",
+             comment = c(ORCID = "0000-0002-7470-9261")),
+      person(given = "Thomas Lin",
+             family = "Pedersen",
+             role = "aut",
+             email = "thomasp85@gmail.com",
+             comment = c(ORCID = "0000-0002-5147-4711")))
 Description: A fast C++ implementation to generate contour lines (isolines) and
   contour polygons (isobands) from regularly spaced grids containing elevation data.
 URL: https://github.com/wilkelab/isoband
@@ -22,7 +25,7 @@ Imports:
     grid,
     utils
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: 
     covr,
     ggplot2,
