@@ -89,6 +89,8 @@ protected:
   typedef unordered_map<grid_point, point_connect, grid_point_hasher> gridmap;
   gridmap polygon_grid;
 
+  bool interrupted;
+
   void reset_grid() {
     polygon_grid.clear();
 
@@ -276,7 +278,7 @@ protected:
 public:
   isobander(SEXP x, SEXP y, SEXP z, double value_low = 0, double value_high = 0) :
     grid_x(x), grid_y(y), grid_z(z), grid_x_p(REAL(x)), grid_y_p(REAL(y)),
-    grid_z_p(REAL(z)), vlo(value_low), vhi(value_high)
+    grid_z_p(REAL(z)), vlo(value_low), vhi(value_high), interrupted(false)
   {
     nrow = Rf_nrows(grid_z);
     ncol = Rf_ncols(grid_z);
@@ -286,6 +288,8 @@ public:
   }
 
   virtual ~isobander() {}
+
+  bool was_interrupted() {return interrupted;}
 
   void set_value(double value_low, double value_high) {
     vlo = value_low;
@@ -321,7 +325,10 @@ public:
       }
       //cout << endl;
     }
-    // checkUserInterrupt(); TODO
+    if (checkInterrupt()) {
+      interrupted = true;
+      return;
+    }
 
     // all polygons must be drawn clockwise for proper merging
     for (int r = 0; r < nrow-1; r++) {
@@ -1220,6 +1227,11 @@ public:
   }
 
   virtual SEXP collect() {
+    // Early exit if calculate_contour was interrupted
+    if (was_interrupted()) {
+      return R_NilValue;
+    }
+
     // make polygons
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for the polygon lines
@@ -1266,8 +1278,10 @@ public:
           cur = newcur;
         }
         i++;
-        //if (i % 100000 == 0)
-        //  checkUserInterrupt(); TODO
+        if (i % 100000 == 0 && checkInterrupt()) {
+          interrupted = true;
+          return R_NilValue;
+        }
       } while (!(cur == start)); // keep going until we reach the start point again
     }
     // output variable
@@ -1384,8 +1398,10 @@ protected:
               polygon_grid[cur].next = tmp;
               cur = tmp;
               i++;
-              //if (i % 100000 == 0)
-              //  checkUserInterrupt(); TODO
+              if (i % 100000 == 0 && checkInterrupt()) {
+                interrupted = true;
+                return;
+              }
             } while (!(cur == grid_point()));
           }
           break;
@@ -1403,8 +1419,10 @@ protected:
               polygon_grid[cur].prev = tmp;
               cur = tmp;
               i++;
-              // if (i % 100000 == 0)
-              //   checkUserInterrupt(); TODO
+              if (i % 100000 == 0 && checkInterrupt()) {
+                interrupted = true;
+                return;
+              }
             } while (!(cur == grid_point()));
           }
           break;
@@ -1465,7 +1483,10 @@ public:
       }
     }
 
-    //checkUserInterrupt(); TODO
+    if (checkInterrupt()) {
+      interrupted = true;
+      return;
+    }
 
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
@@ -1558,6 +1579,11 @@ public:
   }
 
   virtual SEXP collect() {
+    // Early exit if calculate_contour was interrupted
+    if (was_interrupted()) {
+      return R_NilValue;
+    }
+
     // make line segments
     vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for individual line segments
@@ -1581,8 +1607,10 @@ public:
         do {
           cur = polygon_grid[cur].prev;
           i++;
-          //if (i % 100000 == 0)
-          //  checkUserInterrupt(); TODO
+          if (i % 100000 == 0 && checkInterrupt()) {
+            interrupted = true;
+            return R_NilValue;
+          }
         } while (!(cur == start || polygon_grid[cur].prev == grid_point()));
       }
 
@@ -1600,8 +1628,10 @@ public:
         polygon_grid[cur].collected = true;
         cur = polygon_grid[cur].next;
         i++;
-        //if (i % 100000 == 0)
-        //  checkUserInterrupt(); TODO
+        if (i % 100000 == 0 && checkInterrupt()) {
+          interrupted = true;
+          return R_NilValue;
+        }
       } while (!(cur == start || cur == grid_point())); // keep going until we reach the start point again
       // if we're back to start, need to output that point one more time
       if (cur == start) {
@@ -1655,6 +1685,10 @@ extern "C" SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value
     ib.set_value(REAL(value_low)[i], REAL(value_high)[i]);
     ib.calculate_contour();
     SET_VECTOR_ELT(out, i, ib.collect());
+    if (ib.was_interrupted()) {
+      UNPROTECT(1);
+      return rethrow_interrupt();
+    }
   }
 
   UNPROTECT(1);
@@ -1675,6 +1709,10 @@ extern "C" SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value) {
     il.set_value(REAL(value)[i]);
     il.calculate_contour();
     SET_VECTOR_ELT(out, i, il.collect());
+    if (il.was_interrupted()) {
+      UNPROTECT(1);
+      return rethrow_interrupt();
+    }
   }
 
   UNPROTECT(1);

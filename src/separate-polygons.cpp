@@ -335,7 +335,10 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
   // set up polygon hierarchy
   polygon_hierarchy hi(polys.size());
   for (int i = 0; i < polys.size(); i++) {
-    //checkUserInterrupt(); TODO: Need to write a safe wrapper
+    if (checkInterrupt())  {
+      UNPROTECT(1);
+      return rethrow_interrupt();
+    }
 
     for (int j = 0; j < polys.size(); j++ ) {
       if (i == j) continue;
@@ -356,7 +359,10 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
   int i = 0;
   vector<SEXP> all_rings;
   while(next_poly >= 0) {
-    // if (i % 1000 == 0) checkUserInterrupt(); TODO: Need to write a safe wrapper
+    if (i % 1000 == 0 && checkInterrupt()) {
+      UNPROTECT(1);
+      return rethrow_interrupt();
+    }
     i++;
 
     // for simplicity, we collect the rings even if the polygon
