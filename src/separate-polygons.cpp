@@ -336,7 +336,7 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
   polygon_hierarchy hi(polys.size());
   for (int i = 0; i < polys.size(); i++) {
     if (checkInterrupt())  {
-      rethrow_interrupt();
+      longjump_interrupt();
     }
 
     for (int j = 0; j < polys.size(); j++ ) {
@@ -359,7 +359,7 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
   vector<SEXP> all_rings;
   while(next_poly >= 0) {
     if (i % 1000 == 0 && checkInterrupt()) {
-      rethrow_interrupt();
+      longjump_interrupt();
     }
     i++;
 

@@ -23,7 +23,7 @@ static inline bool checkInterrupt() {
   return (R_ToplevelExec(chkIntFn, NULL) == FALSE);
 }
 
-[[ noreturn ]] static inline void rethrow_interrupt() {
+[[ noreturn ]] static inline void longjump_interrupt() {
   SEXP env = PROTECT(Rf_findVarInFrame(R_NamespaceRegistry, Rf_install("isoband")));
   if (env == R_UnboundValue) {
     Rf_error("isoband namespace could not be found");
