@@ -138,7 +138,7 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
 in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference, bool fast) {
   int ins = 0, out = 0, undet = 0;
 
-  for (int i = 0; i < query.size()-1; i++) {
+  for (unsigned int i = 0; i < query.size()-1; i++) {
     switch(point_in_polygon(query[i], reference)) {
     case inside:
       ins += 1;
@@ -186,7 +186,7 @@ public:
   }
 
   void print() {
-    for (int i = 0; i < ext_polygons.size(); i++) {
+    for (unsigned int i = 0; i < ext_polygons.size(); i++) {
       cout << "polygon " << i << " (active = " << active_polygons[i] << ")" << endl;
       cout << "  enclosing: ";
       for (auto it = ext_polygons[i].begin(); it != ext_polygons[i].end(); it++) {
@@ -208,7 +208,7 @@ public:
 
   // returns the next top level polygon found
   int top_level_poly() {
-    int i = 0;
+    unsigned int i = 0;
     do {
       if (active_polygons[i] && ext_polygons[i].size() == 0) {
         active_polygons[i] = false;
@@ -229,7 +229,7 @@ public:
   set<int> collect_holes(int poly) {
     set<int> holes;
 
-    int i = 0;
+    unsigned int i = 0;
     do {
       if (active_polygons[i] &&
           ext_polygons[i].size() == 1 &&
@@ -334,12 +334,12 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
 
   // set up polygon hierarchy
   polygon_hierarchy hi(polys.size());
-  for (int i = 0; i < polys.size(); i++) {
+  for (unsigned int i = 0; i < polys.size(); i++) {
     if (checkInterrupt())  {
       longjump_interrupt();
     }
 
-    for (int j = 0; j < polys.size(); j++ ) {
+    for (unsigned int j = 0; j < polys.size(); j++ ) {
       if (i == j) continue;
 
       in_polygon_type result = polygon_in_polygon(polys[i], polys[j]);
@@ -397,7 +397,7 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
   }
 
   out = PROTECT(Rf_allocVector(VECSXP, all_rings.size()));
-  for (int i = 0; i < all_rings.size(); ++i) {
+  for (unsigned int i = 0; i < all_rings.size(); ++i) {
     SET_VECTOR_ELT(out, i, all_rings[i]);
   }
   Rf_classgets(out, cl);
