@@ -1,5 +1,7 @@
-#include <Rcpp.h>
-using namespace Rcpp;
+#define R_NO_REMAP
+
+#include <R.h>
+#include <Rinternals.h>
 
 #include <iostream>
 #include <cmath>
@@ -7,6 +9,7 @@ using namespace Rcpp;
 using namespace std;
 
 #include "clip-lines.h"
+#include "utils.h"
 
 
 // calculates the intersection point of a line segment and
@@ -246,7 +249,7 @@ bool in_unit_box(const point &p) {
 }
 
 // helper function for crop_lines()
-void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id_out,
+void record_points(vector<double> &x_out, vector<double> &y_out, vector<int> &id_out,
                    const point &p1, const point &p2, int &cur_id_out,
                    bool &p1_recorded, bool &p2_recorded, bool &new_line_segment) {
   if (new_line_segment) {
@@ -289,26 +292,48 @@ void record_points(NumericVector &x_out, NumericVector &y_out, IntegerVector &id
 // @param asp Aspect ratio (width/height) of the target canvas. This is used to convert widths
 //  to heights and vice versa for rotated boxes
 // @export
-// [[Rcpp::export]]
-List clip_lines_impl(const NumericVector &x, const NumericVector &y, const IntegerVector &id,
-                     const double p_mid_x, const double p_mid_y, const double width,
-                     const double height, const double theta, const double asp = 1) {
-  // output variables
-  NumericVector x_out, y_out;
-  IntegerVector id_out;
+extern "C" SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_mid_y,
+                     SEXP _width, SEXP _height, SEXP _theta, SEXP _asp) {
+
+  BEGIN_CPP
+  // input
+  int n = Rf_length(x);
+  double* x_p = REAL(x);
+  double* y_p = REAL(y);
+  int* id_p = INTEGER(id);
+  double p_mid_x = REAL(_p_mid_x)[0];
+  double p_mid_y = REAL(_p_mid_y)[0];
+  double width = REAL(_width)[0];
+  double height = REAL(_height)[0];
+  double theta = REAL(_theta)[0];
+  double asp = REAL(_asp)[0];
+
+  // output variable
+  SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
+  SEXP names = PROTECT(Rf_allocVector(STRSXP, 3));
+  SET_STRING_ELT(names, 0, Rf_mkChar("x"));
+  SET_STRING_ELT(names, 1, Rf_mkChar("y"));
+  SET_STRING_ELT(names, 2, Rf_mkChar("id"));
+  Rf_setAttrib(res, Rf_install("names"), names);
+
+  vector<double> x_out, y_out;
+  vector<int> id_out;
 
   // input checks
-  if (x.size() != y.size()) {
-    stop("Number of x and y coordinates must match.");
+  if (n != Rf_length(y)) {
+    Rf_error("Number of x and y coordinates must match.");
   }
-  if (x.size() != id.size()) {
-    stop("Number of x coordinates and id values must match.");
+  if (n != Rf_length(id)) {
+    Rf_error("Number of x coordinates and id values must match.");
   }
-  if (x.size() == 0) {
+  if (n == 0) {
     // empty input, return empty output
-    return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id_out);
+    SET_VECTOR_ELT(res, 0, Rf_allocVector(REALSXP, 0));
+    SET_VECTOR_ELT(res, 1, Rf_allocVector(REALSXP, 0));
+    SET_VECTOR_ELT(res, 2, Rf_allocVector(INTSXP, 0));
+    UNPROTECT(2);
+    return res;
   }
-
 
   // set up transformation
   // lower left point of cropping rectangle
@@ -322,35 +347,35 @@ List clip_lines_impl(const NumericVector &x, const NumericVector &y, const Integ
   unitbox_transformer t(ll, lr, ul);
 
   // crop
-  int cur_id = id[0];
+  int cur_id = id_p[0];
   int cur_id_out = 0; // first output id - 1
   point p1, p2, p1t, p2t;
   point crop1, crop2;
-  p1 = point(x[0], y[0]);
+  p1 = point(x_p[0], y_p[0]);
   p1t = t.transform(p1);
 
   bool p1_recorded = in_unit_box(p1t); // record only if not in unit box, catches singlets
   bool p2_recorded = true; // when we first enter the loop, have only p1 unrecorded
   bool new_line_segment = true;
 
-  size_t i = 1;
-  while(i < x.size()) {
-    if (cur_id != id[i]) {
+  int i = 1;
+  while(i < n) {
+    if (cur_id != id_p[i]) {
       // id mismatch means we are starting a new line segment
 
       // first record any points that haven't been recorded yet. catches singlets
       record_points(x_out, y_out, id_out, p1, p2, cur_id_out,
                     p1_recorded, p2_recorded, new_line_segment);
       // now set up next line segment
-      p1 = point(x[i], y[i]);
+      p1 = point(x_p[i], y_p[i]);
       p1t = t.transform(p1);
-      cur_id = id[i];
+      cur_id = id_p[i];
       p1_recorded = in_unit_box(p1t); // record only if not in unit box, catches singlets
       new_line_segment = true;
       i++;
       continue;
     }
-    p2 = point(x[i], y[i]);
+    p2 = point(x_p[i], y_p[i]);
     p2t = t.transform(p2);
     p2_recorded = false;
     segment_crop_type result = crop_to_unit_box(p1t, p2t, crop1, crop2);
@@ -398,7 +423,24 @@ List clip_lines_impl(const NumericVector &x, const NumericVector &y, const Integ
   record_points(x_out, y_out, id_out, p1, p2, cur_id_out,
                 p1_recorded, p2_recorded, new_line_segment);
 
-  return List::create(_["x"] = x_out, _["y"] = y_out, _["id"] = id_out);
+  int final_size = x_out.size();
+  SEXP x_final = SET_VECTOR_ELT(res, 0, Rf_allocVector(REALSXP, final_size));
+  double* x_final_p = REAL(x_final);
+  SEXP y_final = SET_VECTOR_ELT(res, 1, Rf_allocVector(REALSXP, final_size));
+  double* y_final_p = REAL(y_final);
+  SEXP id_final = SET_VECTOR_ELT(res, 2, Rf_allocVector(INTSXP, final_size));
+  int* id_final_p = INTEGER(id_final);
+
+  for (int i = 0; i < final_size; ++i) {
+    x_final_p[i] = x_out[i];
+    y_final_p[i] = y_out[i];
+    id_final_p[i] = id_out[i];
+  }
+
+  UNPROTECT(2);
+  return res;
+
+  END_CPP
 }
 
 

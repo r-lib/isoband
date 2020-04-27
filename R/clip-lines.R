@@ -26,3 +26,11 @@ clip_lines <- function(x, y, id, clip_boxes, asp = 1) {
 
   out
 }
+
+clip_lines_impl <- function(x, y, id, p_mid_x, p_mid_y, width, height, theta, asp = 1) {
+  .Call(
+    `clip_lines_impl_c`, as.numeric(x), as.numeric(y), as.integer(id),
+    as.numeric(p_mid_x), as.numeric(p_mid_y), as.numeric(width),
+    as.numeric(height), as.numeric(theta), as.numeric(asp), PACKAGE = "isoband"
+  )
+}

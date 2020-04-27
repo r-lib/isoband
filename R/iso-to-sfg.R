@@ -104,3 +104,9 @@ multipolygon <- function(object) {
   separate_polygons(object$x, object$y, object$id)
 }
 
+separate_polygons <- function(x, y, id) {
+  .Call(
+    `separate_polygons_c`, as.numeric(x), as.numeric(y),
+    as.integer(id), PACKAGE = "isoband"
+  )
+}

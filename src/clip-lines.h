@@ -1,9 +1,10 @@
 #ifndef CLIP_LINES_H
 #define CLIP_LINES_H
 
-#include <Rcpp.h>
-using namespace Rcpp;
+#define R_NO_REMAP
 
+#include <R.h>
+#include <Rinternals.h>
 #include "polygon.h"
 
 enum segment_crop_type {
@@ -35,13 +36,13 @@ public:
     double y1 = up_left.y - low_left.y;
 
     if ((x0 == 0 && y0 == 0) || (x1 == 0 && y1 == 0)) {
-      stop("singular transformation due to invalid box extent");
+      Rf_error("singular transformation due to invalid box extent");
     }
 
     double denominator = y0*x1 - y1*x0;
 
     if (denominator == 0) {
-      stop("singular transformation due to invalid box extent");
+      Rf_error("singular transformation due to invalid box extent");
     }
 
     m00 = -y1/denominator;
