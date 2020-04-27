@@ -356,7 +356,7 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
 
   int next_poly = hi.top_level_poly();
   int i = 0;
-  vector<SEXP> all_rings;
+  CollectorList all_rings;
   while(next_poly >= 0) {
     if (i % 1000 == 0 && checkInterrupt()) {
       longjump_interrupt();
@@ -392,17 +392,15 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
       // Shrink list to actual size because some holes may have been invalid
       rings = PROTECT(Rf_lengthgets(rings, k));
       all_rings.push_back(rings);
+      UNPROTECT(2);
     }
     next_poly = hi.top_level_poly();
   }
 
-  out = PROTECT(Rf_allocVector(VECSXP, all_rings.size()));
-  for (unsigned int i = 0; i < all_rings.size(); ++i) {
-    SET_VECTOR_ELT(out, i, all_rings[i]);
-  }
+  out = all_rings;
   Rf_classgets(out, cl);
 
-  UNPROTECT(2 + all_rings.size() * 2);
+  UNPROTECT(1);
   return(out);
 
   END_CPP

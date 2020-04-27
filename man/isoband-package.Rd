@@ -20,4 +20,9 @@ Useful links:
 \author{
 \strong{Maintainer}: Claus O. Wilke \email{wilke@austin.utexas.edu} (\href{https://orcid.org/0000-0002-7470-9261}{ORCID})
 
+Authors:
+\itemize{
+  \item Thomas Lin Pedersen \email{thomasp85@gmail.com} (\href{https://orcid.org/0000-0002-5147-4711}{ORCID})
+}
+
 }
