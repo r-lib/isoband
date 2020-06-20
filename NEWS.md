@@ -1,6 +1,6 @@
-isoband (development version)
+isoband 0.2.2
 ----------------------------------------
-- Remove Rcpp dependency
+- Remove Rcpp dependency (#11, @thomasp85).
 
 isoband 0.2.1
 ----------------------------------------

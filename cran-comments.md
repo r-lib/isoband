@@ -1,4 +1,4 @@
-This is a minor update only changing some internal algorithms to have more numeric stability.
+This is a minor update removing the dependency on Rcpp.
 
 ## Test environment
 * R devel on win-builder
@@ -6,7 +6,7 @@ This is a minor update only changing some internal algorithms to have more numer
 * R version 3.6.0 on x86_64-apple-darwin15.6.0 (64-bit) (local install)
 
 ## R CMD check results
-There were no ERRORs or WARNINGs.
+There were no ERRORs, WARNINGs, or NOTEs.
 
-There was one NOTE: New maintainer
-I added my middle initial to my name, and this triggered the note.
+## Reverse dependencies
+No issues. Checked with revdepcheck::revdep_check().
