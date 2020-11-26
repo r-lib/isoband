@@ -1,6 +1,6 @@
 Package: isoband
 Title: Generate Isolines and Isobands from Regularly Spaced Elevation Grids
-Version: 0.2.2.9000
+Version: 0.2.3
 Authors@R: 
     c(person(given = "Claus O.",
              family = "Wilke",
@@ -26,6 +26,7 @@ Imports:
     utils
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
+Config/testthat/edition: 3
 Suggests: 
     covr,
     ggplot2,

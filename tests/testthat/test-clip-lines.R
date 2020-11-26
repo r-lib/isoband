@@ -1,5 +1,3 @@
-context("test-clip-lines")
-
 test_that("basic clipping", {
   x <- c(0, 0, 1, 1, 0)
   y <- c(0, 1, 1, 0, 0)

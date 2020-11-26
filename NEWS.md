@@ -1,6 +1,6 @@
-isoband devel
+isoband 0.2.3
 ----------------------------------------
-No changes as of yet.
+- Fix build for testthat 3.0.
 
 isoband 0.2.2
 ----------------------------------------

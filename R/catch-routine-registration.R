@@ -2,5 +2,5 @@
 # 'tools::package_native_routine_registration_skeleton()' generates the required
 # registration info for the 'run_testthat_tests' symbol.
 (function() {
-  .Call("run_testthat_tests", PACKAGE = "isoband")
+  .Call("run_testthat_tests", TRUE, PACKAGE = "isoband")
 })

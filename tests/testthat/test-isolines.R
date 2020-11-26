@@ -1,5 +1,3 @@
-context("test-isolines")
-
 test_that("line segments get merged", {
   # two connected line segments get merged
   z <- matrix(c(0, 0, 1,

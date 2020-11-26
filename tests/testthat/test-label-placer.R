@@ -1,5 +1,3 @@
-context("test-label-placer")
-
 test_that("minmax label placer", {
   lines <- list(
     "1" = list(x = c(.5, .75, .5, .25), y = c(.25, .5, .75, .5), id = rep(1, 4)),

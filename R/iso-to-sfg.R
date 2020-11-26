@@ -55,11 +55,11 @@
 #' # this doesn't prevent us from plotting them
 #' ggplot(iso, aes(fill = id)) + geom_sf()
 #'
-#' ## make all geometries valid
-#' #iso2 <- st_make_valid(iso)
-#' #st_is_valid(iso2, reason=TRUE)
-#' ## the plot looks unchanged (this is not always the case)
-#' #ggplot(iso2, aes(fill = id)) + geom_sf()
+#' # make all geometries valid
+#' iso2 <- st_make_valid(iso)
+#' st_is_valid(iso2, reason=TRUE)
+#' # the plot looks unchanged (this is not always the case)
+#' ggplot(iso2, aes(fill = id)) + geom_sf()
 #'
 #' # alternatively, if we shift all data values by a tiny
 #' # amount (here, 1e-10) so they don't coincide with the band

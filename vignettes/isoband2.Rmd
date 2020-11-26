@@ -136,15 +136,15 @@ ggplot(iso, aes(fill = id)) +
 
 We can repair invalid geometries using `st_make_valid()`:
 ```{r}
-#iso_valid <- st_make_valid(iso)
-#st_is_valid(iso_valid, reason=TRUE)
+iso_valid <- st_make_valid(iso)
+st_is_valid(iso_valid, reason=TRUE)
 ```
 
-The resulting plot is unchanged. (This is not always the case; sometimes single lines between two polygons are eliminated by `st_make_valid()`.)
+The resulting plot is unchanged. (This is not always the case; sometimes single lines between two polygons are eliminated by `st_make_valid()`. Also, some ggplot2 versions have a bug that causes the plot to be drawn incorrectly.)
 ```{r}
-#ggplot(iso_valid, aes(fill = id)) +
-#  geom_sf() +
-#  theme(legend.position = "bottom")
+ggplot(iso_valid, aes(fill = id)) +
+  geom_sf() +
+  theme(legend.position = "bottom")
 ```
 
 Alternatively, we can avoid invalid geometries if we can guarantee that no elevation value ever is exactly equal to an isoband boundary. For example, if we shift all data values by a tiny amount (here, 1e-10) so they don't coincide with the band limits, no invalid geometries are generated. The resulting plot again looks visually unchanged.

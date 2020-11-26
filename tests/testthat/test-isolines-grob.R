@@ -1,5 +1,3 @@
-context("test-isolines-grob")
-
 test_that("basic functions", {
   m <- matrix(c(0, 0, 0, 0, 0,
                 0, 0, 1, 0, 0,

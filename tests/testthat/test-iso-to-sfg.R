@@ -1,5 +1,3 @@
-context("test-iso-to-sfg")
-
 test_that("conversion of isolines to sfg", {
   #m <- matrix(c(0, 0, 0, 2,
   #              0, 1, 0, 2,

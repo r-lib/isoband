@@ -1,5 +1,3 @@
-context("test-isobands")
-
 test_that("elementary polygons get merged", {
   # two connected polygons get merged
   z <- matrix(c(0, 0, 1,
@@ -320,5 +318,5 @@ test_that("Swap isoband levels if given in the wrong order", {
   out1 <- isobands(1:4, 1:4, m, c(-.5, 0.5), c(0.5, 1.5))
   out2 <- isobands(1:4, 1:4, m, c(0.5, 1.5), c(-.5, 0.5))
 
-  expect_equivalent(out1, out2)
+  expect_equal(out1, out2)
 })
