@@ -1,3 +1,4 @@
 test_that("Catch unit tests pass", {
-    #run_cpp_tests("isoband")
+  ## disable for now, tests don't currently run successfully, reason unclear
+  #run_cpp_tests("isoband")
 })
