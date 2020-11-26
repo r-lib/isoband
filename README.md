@@ -7,7 +7,7 @@ isoband <img width="120px" alt="isoband logo" align="right" src="man/figures/iso
 <!-- badges: start -->
 
 [![R build
-status](https://github.com/extendr/rextendr/workflows/R-CMD-check/badge.svg)](https://github.com/extendr/rextendr/actions)
+status](https://github.com/wilkelab/isoband/workflows/R-CMD-check/badge.svg)](https://github.com/wilkelab/isoband/actions)
 [![Build
 Status](https://travis-ci.org/wilkelab/isoband.svg?branch=master)](https://travis-ci.org/wilkelab/isoband)
 [![AppVeyor build
