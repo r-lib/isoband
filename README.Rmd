@@ -17,8 +17,6 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![R build
 status](https://github.com/wilkelab/isoband/workflows/R-CMD-check/badge.svg)](https://github.com/wilkelab/isoband/actions)
-[![Build Status](https://travis-ci.org/wilkelab/isoband.svg?branch=master)](https://travis-ci.org/wilkelab/isoband)
-[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/wilkelab/isoband?branch=master&svg=true)](https://ci.appveyor.com/project/clauswilke/isoband)
 [![Coverage Status](https://img.shields.io/codecov/c/github/wilkelab/isoband/master.svg)](https://codecov.io/github/wilkelab/isoband?branch=master)
 [![CRAN status](https://www.r-pkg.org/badges/version/isoband)](https://cran.r-project.org/package=isoband)
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)

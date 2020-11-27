@@ -8,10 +8,6 @@ isoband <img width="120px" alt="isoband logo" align="right" src="man/figures/iso
 
 [![R build
 status](https://github.com/wilkelab/isoband/workflows/R-CMD-check/badge.svg)](https://github.com/wilkelab/isoband/actions)
-[![Build
-Status](https://travis-ci.org/wilkelab/isoband.svg?branch=master)](https://travis-ci.org/wilkelab/isoband)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/wilkelab/isoband?branch=master&svg=true)](https://ci.appveyor.com/project/clauswilke/isoband)
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/wilkelab/isoband/master.svg)](https://codecov.io/github/wilkelab/isoband?branch=master)
 [![CRAN

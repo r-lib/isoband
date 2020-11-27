@@ -369,6 +369,9 @@ context("Transform to unit box") {
     expect_true(near_equal(p2.y, 2));
   }
 
+  /*
+  // the following tests don't work properly, because `expect_error()`
+  // doesn't catch calls to Rf_error(), it only catches exceptions.
   test_that("Singular transformations are caught") {
     expect_error(
       // box without width
@@ -385,5 +388,5 @@ context("Transform to unit box") {
       unitbox_transformer(point(1, 1), point(2, 2), point(2, 2))
     );
   }
-
+*/
 }
