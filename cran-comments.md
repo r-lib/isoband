@@ -1,4 +1,4 @@
-This is a minor update making this package compatible with testthat 3.0.0 and fixing LTO issues found by CRAN.
+This is a minor update removing the testthat compile-time dependency and fixing errors on Solaris.
 
 ## Test environment
 * ubuntu 20.04, devel and release

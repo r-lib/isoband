@@ -1,6 +1,6 @@
 Package: isoband
 Title: Generate Isolines and Isobands from Regularly Spaced Elevation Grids
-Version: 0.2.3
+Version: 0.2.4
 Authors@R: 
     c(person(given = "Claus O.",
              family = "Wilke",
