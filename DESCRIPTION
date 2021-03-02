@@ -11,7 +11,10 @@ Authors@R:
              family = "Pedersen",
              role = "aut",
              email = "thomasp85@gmail.com",
-             comment = c(ORCID = "0000-0002-5147-4711")))
+             comment = c(ORCID = "0000-0002-5147-4711")),
+      person(given = "testthat and Catch authors",
+             role = "ctb",
+             comment = "testthat C++ testing code"))
 Description: A fast C++ implementation to generate contour lines (isolines) and
   contour polygons (isobands) from regularly spaced grids containing elevation data.
 URL: https://github.com/wilkelab/isoband
@@ -19,8 +22,6 @@ BugReports: https://github.com/wilkelab/isoband/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-LinkingTo: 
-    testthat
 Imports: 
     grid,
     utils
