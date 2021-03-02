@@ -25,4 +25,9 @@ Authors:
   \item Thomas Lin Pedersen \email{thomasp85@gmail.com} (\href{https://orcid.org/0000-0002-5147-4711}{ORCID})
 }
 
+Other contributors:
+\itemize{
+  \item testthat and Catch authors (testthat C++ testing code) [contributor]
+}
+
 }

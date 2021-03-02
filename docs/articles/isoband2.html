@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">isoband</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -71,7 +71,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/wilkelab/isoband/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -85,13 +85,13 @@
 
       
 
-      </header><script src="isoband2_files/header-attrs-2.3/header-attrs.js"></script><div class="row">
+      </header><script src="isoband2_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>2. Simple features</h1>
                         <h4 class="author">Claus O. Wilke</h4>
             
-            <h4 class="date">2020-11-30</h4>
+            <h4 class="date">2021-03-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/wilkelab/isoband/blob/master/vignettes/isoband2.Rmd"><code>vignettes/isoband2.Rmd</code></a></small>
       <div class="hidden name"><code>isoband2.Rmd</code></div>
@@ -101,150 +101,145 @@
     
     
 <p>For geospatial applications, it may be convenient to convert isolines and isobands into simple features. This can be done with the function <code><a href="../reference/iso_to_sfg.html">iso_to_sfg()</a></code>, which converts an isolines or isobands object into an sf geometry collection. This converted object can then be further processed with functions from the <code>sf</code> package. For example, we can add them to an sf data frame and plot with ggplot2.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/wilkelab/isoband">isoband</a></span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span>)
-<span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://r-spatial.github.io/sf">sf</a></span>))
-<span class="co">#&gt; Linking to GEOS 3.8.1, GDAL 3.1.1, PROJ 6.3.1</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wilkelab/isoband">isoband</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Linking to GEOS 3.8.1, GDAL 3.1.4, PROJ 6.3.1</span>
 
-<span class="kw">m</span> <span class="op">&lt;-</span> <span class="kw">volcano</span>
+<span class="va">m</span> <span class="op">&lt;-</span> <span class="va">volcano</span>
 
 <span class="co"># make isobands</span>
-<span class="kw">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span>((<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="kw">m</span>))<span class="op">/</span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="kw">m</span>)<span class="op">+</span><span class="fl">1</span>), (<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="kw">m</span>)<span class="op">:</span><span class="fl">1</span>)<span class="op">/</span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="kw">m</span>)<span class="op">+</span><span class="fl">1</span>), <span class="kw">m</span>, <span class="fl">10</span><span class="op">*</span>(<span class="fl">9</span><span class="op">:</span><span class="fl">19</span>), <span class="fl">10</span><span class="op">*</span>(<span class="fl">10</span><span class="op">:</span><span class="fl">20</span>))
-<span class="kw">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span>(<span class="kw">b</span>)
-<span class="kw">data_bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sf.html">st_sf</a></span>(
-  level = <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">bands</span>),
-  geometry = <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sfc.html">st_sfc</a></span>(<span class="kw">bands</span>)
-)
+<span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, <span class="va">m</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">9</span><span class="op">:</span><span class="fl">19</span><span class="op">)</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span>
+<span class="va">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span>
+<span class="va">data_bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html">st_sf</a></span><span class="op">(</span>
+  level <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bands</span><span class="op">)</span>,
+  geometry <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html">st_sfc</a></span><span class="op">(</span><span class="va">bands</span><span class="op">)</span>
+<span class="op">)</span>
 
 <span class="co"># make isolines</span>
-<span class="kw">l</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isolines</a></span>((<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="kw">m</span>))<span class="op">/</span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="kw">m</span>)<span class="op">+</span><span class="fl">1</span>), (<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="kw">m</span>)<span class="op">:</span><span class="fl">1</span>)<span class="op">/</span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="kw">m</span>)<span class="op">+</span><span class="fl">1</span>), <span class="kw">m</span>, <span class="fl">10</span><span class="op">*</span>(<span class="fl">10</span><span class="op">:</span><span class="fl">19</span>))
-<span class="kw">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span>(<span class="kw">l</span>)
-<span class="kw">data_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sf.html">st_sf</a></span>(
-  level = <span class="fl">2</span><span class="op">:</span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">lines</span>)<span class="op">+</span><span class="fl">1</span>),
-  geometry = <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sfc.html">st_sfc</a></span>(<span class="kw">lines</span>)
-)
+<span class="va">l</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isolines</a></span><span class="op">(</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, <span class="va">m</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">19</span><span class="op">)</span><span class="op">)</span>
+<span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span><span class="op">(</span><span class="va">l</span><span class="op">)</span>
+<span class="va">data_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html">st_sf</a></span><span class="op">(</span>
+  level <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">lines</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>,
+  geometry <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html">st_sfc</a></span><span class="op">(</span><span class="va">lines</span><span class="op">)</span>
+<span class="op">)</span>
 
 <span class="co"># plot with geom_sf()</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(data = <span class="kw">data_bands</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(fill = <span class="kw">level</span>), color = <span class="fl">NA</span>, alpha = <span class="fl">0.7</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(data = <span class="kw">data_lines</span>, color = <span class="st">"black"</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_c</a></span>(guide = <span class="st">"none"</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span>(expand = <span class="fl">FALSE</span>)
-</pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_bands</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">level</span><span class="op">)</span>, color <span class="op">=</span> <span class="cn">NA</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_lines</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_c</a></span><span class="op">(</span>guide <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband2_files/figure-html/unnamed-chunk-1-1.png" width="700"></p>
 <p>As a second application of this feature, we will take a photograph and convert it into a set of polygons that we plot with false colors.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://docs.ropensci.org/magick">magick</a></span>))
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/magick/">magick</a></span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># helper function to convert a raster image into isobands</span>
-<span class="kw">sf_from_image</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">image</span>) {
-  <span class="kw">image_gray</span> <span class="op">&lt;-</span> <span class="kw">image</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://docs.ropensci.org/magick/reference/color.html">image_quantize</a></span>(colorspace = <span class="st">"gray"</span>)
-  <span class="kw">image_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/as.raster.html">as.raster</a></span>(<span class="kw">image_gray</span>)
-  <span class="kw">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(<span class="kw">image_raster</span>)
-  <span class="kw">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>((<span class="fl">255</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/grDevices/col2rgb.html">col2rgb</a></span>(<span class="kw">image_raster</span>)[<span class="fl">1</span>,])), nrow = <span class="kw">d</span>[<span class="fl">1</span>], ncol = <span class="kw">d</span>[<span class="fl">2</span>], byrow = <span class="fl">TRUE</span>)
-  <span class="kw">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span>(<span class="fl">1</span><span class="op">:</span><span class="kw">d</span>[<span class="fl">2</span>], <span class="kw">d</span>[<span class="fl">1</span>]<span class="op">:</span><span class="fl">1</span>, <span class="kw">m</span>, <span class="fl">20</span><span class="op">*</span>(<span class="fl">0</span><span class="op">:</span><span class="fl">13</span>), <span class="fl">20</span><span class="op">*</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">14</span>))
-  <span class="kw">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span>(<span class="kw">b</span>)
-  <span class="kw">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sf.html">st_sf</a></span>(
-    level = <span class="kw">letters</span>[<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">bands</span>)],
-    geometry = <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sfc.html">st_sfc</a></span>(<span class="kw">bands</span>)
-  )
-}
+<span class="va">sf_from_image</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">image</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">image_gray</span> <span class="op">&lt;-</span> <span class="va">image</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://docs.ropensci.org/magick/reference/color.html">image_quantize</a></span><span class="op">(</span>colorspace <span class="op">=</span> <span class="st">"gray"</span><span class="op">)</span>
+  <span class="va">image_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/as.raster.html">as.raster</a></span><span class="op">(</span><span class="va">image_gray</span><span class="op">)</span>
+  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">image_raster</span><span class="op">)</span>
+  <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">(</span><span class="fl">255</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/grDevices/col2rgb.html">col2rgb</a></span><span class="op">(</span><span class="va">image_raster</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">)</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, ncol <span class="op">=</span> <span class="va">d</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+  <span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">d</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">:</span><span class="fl">1</span>, <span class="va">m</span>, <span class="fl">20</span><span class="op">*</span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">13</span><span class="op">)</span>, <span class="fl">20</span><span class="op">*</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span>
+  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html">st_sf</a></span><span class="op">(</span>
+    level <span class="op">=</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bands</span><span class="op">)</span><span class="op">]</span>,
+    geometry <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html">st_sfc</a></span><span class="op">(</span><span class="va">bands</span><span class="op">)</span>
+  <span class="op">)</span>
+<span class="op">}</span>
 
 <span class="co"># load the image, convert, and plot</span>
-<span class="kw">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://docs.ropensci.org/magick/reference/transform.html">image_resize</a></span>(<span class="fu"><a href="https://docs.ropensci.org/magick/reference/editing.html">image_read</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"ocean-cat.jpg"</span>, package = <span class="st">"isoband"</span>)), <span class="st">"200x200"</span>)
-<span class="kw">img_sf</span> <span class="op">&lt;-</span> <span class="fu">sf_from_image</span>(<span class="kw">img</span>)
+<span class="va">img</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://docs.ropensci.org/magick/reference/transform.html">image_resize</a></span><span class="op">(</span><span class="fu"><a href="https://docs.ropensci.org/magick/reference/editing.html">image_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ocean-cat.jpg"</span>, package <span class="op">=</span> <span class="st">"isoband"</span><span class="op">)</span><span class="op">)</span>, <span class="st">"200x200"</span><span class="op">)</span>
+<span class="va">img_sf</span> <span class="op">&lt;-</span> <span class="fu">sf_from_image</span><span class="op">(</span><span class="va">img</span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">img_sf</span>) <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(color = <span class="st">"blue"</span>, fill = <span class="fl">NA</span>, size = <span class="fl">0.05</span>) <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span>(expand = <span class="fl">FALSE</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_gray</a></span>() <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(
-    axis.ticks = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>(),
-    axis.text = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>(),
-    axis.title = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>(),
-    axis.ticks.length = <span class="kw">grid</span>::<span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span>(<span class="fl">0</span>, <span class="st">"pt"</span>),
-    plot.margin = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span>(<span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>)
-  )
-</pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">img_sf</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"blue"</span>, fill <span class="op">=</span> <span class="cn">NA</span>, size <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_gray</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>
+    axis.ticks <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,
+    axis.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,
+    axis.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,
+    axis.ticks.length <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0</span>, <span class="st">"pt"</span><span class="op">)</span>,
+    plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">margin</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>
+  <span class="op">)</span></code></pre></div>
 <p><img src="isoband2_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
 
-
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">img_sf</span>) <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(fill = <span class="kw">level</span>, color = <span class="kw">level</span>)) <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span>(expand = <span class="fl">FALSE</span>) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span>() <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_d</a></span>(
-    aesthetics = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"color"</span>, <span class="st">"fill"</span>), option = <span class="st">"B"</span>, guide = <span class="st">"none"</span>,
-    direction = <span class="op">-</span><span class="fl">1</span>
-  )
-</pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">img_sf</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">level</span>, color <span class="op">=</span> <span class="va">level</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_d</a></span><span class="op">(</span>
+    aesthetics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"color"</span>, <span class="st">"fill"</span><span class="op">)</span>, option <span class="op">=</span> <span class="st">"B"</span>, guide <span class="op">=</span> <span class="st">"none"</span>,
+    direction <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>
+  <span class="op">)</span></code></pre></div>
 <p><img src="isoband2_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
 <div id="invalid-geometries" class="section level1">
 <h1 class="hasAnchor">
 <a href="#invalid-geometries" class="anchor"></a>Invalid geometries</h1>
 <p>When converting isolines or isobands into simple features, we can end up with geometries that are considered invalid. These are generally cases where isobands have portions with zero width or height, for example because a set of values in a single row or column is exactly equal to the lower boundary of an isoband. (The lower boundary of an isoband is included in that band, while the upper boundary is excluded.) As an example, consider the following elevation matrix, which yields one isoband with zero width and one with zero height.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="kw">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">0.6</span>, <span class="fl">0</span>,
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">1.5</span>, <span class="fl">0.6</span>, <span class="fl">0</span>,
     <span class="fl">0.5</span>, <span class="fl">1.5</span>, <span class="fl">1.5</span>,   <span class="fl">0</span>,   <span class="fl">0</span>, <span class="fl">0</span>,
       <span class="fl">0</span>,   <span class="fl">1</span>,   <span class="fl">0</span>,   <span class="fl">1</span>,   <span class="fl">1</span>, <span class="fl">0</span>,
       <span class="fl">0</span>,   <span class="fl">1</span>,   <span class="fl">0</span>, <span class="fl">0.7</span>,   <span class="fl">0</span>, <span class="fl">0</span>,
     <span class="fl">0.9</span>, <span class="fl">1.3</span>, <span class="fl">1.8</span>, <span class="fl">1.4</span>, <span class="fl">0.4</span>, <span class="fl">0</span>
-  ),
-  nrow = <span class="fl">5</span>, ncol = <span class="fl">6</span>, byrow = <span class="fl">TRUE</span>
-)
+  <span class="op">)</span>,
+  nrow <span class="op">=</span> <span class="fl">5</span>, ncol <span class="op">=</span> <span class="fl">6</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="../reference/plot_iso.html">plot_iso</a></span>(<span class="kw">m</span>, <span class="fl">1</span>, <span class="fl">2</span>)
-</pre></div>
+<span class="fu"><a href="../reference/plot_iso.html">plot_iso</a></span><span class="op">(</span><span class="va">m</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband2_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>The isobands are correct, but conversion into simple features yields invalid geometries.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="kw">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span>(x = <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, y = <span class="fl">5</span><span class="op">:</span><span class="fl">1</span>, z = <span class="kw">m</span>, levels_low = <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, levels_high = <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>)
-<span class="kw">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span>(<span class="kw">b</span>)
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, y <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">1</span>, z <span class="op">=</span> <span class="va">m</span>, levels_low <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, levels_high <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>
+<span class="va">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span>
 
-<span class="kw">iso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sf.html">st_sf</a></span>(
-  id = <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">bands</span>)),
-  geometry = <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sfc.html">st_sfc</a></span>(<span class="kw">bands</span>)
-)
+<span class="va">iso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html">st_sf</a></span><span class="op">(</span>
+  id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bands</span><span class="op">)</span><span class="op">)</span>,
+  geometry <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html">st_sfc</a></span><span class="op">(</span><span class="va">bands</span><span class="op">)</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/pkg/sf/man/valid.html">st_is_valid</a></span>(<span class="kw">iso</span>, reason = <span class="fl">TRUE</span>)
+<span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html">st_is_valid</a></span><span class="op">(</span><span class="va">iso</span>, reason <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; [1] "Too few points in geometry component[4 3]"</span>
-<span class="co">#&gt; [2] "Too few points in geometry component[4 3]"</span>
-</pre></div>
+<span class="co">#&gt; [2] "Too few points in geometry component[4 3]"</span></code></pre></div>
 <p>Invalid geometries can cause problems in some applications, even though they usually can be plotted with <code><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">iso</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(fill = <span class="kw">id</span>)) <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>() <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(legend.position = <span class="st">"bottom"</span>)
-</pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">iso</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband2_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<p>We can repair invalid geometries using <code><a href="https://rdrr.io/pkg/sf/man/valid.html">st_make_valid()</a></code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="kw">iso_valid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sf/man/valid.html">st_make_valid</a></span>(<span class="kw">iso</span>)
-<span class="fu"><a href="https://rdrr.io/pkg/sf/man/valid.html">st_is_valid</a></span>(<span class="kw">iso_valid</span>, reason=<span class="fl">TRUE</span>)
-<span class="co">#&gt; [1] "Valid Geometry" "Valid Geometry"</span>
-</pre></div>
-<p>The resulting plot is unchanged. (This is not always the case; sometimes single lines between two polygons are eliminated by <code><a href="https://rdrr.io/pkg/sf/man/valid.html">st_make_valid()</a></code>. Also, some ggplot2 versions have a bug that causes the plot to be drawn incorrectly.)</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">iso_valid</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(fill = <span class="kw">id</span>)) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>() <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(legend.position = <span class="st">"bottom"</span>)
-</pre></div>
+<p>We can repair invalid geometries using <code><a href="https://r-spatial.github.io/sf/reference/valid.html">st_make_valid()</a></code>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf_extSoftVersion.html">sf_extSoftVersion</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="st">"GEOS"</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="st">"3.8.0"</span><span class="op">)</span> <span class="op">{</span> <span class="co"># requires GEOS &gt;= 3.8.0</span>
+  <span class="va">iso_valid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html">st_make_valid</a></span><span class="op">(</span><span class="va">iso</span><span class="op">)</span>
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html">st_is_valid</a></span><span class="op">(</span><span class="va">iso_valid</span>, reason<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<span class="op">}</span>
+<span class="co">#&gt; [1] "Valid Geometry" "Valid Geometry"</span></code></pre></div>
+<p>The resulting plot is unchanged. (This is not always the case; sometimes single lines between two polygons are eliminated by <code><a href="https://r-spatial.github.io/sf/reference/valid.html">st_make_valid()</a></code>. Also, see ggplot2 issue <a href="https://github.com/tidyverse/ggplot2/issues/4275">#4275.</a>)</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf_extSoftVersion.html">sf_extSoftVersion</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="st">"GEOS"</span><span class="op">]</span> <span class="op">&gt;=</span> <span class="st">"3.8.0"</span><span class="op">)</span> <span class="op">{</span> <span class="co"># requires GEOS &gt;= 3.8.0</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">iso_valid</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
 <p><img src="isoband2_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>Alternatively, we can avoid invalid geometries if we can guarantee that no elevation value ever is exactly equal to an isoband boundary. For example, if we shift all data values by a tiny amount (here, 1e-10) so they don’t coincide with the band limits, no invalid geometries are generated. The resulting plot again looks visually unchanged.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="kw">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span>(x = <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, y = <span class="fl">5</span><span class="op">:</span><span class="fl">1</span>, z = <span class="kw">m</span> <span class="op">+</span> <span class="fl">1e-10</span>, levels_low = <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, levels_high = <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>)
-<span class="kw">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span>(<span class="kw">b</span>)
-<span class="kw">iso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sf.html">st_sf</a></span>(id = <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">bands</span>)), geometry = <span class="fu"><a href="https://rdrr.io/pkg/sf/man/sfc.html">st_sfc</a></span>(<span class="kw">bands</span>))
-<span class="fu"><a href="https://rdrr.io/pkg/sf/man/valid.html">st_is_valid</a></span>(<span class="kw">iso</span>, reason = <span class="fl">TRUE</span>)
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, y <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">1</span>, z <span class="op">=</span> <span class="va">m</span> <span class="op">+</span> <span class="fl">1e-10</span>, levels_low <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, levels_high <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>
+<span class="va">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/iso_to_sfg.html">iso_to_sfg</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span>
+<span class="va">iso</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf.html">st_sf</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">bands</span><span class="op">)</span><span class="op">)</span>, geometry <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/sfc.html">st_sfc</a></span><span class="op">(</span><span class="va">bands</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html">st_is_valid</a></span><span class="op">(</span><span class="va">iso</span>, reason <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; [1] "Valid Geometry" "Valid Geometry"</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">iso</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(fill = <span class="kw">id</span>)) <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>() <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(legend.position = <span class="st">"bottom"</span>)
-</pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">iso</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband2_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 </div>
   </div>

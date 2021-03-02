@@ -74,7 +74,7 @@ examples." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">isoband</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
       </span>
     </div>
 
@@ -82,7 +82,7 @@ examples." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -114,7 +114,7 @@ examples." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/wilkelab/isoband/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -142,18 +142,18 @@ for debugging and visualizing the isobanding algorithm. See <code><a href='isoba
 examples.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_iso</span>(
-  <span class='kw'>m</span>,
-  <span class='kw'>vlo</span>,
-  <span class='kw'>vhi</span>,
-  fill_lo = <span class='st'>"gray95"</span>,
-  fill_mid = <span class='st'>"gray50"</span>,
-  fill_hi = <span class='st'>"black"</span>,
-  fill_band = <span class='st'>"cornsilk"</span>,
-  col_lo = <span class='st'>"black"</span>,
-  col_hi = <span class='st'>"black"</span>,
-  newpage = <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>plot_iso</span><span class='op'>(</span>
+  <span class='va'>m</span>,
+  <span class='va'>vlo</span>,
+  <span class='va'>vhi</span>,
+  fill_lo <span class='op'>=</span> <span class='st'>"gray95"</span>,
+  fill_mid <span class='op'>=</span> <span class='st'>"gray50"</span>,
+  fill_hi <span class='op'>=</span> <span class='st'>"black"</span>,
+  fill_band <span class='op'>=</span> <span class='st'>"cornsilk"</span>,
+  col_lo <span class='op'>=</span> <span class='st'>"black"</span>,
+  col_hi <span class='op'>=</span> <span class='st'>"black"</span>,
+  newpage <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -203,14 +203,14 @@ be called or not</p></td>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>,
+    <pre class="examples"><div class='input'><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>,
               <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>0</span>,
               <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>0</span>,
               <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>0</span>,
               <span class='fl'>0</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>2</span>, <span class='fl'>0</span>,
-              <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>), <span class='fl'>6</span>, <span class='fl'>6</span>, byrow = <span class='fl'>TRUE</span>)
+              <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>, <span class='fl'>6</span>, <span class='fl'>6</span>, byrow <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
-<span class='fu'>plot_iso</span>(<span class='kw'>m</span>, <span class='fl'>0.5</span>, <span class='fl'>1.5</span>)
+<span class='fu'>plot_iso</span><span class='op'>(</span><span class='va'>m</span>, <span class='fl'>0.5</span>, <span class='fl'>1.5</span><span class='op'>)</span>
 </div><div class='img'><img src='plot_iso-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
