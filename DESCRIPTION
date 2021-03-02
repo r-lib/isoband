@@ -12,7 +12,7 @@ Authors@R:
              role = "aut",
              email = "thomasp85@gmail.com",
              comment = c(ORCID = "0000-0002-5147-4711")),
-      person(given = "testthat authors",
+      person(given = "testthat and Catch authors",
              role = "ctb",
              comment = "testthat C++ testing code"))
 Description: A fast C++ implementation to generate contour lines (isolines) and
