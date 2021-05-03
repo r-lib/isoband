@@ -195,6 +195,9 @@ makeContent.isolines_grob <- function(x) {
       return(NULL)
     }
     clipped <- clip_lines(data$x, data$y, data$id, clip_boxes, asp = asp)
+    if (length(clipped$x) == 0) {
+      return(NULL)
+    }
     polylineGrob(
       clipped$x, clipped$y, clipped$id,
       default.units = x$units,
