@@ -207,42 +207,36 @@ label_placer_manual <- function(breaks, x, y, theta) {
 #'   See e.g. [`angle_halfcircle_bottom()`].
 #' @rdname label_placer
 #' @export
-label_placer_middle= function(rot_adjuster = angle_halfcircle_bottom(), ...){
-  
+label_placer_middle <- function(rot_adjuster = angle_halfcircle_bottom(), ...) {
   placer_fun <- function(line_data, ...) {
     out <- data.frame(x = numeric(0), y = numeric(0), theta = numeric(0))
-    
-    #It identifies each isoline subdivision. For an individual isoline the id column identifies the number of subdivisions.
-    line_sections<-unique(line_data$id)
-    
-    #Then the label is printed st the middle of each isoline subdivision.
-    for(i in 1:length(line_sections)){
-      
-      x<-line_data$x[line_data$id==i]
-      y<-line_data$y[line_data$id==i]
-      
-      middle_index<-as.integer(length(x)/2)
-      
-      x_<-x[middle_index]
-      y_<-y[middle_index]
-      
-      xtheta <- c(x[middle_index-1], x[middle_index], x[middle_index+1])
-      ytheta <- c(y[middle_index-1], y[middle_index], y[middle_index+1])
-      
-      xave <- mean(xtheta)
-      yave <- mean(ytheta)
-      
-      m <- cbind(xtheta - xave, ytheta - yave)
+
+    # It identifies each isoline subdivision. For an individual isoline the id column identifies the number of subdivisions.
+    line_sections <- unique(line_data$id)
+
+    # Then the label is printed at the middle of each isoline subdivision.
+    for (i in 1:length(line_sections)) {
+      x <- line_data$x[line_data$id == i]
+      y <- line_data$y[line_data$id == i]
+
+      middle_index <- as.integer(length(x) / 2)
+
+      x_ <- x[middle_index]
+      y_ <- y[middle_index]
+
+      xtheta <- c(x[middle_index - 1], x[middle_index], x[middle_index + 1])
+      ytheta <- c(y[middle_index - 1], y[middle_index], y[middle_index + 1])
+
+      m <- cbind(xtheta - mean(xtheta), ytheta - mean(ytheta))
       v <- svd(m)$v
-      
-      out[i ,]<-list(x = x_, y = y_, theta = atan2(v[2], v[1]))
-      
+
+      out[i, ] <- list(x = x_, y = y_, theta = atan2(v[2], v[1]))
     }
     # standardize rotation angles for text labels
     out$theta <- rot_adjuster(out$theta)
     out
   }
-  
+
   # final placer function
   function(lines, labels_data) {
     label_placer_simple(lines, labels_data, placer_fun)
