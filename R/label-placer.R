@@ -205,7 +205,7 @@ label_placer_manual <- function(breaks, x, y, theta) {
 
 #' @rdname label_placer
 #' @export
-label_placer_middle <- function(rot_adjuster = angle_halfcircle_bottom(), ...) {
+label_placer_middle <- function(rot_adjuster = angle_halfcircle_bottom()) {
   placer_fun <- function(line_data, ...) {
     out <- data.frame(x = numeric(0), y = numeric(0), theta = numeric(0))
 

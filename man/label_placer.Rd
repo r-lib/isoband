@@ -17,7 +17,7 @@ label_placer_none()
 
 label_placer_manual(breaks, x, y, theta)
 
-label_placer_middle(rot_adjuster = angle_halfcircle_bottom(), ...)
+label_placer_middle(rot_adjuster = angle_halfcircle_bottom())
 }
 \arguments{
 \item{placement}{String consisting of any combination of the letters
