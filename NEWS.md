@@ -1,3 +1,7 @@
+isoband devel
+----------------------------------------
+- Add new label placer function `label_placer_middle()` (#24, @jamarav).
+
 isoband 0.2.4
 ----------------------------------------
 - Remove testthat compile-time dependency.
