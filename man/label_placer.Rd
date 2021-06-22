@@ -4,6 +4,7 @@
 \alias{label_placer_minmax}
 \alias{label_placer_none}
 \alias{label_placer_manual}
+\alias{label_placer_middle}
 \title{Set up a label placement strategy}
 \usage{
 label_placer_minmax(
@@ -15,6 +16,8 @@ label_placer_minmax(
 label_placer_none()
 
 label_placer_manual(breaks, x, y, theta)
+
+label_placer_middle(rot_adjuster = angle_halfcircle_bottom())
 }
 \arguments{
 \item{placement}{String consisting of any combination of the letters
@@ -43,4 +46,6 @@ the respective isolines.
 \code{label_placer_none()} places no labels at all.
 
 \code{label_placer_manual()} places labels at manually defined locations.
+
+\code{label_placer_middle()} places labels at the middle of each isoline.
 }

@@ -85,6 +85,8 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
 #' `label_placer_none()` places no labels at all.
 #'
 #' `label_placer_manual()` places labels at manually defined locations.
+#' 
+#' `label_placer_middle()` places labels at the middle of each isoline.
 #'
 #' @param placement String consisting of any combination of the letters
 #'   "t", "r", "b", "l" indicating the placement of labels at the top,
@@ -200,6 +202,44 @@ label_placer_manual <- function(breaks, x, y, theta) {
   }
 }
 
+
+#' @rdname label_placer
+#' @export
+label_placer_middle <- function(rot_adjuster = angle_halfcircle_bottom()) {
+  placer_fun <- function(line_data, ...) {
+    out <- data.frame(x = numeric(0), y = numeric(0), theta = numeric(0))
+
+    # It identifies each isoline subdivision. For an individual isoline the id column identifies the number of subdivisions.
+    line_sections <- unique(line_data$id)
+
+    # Then the label is printed at the middle of each isoline subdivision.
+    for (i in 1:length(line_sections)) {
+      x <- line_data$x[line_data$id == i]
+      y <- line_data$y[line_data$id == i]
+
+      middle_index <- as.integer(length(x) / 2)
+
+      x_mid <- x[middle_index]
+      y_mid <- y[middle_index]
+
+      xtheta <- c(x[middle_index - 1], x[middle_index], x[middle_index + 1])
+      ytheta <- c(y[middle_index - 1], y[middle_index], y[middle_index + 1])
+
+      m <- cbind(xtheta - mean(xtheta), ytheta - mean(ytheta))
+      v <- svd(m)$v
+
+      out[i, ] <- list(x = x_mid, y = y_mid, theta = atan2(v[2], v[1]))
+    }
+    # standardize rotation angles for text labels
+    out$theta <- rot_adjuster(out$theta)
+    out
+  }
+
+  # final placer function
+  function(lines, labels_data) {
+    label_placer_simple(lines, labels_data, placer_fun)
+  }
+}
 
 #' Standardize label angles
 #'
