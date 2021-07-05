@@ -1,10 +1,10 @@
 ---
-title: "2. Simple features"
+title: "Simple features"
 author: "Claus O. Wilke"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Simple features}
+  %\VignetteIndexEntry{Simple features}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

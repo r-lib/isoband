@@ -1,10 +1,10 @@
 ---
-title: "1. Generating isolines and isobands"
+title: "Generating isolines and isobands"
 author: "Claus O. Wilke"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{1. Generating isolines and isobands}
+  %\VignetteIndexEntry{Generating isolines and isobands}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
