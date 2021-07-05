@@ -110,7 +110,7 @@
 <a href="#examples" class="anchor"></a>Examples</h2>
 <p>The two main workhorses of the package are the functions <code><a href="reference/isobands.html">isolines()</a></code> and <code><a href="reference/isobands.html">isobands()</a></code>, respectively. They return a list of isolines/isobands for each isolevel specified. Each isoline/isoband consists of vectors of x and y coordinates, as well as a vector of ids specifying which sets of coordinates should be connected. This format can be handed directly to <code>grid.polyline()</code>/<code>grid.path()</code> for drawing. However, we can also convert the output to spatial features and draw with ggplot2 (see below).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wilkelab/isoband">isoband</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/isoband">isoband</a></span><span class="op">)</span>
 
 <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>,
               <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">0</span>,
