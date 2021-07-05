@@ -142,7 +142,8 @@ if (sf_extSoftVersion()["GEOS"] >= "3.8.0") { # requires GEOS >= 3.8.0
 }
 ```
 
-The resulting plot is unchanged. (This is not always the case; sometimes single lines between two polygons are eliminated by `st_make_valid()`. Also, see ggplot2 issue [#4275.](https://github.com/tidyverse/ggplot2/issues/4275))
+The resulting plot is unchanged. (This is not always the case; sometimes single lines between two polygons are eliminated by `st_make_valid()`.)
+
 ```{r}
 if (sf_extSoftVersion()["GEOS"] >= "3.8.0") { # requires GEOS >= 3.8.0
   ggplot(iso_valid, aes(fill = id)) +

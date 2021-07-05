@@ -72,7 +72,6 @@ if (sf_extSoftVersion()["GEOS"] >= "3.8.0") {
   iso2 <- st_make_valid(iso)
   st_is_valid(iso2, reason=TRUE)
   # the plot should be unchanged
-  # (this may not be the case, see ggplot2 issue #4275)
   ggplot(iso2, aes(fill = id)) + geom_sf()
 }
 

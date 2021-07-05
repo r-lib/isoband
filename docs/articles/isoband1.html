@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1. Generating isolines and isobands • isoband</title>
+<title>Generating isolines and isobands • isoband</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="1. Generating isolines and isobands">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Generating isolines and isobands">
 <meta property="og:description" content="isoband">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">isoband</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
       </span>
     </div>
 
@@ -54,13 +54,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/isoband1.html">1. Generating isolines and isobands</a>
+      <a href="../articles/isoband1.html">Generating isolines and isobands</a>
     </li>
     <li>
-      <a href="../articles/isoband2.html">2. Simple features</a>
+      <a href="../articles/isoband2.html">Simple features</a>
     </li>
     <li>
-      <a href="../articles/isoband3.html">3. Labeled isolines</a>
+      <a href="../articles/isoband3.html">Labeled isolines</a>
     </li>
   </ul>
 </li>
@@ -85,13 +85,13 @@
 
       
 
-      </header><script src="isoband1_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="isoband1_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>1. Generating isolines and isobands</h1>
+      <h1 data-toc-skip>Generating isolines and isobands</h1>
                         <h4 class="author">Claus O. Wilke</h4>
             
-            <h4 class="date">2021-03-02</h4>
+            <h4 class="date">2021-07-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/wilkelab/isoband/blob/master/vignettes/isoband1.Rmd"><code>vignettes/isoband1.Rmd</code></a></small>
       <div class="hidden name"><code>isoband1.Rmd</code></div>
@@ -214,9 +214,9 @@
 <span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html">microbenchmark</a></span><span class="op">(</span><span class="fu">fn_contourLines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isolines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isobands</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Unit: milliseconds</span>
 <span class="co">#&gt;               expr       min        lq      mean    median        uq      max</span>
-<span class="co">#&gt;  fn_contourLines()  1.511412  1.841741  2.505430  2.101260  2.507684 11.78453</span>
-<span class="co">#&gt;      fn_isolines()  7.733050  8.228824  8.625724  8.498397  8.693843 24.32390</span>
-<span class="co">#&gt;      fn_isobands() 21.517292 23.202588 23.743662 23.570325 24.047335 33.67547</span>
+<span class="co">#&gt;  fn_contourLines()  1.502983  1.738147  2.515280  1.896078  2.402883 22.30557</span>
+<span class="co">#&gt;      fn_isolines()  7.511494  7.664725  8.101963  7.878146  8.116060 12.28633</span>
+<span class="co">#&gt;      fn_isobands() 21.448236 21.674670 22.555782 22.066980 23.166360 26.57352</span>
 <span class="co">#&gt;  neval cld</span>
 <span class="co">#&gt;    100 a  </span>
 <span class="co">#&gt;    100  b </span>

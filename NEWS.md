@@ -1,11 +1,10 @@
-isoband devel
+isoband 0.2.5
 ----------------------------------------
 - Add new label placer function `label_placer_middle()` (#24, @jamarav).
 
 - The vendored testthat/catch code now uses a constant
   value for the stack size rather than relying on `SIGSTKSZ`. 
   See: https://github.com/r-lib/testthat/issues/1373
-
 
 isoband 0.2.4
 ----------------------------------------
@@ -23,7 +22,6 @@ isoband 0.2.1
 ----------------------------------------
 - Improved clipping algorithm for `clip_lines()`, less likely to
   experience numerical instabilities.
-
 
 isoband 0.2.0
 ----------------------------------------

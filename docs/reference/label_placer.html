@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">isoband</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
       </span>
     </div>
 
@@ -95,13 +95,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/isoband1.html">1. Generating isolines and isobands</a>
+      <a href="../articles/isoband1.html">Generating isolines and isobands</a>
     </li>
     <li>
-      <a href="../articles/isoband2.html">2. Simple features</a>
+      <a href="../articles/isoband2.html">Simple features</a>
     </li>
     <li>
-      <a href="../articles/isoband3.html">3. Labeled isolines</a>
+      <a href="../articles/isoband3.html">Labeled isolines</a>
     </li>
   </ul>
 </li>
@@ -146,7 +146,9 @@
 
 <span class='fu'>label_placer_none</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='fu'>label_placer_manual</span><span class='op'>(</span><span class='va'>breaks</span>, <span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>theta</span><span class='op'>)</span></pre>
+<span class='fu'>label_placer_manual</span><span class='op'>(</span><span class='va'>breaks</span>, <span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>theta</span><span class='op'>)</span>
+
+<span class='fu'>label_placer_middle</span><span class='op'>(</span>rot_adjuster <span class='op'>=</span> <span class='fu'><a href='angle_halfcircle_bottom.html'>angle_halfcircle_bottom</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -185,6 +187,7 @@ angles (in radians) for each label corresponding to each break.</p></td>
 the respective isolines.</p>
 <p><code>label_placer_none()</code> places no labels at all.</p>
 <p><code>label_placer_manual()</code> places labels at manually defined locations.</p>
+<p><code>label_placer_middle()</code> places labels at the middle of each isoline.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
