@@ -1,10 +1,10 @@
 ---
-title: "3. Labeled isolines"
+title: "Labeled isolines"
 author: "Claus O. Wilke"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3. Labeled isolines}
+  %\VignetteIndexEntry{Labeled isolines}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
