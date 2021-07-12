@@ -12,7 +12,7 @@ A fast C++ implementation to generate contour lines (isolines) and
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/wilkelab/isoband}
+  \item \url{https://wilkelab.org/isoband/}
   \item Report bugs at \url{https://github.com/wilkelab/isoband/issues}
 }
 
