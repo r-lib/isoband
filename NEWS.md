@@ -1,6 +1,7 @@
 isoband 0.2.5
 ----------------------------------------
-- Add new label placer function `label_placer_middle()` (#24, @jamarav).
+- Add a new label placer function `label_placer_middle()`
+  (#24, @jamarav).
 
 - The vendored testthat/catch code now uses a constant
   value for the stack size rather than relying on `SIGSTKSZ`. 
