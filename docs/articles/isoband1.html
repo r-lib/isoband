@@ -91,7 +91,7 @@
       <h1 data-toc-skip>Generating isolines and isobands</h1>
                         <h4 class="author">Claus O. Wilke</h4>
             
-            <h4 class="date">2021-07-05</h4>
+            <h4 class="date">2021-07-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/wilkelab/isoband/blob/master/vignettes/isoband1.Rmd"><code>vignettes/isoband1.Rmd</code></a></small>
       <div class="hidden name"><code>isoband1.Rmd</code></div>
@@ -103,7 +103,7 @@
 <p>The isoband package implements fast algorithms for generating isolines (lines of equal elevation) and isobands (ranges of elevation delimited by two isolines) from a matrix of elevation data. For both cases, the package employs the marching squares algorithms as described on <a href="https://en.wikipedia.org/wiki/Marching_squares">Wikipedia.</a> Marching squares algorithms break down the elevation matrix into blocks of 2x2 elevation values. For each block, they then determine the appropriate isolines/isobands from a lookup table of all possible arrangements of isolines or isobands within a 2x2 block. There are 16 distinct possibilities for isolines and 81 for isobands. The implementation in the isoband package goes beyond the algorithm described on Wikipedia in that it merges the isolines or isobands from separate blocks into extended line traces or polygons. The package is meant as a low-level package with minimal required dependencies. Therefore, many of the functions provided may not immediately be useful to endusers, but they will enable developers of other packages to integrate isolines and isobands into their feature set.</p>
 <p>The two main functions of the package are called <code><a href="../reference/isobands.html">isolines()</a></code> and <code><a href="../reference/isobands.html">isobands()</a></code>, and they have similar user interfaces and return values. Both take a vector <code>x</code> specifying the x values corresponding to the columns of the elevation matrix, a vector <code>y</code> specifying the y values corresponding to the rows of the elevation matrix, and an elevation matrix <code>z</code>. The two functions differ in that <code><a href="../reference/isobands.html">isolines()</a></code> takes a single argument <code>levels</code> specifying the elevation levels for which isolines should be calculated, whereas <code><a href="../reference/isobands.html">isobands()</a></code> takes two arguments, <code>levels_low</code> and <code>levels_high</code>, specifying the lower and upper bounds for each isoband. The return value in both cases is a list of lists. The outer list contains one list element for each specified isolevel. The inner lists hold line or polygon data in the form <code>x</code>, <code>y</code>, <code>id</code> as used by <code><a href="https://rdrr.io/r/grid/grid.lines.html">grid::polylineGrob()</a></code> or <code><a href="https://rdrr.io/r/grid/grid.path.html">grid::pathGrob()</a></code>. The format has been chosen for easy drawing of the resulting values via these two grid functions.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/isoband">isoband</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/isoband/">isoband</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span>
 
 <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>
@@ -214,9 +214,9 @@
 <span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html">microbenchmark</a></span><span class="op">(</span><span class="fu">fn_contourLines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isolines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isobands</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Unit: milliseconds</span>
 <span class="co">#&gt;               expr       min        lq      mean    median        uq      max</span>
-<span class="co">#&gt;  fn_contourLines()  1.538238  1.767713  2.400239  1.974547  2.368857 11.18275</span>
-<span class="co">#&gt;      fn_isolines()  7.473851  7.768482  8.287088  7.930856  8.382939 25.28812</span>
-<span class="co">#&gt;      fn_isobands() 21.423153 21.808920 22.652672 22.227902 23.102317 27.91320</span>
+<span class="co">#&gt;  fn_contourLines()  1.657772  1.898011  2.492775  2.153896  2.454865 12.47061</span>
+<span class="co">#&gt;      fn_isolines()  8.114132  8.320545  9.060220  8.628836  9.032136 27.30128</span>
+<span class="co">#&gt;      fn_isobands() 23.314518 23.819863 24.746850 24.380594 25.230745 30.13234</span>
 <span class="co">#&gt;  neval cld</span>
 <span class="co">#&gt;    100 a  </span>
 <span class="co">#&gt;    100  b </span>
