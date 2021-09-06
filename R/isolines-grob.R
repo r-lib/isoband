@@ -163,7 +163,8 @@ makeContent.isolines_grob <- function(x) {
   # need to correct angle for current aspect ratio
   Sy <- convertHeight(unit(1, "npc"), "mm", valueOnly = TRUE)
   Sx <- convertWidth(unit(1, "npc"), "mm", valueOnly = TRUE)
-  labels_data$theta <- atan(tan(labels_data$theta)*Sy/Sx)
+  theta <- atan(tan(labels_data$theta)*Sy/Sx)
+  labels_data$theta <- ifelse(is.finite(theta), theta, 0)
 
   # calculate label widths and heights in npc units
   label_widths <- convertWidth(stringWidth(labels_data$label), x$units, valueOnly = TRUE)
