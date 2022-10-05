@@ -136,7 +136,7 @@ in_polygon_type point_in_polygon(const point &P, const polygon &poly) {
 
 
 in_polygon_type polygon_in_polygon(const polygon &query, const polygon &reference, bool fast) {
-  int ins = 0, out = 0, undet = 0;
+  int ins = 0, out = 0;
 
   for (unsigned int i = 0; i < query.size()-1; i++) {
     switch(point_in_polygon(query[i], reference)) {
@@ -147,7 +147,7 @@ in_polygon_type polygon_in_polygon(const polygon &query, const polygon &referenc
       out += 1;
       break;
     default:
-      undet += 1;
+      break;
     }
 
     // shortcut for faster classification: if at least one
