@@ -1,3 +1,12 @@
+isoband 0.2.6
+----------------------------------------
+- Update to the latest testthat headers for compatibility with
+  LLVM clang 15.0.0.
+
+- Correct label angle for current aspect ratio in `isolines_grob()`
+  (#28, @eliocamp).
+
+
 isoband 0.2.5
 ----------------------------------------
 - Add a new label placer function `label_placer_middle()`

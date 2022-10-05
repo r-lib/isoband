@@ -1,4 +1,4 @@
-This is a maintenance release that fixes build problems with recent releases of glibc.
+This is a maintenance release that fixes build problems with LLVM clang 15.0.0
 
 ## Test environment
 * ubuntu 20.04, devel and release
