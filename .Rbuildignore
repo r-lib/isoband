@@ -12,3 +12,4 @@
 ^appveyor\.yml$
 ^CRAN-RELEASE$
 ^vignettes/isoband2\.Rmd$
+^CRAN-SUBMISSION$
