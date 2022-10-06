@@ -12,6 +12,7 @@
 #'   row.
 #' @param asp Aspect ratio (width/height) of the target canvas. This is used to convert
 #'   widths to heights and vice versa for rotated boxes
+#' @keywords internal
 #' @export
 clip_lines <- function(x, y, id, clip_boxes, asp = 1) {
   out = list(x = x, y = y, id = id)

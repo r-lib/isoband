@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,23 +33,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">isoband</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -70,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/wilkelab/isoband/">
+  <a href="https://github.com/wilkelab/isoband/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -85,29 +81,63 @@
 
       
 
-      </header><script src="isoband1_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Generating isolines and isobands</h1>
-                        <h4 class="author">Claus O. Wilke</h4>
+                        <h4 data-toc-skip class="author">Claus O.
+Wilke</h4>
             
-            <h4 class="date">2021-07-12</h4>
+            <h4 data-toc-skip class="date">2022-10-06</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/wilkelab/isoband/blob/master/vignettes/isoband1.Rmd"><code>vignettes/isoband1.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/wilkelab/isoband/blob/HEAD/vignettes/isoband1.Rmd" class="external-link"><code>vignettes/isoband1.Rmd</code></a></small>
       <div class="hidden name"><code>isoband1.Rmd</code></div>
 
     </div>
 
     
     
-<p>The isoband package implements fast algorithms for generating isolines (lines of equal elevation) and isobands (ranges of elevation delimited by two isolines) from a matrix of elevation data. For both cases, the package employs the marching squares algorithms as described on <a href="https://en.wikipedia.org/wiki/Marching_squares">Wikipedia.</a> Marching squares algorithms break down the elevation matrix into blocks of 2x2 elevation values. For each block, they then determine the appropriate isolines/isobands from a lookup table of all possible arrangements of isolines or isobands within a 2x2 block. There are 16 distinct possibilities for isolines and 81 for isobands. The implementation in the isoband package goes beyond the algorithm described on Wikipedia in that it merges the isolines or isobands from separate blocks into extended line traces or polygons. The package is meant as a low-level package with minimal required dependencies. Therefore, many of the functions provided may not immediately be useful to endusers, but they will enable developers of other packages to integrate isolines and isobands into their feature set.</p>
-<p>The two main functions of the package are called <code><a href="../reference/isobands.html">isolines()</a></code> and <code><a href="../reference/isobands.html">isobands()</a></code>, and they have similar user interfaces and return values. Both take a vector <code>x</code> specifying the x values corresponding to the columns of the elevation matrix, a vector <code>y</code> specifying the y values corresponding to the rows of the elevation matrix, and an elevation matrix <code>z</code>. The two functions differ in that <code><a href="../reference/isobands.html">isolines()</a></code> takes a single argument <code>levels</code> specifying the elevation levels for which isolines should be calculated, whereas <code><a href="../reference/isobands.html">isobands()</a></code> takes two arguments, <code>levels_low</code> and <code>levels_high</code>, specifying the lower and upper bounds for each isoband. The return value in both cases is a list of lists. The outer list contains one list element for each specified isolevel. The inner lists hold line or polygon data in the form <code>x</code>, <code>y</code>, <code>id</code> as used by <code><a href="https://rdrr.io/r/grid/grid.lines.html">grid::polylineGrob()</a></code> or <code><a href="https://rdrr.io/r/grid/grid.path.html">grid::pathGrob()</a></code>. The format has been chosen for easy drawing of the resulting values via these two grid functions.</p>
+<p>The isoband package implements fast algorithms for generating
+isolines (lines of equal elevation) and isobands (ranges of elevation
+delimited by two isolines) from a matrix of elevation data. For both
+cases, the package employs the marching squares algorithms as described
+on <a href="https://en.wikipedia.org/wiki/Marching_squares" class="external-link">Wikipedia.</a>
+Marching squares algorithms break down the elevation matrix into blocks
+of 2x2 elevation values. For each block, they then determine the
+appropriate isolines/isobands from a lookup table of all possible
+arrangements of isolines or isobands within a 2x2 block. There are 16
+distinct possibilities for isolines and 81 for isobands. The
+implementation in the isoband package goes beyond the algorithm
+described on Wikipedia in that it merges the isolines or isobands from
+separate blocks into extended line traces or polygons. The package is
+meant as a low-level package with minimal required dependencies.
+Therefore, many of the functions provided may not immediately be useful
+to endusers, but they will enable developers of other packages to
+integrate isolines and isobands into their feature set.</p>
+<p>The two main functions of the package are called
+<code><a href="../reference/isobands.html">isolines()</a></code> and <code><a href="../reference/isobands.html">isobands()</a></code>, and they have
+similar user interfaces and return values. Both take a vector
+<code>x</code> specifying the x values corresponding to the columns of
+the elevation matrix, a vector <code>y</code> specifying the y values
+corresponding to the rows of the elevation matrix, and an elevation
+matrix <code>z</code>. The two functions differ in that
+<code><a href="../reference/isobands.html">isolines()</a></code> takes a single argument <code>levels</code>
+specifying the elevation levels for which isolines should be calculated,
+whereas <code><a href="../reference/isobands.html">isobands()</a></code> takes two arguments,
+<code>levels_low</code> and <code>levels_high</code>, specifying the
+lower and upper bounds for each isoband. The return value in both cases
+is a list of lists. The outer list contains one list element for each
+specified isolevel. The inner lists hold line or polygon data in the
+form <code>x</code>, <code>y</code>, <code>id</code> as used by
+<code><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">grid::polylineGrob()</a></code> or <code><a href="https://rdrr.io/r/grid/grid.path.html" class="external-link">grid::pathGrob()</a></code>. The
+format has been chosen for easy drawing of the resulting values via
+these two grid functions.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/isoband/">isoband</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/isoband/" class="external-link">isoband</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span>
 
-<span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>,
+<span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>,
     <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">0</span>,
     <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">0</span>,
     <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>,
@@ -115,7 +145,7 @@
   <span class="fl">5</span>, <span class="fl">5</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span>
 <span class="op">)</span>
 
-<span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isolines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">/</span><span class="fl">6</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">:</span><span class="fl">1</span><span class="op">/</span><span class="fl">6</span>, z <span class="op">=</span> <span class="va">m</span>, levels <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
+<span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isolines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">/</span><span class="fl">6</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">:</span><span class="fl">1</span><span class="op">/</span><span class="fl">6</span>, z <span class="op">=</span> <span class="va">m</span>, levels <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
 <span class="va">lines</span>
 <span class="co">#&gt; $`0.5`</span>
 <span class="co">#&gt; $`0.5`$x</span>
@@ -134,12 +164,12 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; attr(,"class")</span>
 <span class="co">#&gt; [1] "isolines" "iso"</span>
-<span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html">grid.newpage</a></span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grid/grid.lines.html">polylineGrob</a></span><span class="op">(</span><span class="va">lines</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x</span>, <span class="va">lines</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">y</span>, <span class="va">lines</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">id</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grid/grid.lines.html" class="external-link">polylineGrob</a></span><span class="op">(</span><span class="va">lines</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x</span>, <span class="va">lines</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">y</span>, <span class="va">lines</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">id</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband1_files/figure-html/unnamed-chunk-1-1.png" width="700"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="va">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">/</span><span class="fl">6</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">:</span><span class="fl">1</span><span class="op">/</span><span class="fl">6</span>, z <span class="op">=</span> <span class="va">m</span>, levels_low <span class="op">=</span> <span class="fl">0.5</span>, levels_high <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span>
+<span class="va">bands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">/</span><span class="fl">6</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">:</span><span class="fl">1</span><span class="op">/</span><span class="fl">6</span>, z <span class="op">=</span> <span class="va">m</span>, levels_low <span class="op">=</span> <span class="fl">0.5</span>, levels_high <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span>
 <span class="va">bands</span>
 <span class="co">#&gt; $`0.5:1.5`</span>
 <span class="co">#&gt; $`0.5:1.5`$x</span>
@@ -160,17 +190,23 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; attr(,"class")</span>
 <span class="co">#&gt; [1] "isobands" "iso"</span>
-<span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html">grid.newpage</a></span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grid/grid.path.html">pathGrob</a></span><span class="op">(</span><span class="va">bands</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x</span>, <span class="va">bands</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">y</span>, <span class="va">bands</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">id</span>, gp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/gpar.html">gpar</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"cornsilk"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grid/grid.path.html" class="external-link">pathGrob</a></span><span class="op">(</span><span class="va">bands</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x</span>, <span class="va">bands</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">y</span>, <span class="va">bands</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">id</span>, gp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"cornsilk"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband1_files/figure-html/unnamed-chunk-1-2.png" width="700"></p>
-<p>A convenience function <code><a href="../reference/plot_iso.html">plot_iso()</a></code> can be used to inspect a single isoband and corresponding isolines for an elevation matrix. This function is mostly meant for debugging and illustration purposes. It draws a grid of matrix points colored by whether each point is below, within, or above the isoband, as well as the isoband itself and the enclosing isolines.</p>
+<p>A convenience function <code><a href="../reference/plot_iso.html">plot_iso()</a></code> can be used to inspect
+a single isoband and corresponding isolines for an elevation matrix.
+This function is mostly meant for debugging and illustration purposes.
+It draws a grid of matrix points colored by whether each point is below,
+within, or above the isoband, as well as the isoband itself and the
+enclosing isolines.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_iso.html">plot_iso</a></span><span class="op">(</span><span class="va">m</span>, <span class="fl">0.5</span>, <span class="fl">1.5</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband1_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>The isoband package handles <code>NA</code> values in the matrix by simply ignoring the respective grid points.</p>
+<p>The isoband package handles <code>NA</code> values in the matrix by
+simply ignoring the respective grid points.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>,
+<code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>,
     <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span>,
      <span class="fl">0</span>,  <span class="fl">0</span>,  <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span>,
      <span class="fl">0</span>,  <span class="fl">1</span>,  <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>,
@@ -180,10 +216,11 @@
 <span class="op">)</span>
 <span class="fu"><a href="../reference/plot_iso.html">plot_iso</a></span><span class="op">(</span><span class="va">m</span>, <span class="fl">0.5</span>, <span class="fl">1.5</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband1_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
-<p>Isobands can contain holes, as shown above, and they can also consist of multiple disconnected pieces.</p>
+<p>Isobands can contain holes, as shown above, and they can also consist
+of multiple disconnected pieces.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>,
+<code class="sourceCode R"><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>,
     <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>,
     <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>,
     <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0.8</span>, <span class="fl">0</span><span class="op">)</span>,
@@ -191,32 +228,34 @@
 <span class="op">)</span>
 <span class="fu"><a href="../reference/plot_iso.html">plot_iso</a></span><span class="op">(</span><span class="va">m</span>, <span class="fl">0.5</span>, <span class="fl">1.5</span><span class="op">)</span></code></pre></div>
 <p><img src="isoband1_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
-<div id="performance" class="section level1">
-<h1 class="hasAnchor">
-<a href="#performance" class="anchor"></a>Performance</h1>
-<p>The code is written in C++ and performance is generally good. Isolining is about as fast as <code><a href="https://rdrr.io/r/grDevices/contourLines.html">grDevices::contourLines()</a></code>, isobanding is approximately 2.5 times slower.</p>
+<div class="section level2">
+<h2 id="performance">Performance<a class="anchor" aria-label="anchor" href="#performance"></a>
+</h2>
+<p>The code is written in C++ and performance is generally good.
+Isolining is about as fast as <code><a href="https://rdrr.io/r/grDevices/contourLines.html" class="external-link">grDevices::contourLines()</a></code>,
+isobanding is approximately 2.5 times slower.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># contouring with contourLines() from grDevices</span>
 <span class="va">fn_contourLines</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/contourLines.html">contourLines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="va">volcano</span>, levels <span class="op">=</span> <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu">grDevices</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grDevices/contourLines.html" class="external-link">contourLines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="va">volcano</span>, levels <span class="op">=</span> <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 
 <span class="co"># contouring with isolines()</span>
 <span class="va">fn_isolines</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="../reference/isobands.html">isolines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="va">volcano</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="../reference/isobands.html">isolines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="va">volcano</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 
 <span class="co"># contouring with isobands()</span>
 <span class="va">fn_isobands</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="va">volcano</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">9</span><span class="op">:</span><span class="fl">17</span><span class="op">)</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="va">volcano</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">9</span><span class="op">:</span><span class="fl">17</span><span class="op">)</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 
-<span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html">microbenchmark</a></span><span class="op">(</span><span class="fu">fn_contourLines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isolines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isobands</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html" class="external-link">microbenchmark</a></span><span class="op">(</span><span class="fu">fn_contourLines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isolines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isobands</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Unit: milliseconds</span>
 <span class="co">#&gt;               expr       min        lq      mean    median        uq      max</span>
-<span class="co">#&gt;  fn_contourLines()  1.657772  1.898011  2.492775  2.153896  2.454865 12.47061</span>
-<span class="co">#&gt;      fn_isolines()  8.114132  8.320545  9.060220  8.628836  9.032136 27.30128</span>
-<span class="co">#&gt;      fn_isobands() 23.314518 23.819863 24.746850 24.380594 25.230745 30.13234</span>
+<span class="co">#&gt;  fn_contourLines()  1.517781  1.788339  2.386602  1.976886  2.524132 11.49124</span>
+<span class="co">#&gt;      fn_isolines()  7.805544  8.079984  8.724278  8.449420  8.876335 27.31053</span>
+<span class="co">#&gt;      fn_isobands() 22.430446 23.469105 23.945316 23.878121 24.292541 27.35599</span>
 <span class="co">#&gt;  neval cld</span>
 <span class="co">#&gt;    100 a  </span>
 <span class="co">#&gt;    100  b </span>
@@ -235,11 +274,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Claus O. Wilke, Thomas Lin Pedersen.</p>
+  <p></p>
+<p>Developed by Claus O. Wilke, Thomas Lin Pedersen.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.0.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -247,6 +288,8 @@
 
   
 
+
+  
 
   </body>
 </html>

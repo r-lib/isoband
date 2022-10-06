@@ -6,8 +6,7 @@
 \alias{isoband-package}
 \title{isoband: Generate Isolines and Isobands from Regularly Spaced Elevation Grids}
 \description{
-A fast C++ implementation to generate contour lines (isolines) and
-  contour polygons (isobands) from regularly spaced grids containing elevation data.
+A fast C++ implementation to generate contour lines (isolines) and contour polygons (isobands) from regularly spaced grids containing elevation data.
 }
 \seealso{
 Useful links:
@@ -31,3 +30,4 @@ Other contributors:
 }
 
 }
+\keyword{internal}

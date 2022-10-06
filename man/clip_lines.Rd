@@ -26,3 +26,4 @@ widths to heights and vice versa for rotated boxes}
 Clip lines so they don't run into a set of boxes. Useful for labeling isolines,
 as it allows removal of line segments that would run into any text labels.
 }
+\keyword{internal}
