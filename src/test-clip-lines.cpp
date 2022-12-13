@@ -1,3 +1,5 @@
+// Commented out to remove compile-time dependency on testthat
+/*
 #include <testthat.h>
 
 #include "polygon.h"
@@ -369,24 +371,23 @@ context("Transform to unit box") {
     expect_true(near_equal(p2.y, 2));
   }
 
-  /*
   // the following tests don't work properly, because `expect_error()`
   // doesn't catch calls to Rf_error(), it only catches exceptions.
-  test_that("Singular transformations are caught") {
-    expect_error(
-      // box without width
-      unitbox_transformer(point(1, 1), point(1, 1), point(0, 2))
-    );
-
-    expect_error(
-      // box without height
-      unitbox_transformer(point(1, 1), point(2, 2), point(1, 1))
-    );
-
-    expect_error(
-      // singular inverse transform
-      unitbox_transformer(point(1, 1), point(2, 2), point(2, 2))
-    );
-  }
-*/
+  // test_that("Singular transformations are caught") {
+  //   expect_error(
+  //     // box without width
+  //     unitbox_transformer(point(1, 1), point(1, 1), point(0, 2))
+  //   );
+  //
+  //   expect_error(
+  //     // box without height
+  //     unitbox_transformer(point(1, 1), point(2, 2), point(1, 1))
+  //   );
+  //
+  //   expect_error(
+  //     // singular inverse transform
+  //     unitbox_transformer(point(1, 1), point(2, 2), point(2, 2))
+  //   );
+  // }
 }
+*/

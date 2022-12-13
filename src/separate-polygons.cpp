@@ -2,7 +2,7 @@
 
 #include <R.h>
 #include <Rinternals.h>
-#include <testthat.h>
+//#include <testthat.h>
 
 #include <iostream>
 #include <vector>

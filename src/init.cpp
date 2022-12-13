@@ -12,15 +12,16 @@ extern "C" SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value);
 // Defined in separate-polygons.cpp
 extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id);
 
-// From testthat
-extern "C" SEXP run_testthat_tests(SEXP use_xml_sxp);
+// Commented out to avoid compile-time testthat dependency
+//extern "C" SEXP run_testthat_tests(SEXP use_xml_sxp);
 
 static const R_CallMethodDef CallEntries[] = {
   {"clip_lines_impl_c", (DL_FUNC) &clip_lines_impl, 9},
   {"isobands_impl_c", (DL_FUNC) &isobands_impl, 5},
   {"isolines_impl_c", (DL_FUNC) &isolines_impl, 4},
   {"separate_polygons_c", (DL_FUNC) &separate_polygons, 3},
-  {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
+// Commented out to avoid compile-time testthat dependency
+//  {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
   {NULL, NULL, 0}
 };
 

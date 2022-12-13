@@ -1,3 +1,7 @@
+isoband devel
+----------------------------------------
+- Remove compile-time dependency on testthat.
+
 isoband 0.2.6
 ----------------------------------------
 - Update to the latest testthat headers for compatibility with

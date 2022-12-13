@@ -1,3 +1,5 @@
+// Commented out to remove compile-time dependency on testthat
+/*
 #include <testthat.h>
 
 #include "polygon.h"
@@ -329,3 +331,4 @@ context("is_valid_ring()") {
     expect_true(is_valid_ring(poly2));
   }
 }
+*/
