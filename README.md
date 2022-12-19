@@ -26,7 +26,8 @@ install.packages("isoband")
 Install the current development from github via:
 
 ``` r
-remotes::install_github("wilkelab/isoband")
+# install.packages("pak")
+pak::pak("r-lib/isoband")
 ```
 
 ## Examples
