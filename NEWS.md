@@ -2,6 +2,9 @@ isoband devel
 ----------------------------------------
 - Remove compile-time dependency on testthat.
 
+- Changed maintainer after the original author (Claus Wilke) donated codebase 
+  to r-lib.
+
 isoband 0.2.6
 ----------------------------------------
 - Update to the latest testthat headers for compatibility with

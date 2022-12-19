@@ -1,29 +1,4 @@
-url: https://isoband.r-lib.org
-
+url: ~
 template:
-  package: tidytemplate
   bootstrap: 5
-  includes:
-    in_header: |
-      <script defer data-domain="{YOUR DOMAIN},all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
 
-reference:
-- title: Isolines and isobands
-  desc: Generating isolines and isobands from elevation matrices
-  contents:
-  - isolines
-  - isobands
-
-- title: Simple features
-  desc: Converting isolines or isobands into simple feature objects
-  contents:
-  - iso_to_sfg
-
-- title: Plotting
-  desc: Helper functions to plot isolines and isobands
-  contents:
-  - plot_iso
-  - isolines_grob
-  - isobands_grob
-  - starts_with("label_placer_")
-  - starts_with("angle_")

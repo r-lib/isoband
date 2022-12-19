@@ -13,7 +13,8 @@ coverage](https://codecov.io/gh/r-lib/isoband/branch/main/graph/badge.svg)](http
 <!-- badges: end -->
 
 Generate contour lines (isolines) and contour polygons (isobands) from
-regularly spaced grids containing elevation data.
+regularly spaced grids containing elevation data. Package originally
+written by Claus Wilke and donated to r-lib in 2022.
 
 ## Installation
 
