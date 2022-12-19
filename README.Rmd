@@ -15,11 +15,9 @@ knitr::opts_chunk$set(
 # isoband <img width="120px" alt="isoband logo" align="right" src="man/figures/isoband-logo.png">
 
 <!-- badges: start -->
-[![R build
-status](https://github.com/wilkelab/isoband/workflows/R-CMD-check/badge.svg)](https://github.com/wilkelab/isoband/actions)
-[![Coverage Status](https://img.shields.io/codecov/c/github/wilkelab/isoband/master.svg)](https://codecov.io/github/wilkelab/isoband?branch=master)
-[![CRAN status](https://www.r-pkg.org/badges/version/isoband)](https://cran.r-project.org/package=isoband)
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+[![CRAN status](https://www.r-pkg.org/badges/version/isoband)](https://CRAN.R-project.org/package=isoband)
+[![R-CMD-check](https://github.com/r-lib/isoband/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/isoband/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/r-lib/isoband/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/isoband?branch=main)
 <!-- badges: end -->
 
 Generate contour lines (isolines) and contour polygons (isobands) from regularly spaced grids containing elevation data.
@@ -33,7 +31,8 @@ install.packages("isoband")
 
 Install the current development from github via:
 ``` r
-remotes::install_github("wilkelab/isoband")
+# install.packages("pak")
+pak::pak("r-lib/isoband")
 ```
 
 ## Examples
