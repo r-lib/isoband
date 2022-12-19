@@ -13,3 +13,5 @@
 ^CRAN-RELEASE$
 ^vignettes/isoband2\.Rmd$
 ^CRAN-SUBMISSION$
+^codecov\.yml$
+^pkgdown$
