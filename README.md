@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# isoband <img width="120px" alt="isoband logo" align="right" src="man/figures/isoband-logo.png">
+# isoband <img width="120" alt="" align="right" src="man/figures/logo.png">
 
 <!-- badges: start -->
 
