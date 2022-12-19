@@ -1,5 +1,5 @@
-isoband devel
-----------------------------------------
+# isoband (development verison)
+
 - Remove compile-time dependency on testthat.
 
 - Changed maintainer after the original author (Claus Wilke) donated codebase 

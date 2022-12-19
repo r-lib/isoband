@@ -1,7 +1,7 @@
 Package: isoband
 Title: Generate Isolines and Isobands from Regularly Spaced Elevation
     Grids
-Version: 0.2.6
+Version: 0.2.6.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4757-117X")),
