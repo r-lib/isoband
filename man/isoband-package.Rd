@@ -11,22 +11,18 @@ A fast C++ implementation to generate contour lines (isolines) and contour polyg
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://wilkelab.org/isoband/}
-  \item Report bugs at \url{https://github.com/wilkelab/isoband/issues}
+  \item \url{https://isoband.r-lib.org}
+  \item Report bugs at \url{https://github.com/r-lib/isoband/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Claus O. Wilke \email{wilke@austin.utexas.edu} (\href{https://orcid.org/0000-0002-7470-9261}{ORCID})
+\strong{Maintainer}: Hadley Wickham \email{hadley@posit.co} (\href{https://orcid.org/0000-0003-4757-117X}{ORCID})
 
 Authors:
 \itemize{
+  \item Claus O. Wilke \email{wilke@austin.utexas.edu} (\href{https://orcid.org/0000-0002-7470-9261}{ORCID})
   \item Thomas Lin Pedersen \email{thomasp85@gmail.com} (\href{https://orcid.org/0000-0002-5147-4711}{ORCID})
-}
-
-Other contributors:
-\itemize{
-  \item testthat and Catch authors (testthat C++ testing code) [contributor]
 }
 
 }
