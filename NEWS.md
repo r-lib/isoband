@@ -1,4 +1,4 @@
-# isoband (development verison)
+# isoband 0.2.7
 
 - Remove compile-time dependency on testthat.
 
