@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">isoband</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,48 @@
       <small>Source: <a href="https://github.com/r-lib/isoband/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
-  </main></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.7" id="isoband-027">isoband 0.2.7<a class="anchor" aria-label="anchor" href="#isoband-027"></a></h2><p class="text-muted">CRAN release: 2022-12-20</p>
+<ul><li><p>Remove compile-time dependency on testthat.</p></li>
+<li><p>Changed maintainer after the original author (Claus Wilke) donated codebase to r-lib.</p></li>
+</ul><div class="section level3">
+<h3 id="isoband-0-2-7">isoband 0.2.6<a class="anchor" aria-label="anchor" href="#isoband-0-2-7"></a></h3>
+<ul><li><p>Update to the latest testthat headers for compatibility with LLVM clang 15.0.0.</p></li>
+<li><p>Correct label angle for current aspect ratio in <code><a href="../reference/isolines_grob.html">isolines_grob()</a></code> (<a href="https://github.com/r-lib/isoband/issues/28" class="external-link">#28</a>, <a href="https://github.com/eliocamp" class="external-link">@eliocamp</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="isoband-0-2-7-1">isoband 0.2.5<a class="anchor" aria-label="anchor" href="#isoband-0-2-7-1"></a></h3>
+<ul><li><p>Add a new label placer function <code><a href="../reference/label_placer.html">label_placer_middle()</a></code> (<a href="https://github.com/r-lib/isoband/issues/24" class="external-link">#24</a>, <a href="https://github.com/jamarav" class="external-link">@jamarav</a>).</p></li>
+<li><p>The vendored testthat/catch code now uses a constant value for the stack size rather than relying on <code>SIGSTKSZ</code>. See: <a href="https://github.com/r-lib/testthat/issues/1373" class="external-link uri">https://github.com/r-lib/testthat/issues/1373</a></p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="isoband-0-2-7-2">isoband 0.2.4<a class="anchor" aria-label="anchor" href="#isoband-0-2-7-2"></a></h3>
+<ul><li>Remove testthat compile-time dependency.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="isoband-0-2-7-3">isoband 0.2.3<a class="anchor" aria-label="anchor" href="#isoband-0-2-7-3"></a></h3>
+<ul><li>Fix build for testthat 3.0.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="isoband-0-2-7-4">isoband 0.2.2<a class="anchor" aria-label="anchor" href="#isoband-0-2-7-4"></a></h3>
+<ul><li>Remove Rcpp dependency (<a href="https://github.com/r-lib/isoband/issues/11" class="external-link">#11</a>, <a href="https://github.com/thomasp85" class="external-link">@thomasp85</a>).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="isoband-0-2-7-5">isoband 0.2.1<a class="anchor" aria-label="anchor" href="#isoband-0-2-7-5"></a></h3>
+<ul><li>Improved clipping algorithm for <code><a href="../reference/clip_lines.html">clip_lines()</a></code>, less likely to experience numerical instabilities.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="isoband-0-2-7-6">isoband 0.2.0<a class="anchor" aria-label="anchor" href="#isoband-0-2-7-6"></a></h3>
+<ul><li><p>Added <code><a href="../reference/isolines_grob.html">isolines_grob()</a></code> for drawing labeled isolines via the grid graphics system. A companion function <code><a href="../reference/isobands_grob.html">isobands_grob()</a></code> is provided for convenience.</p></li>
+<li><p>Numerous minor fixes and improvements.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="isoband-0-2-7-7">isoband 0.1.0<a class="anchor" aria-label="anchor" href="#isoband-0-2-7-7"></a></h3>
+<p>First public release.</p>
+</div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
