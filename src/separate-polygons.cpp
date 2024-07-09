@@ -210,7 +210,7 @@ public:
   int top_level_poly() {
     unsigned int i = 0;
     do {
-      if (active_polygons[i] && ext_polygons[i].size() == 0) {
+      if (active_polygons[i] && ext_polygons[i].empty()) {
         active_polygons[i] = false;
         break;
       }
