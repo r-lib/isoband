@@ -231,16 +231,13 @@ isobanding is approximately 2.5 times slower.</p>
 <span>  <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="va">volcano</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">9</span><span class="op">:</span><span class="fl">17</span><span class="op">)</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html" class="external-link">microbenchmark</a></span><span class="op">(</span><span class="fu">fn_contourLines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isolines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isobands</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;               expr      min       lq     mean   median       uq</span></span>
-<span><span class="co">#&gt;  fn_contourLines() 1.157970 1.190651 1.561081 1.208140 2.034516</span></span>
-<span><span class="co">#&gt;      fn_isolines() 1.000196 1.022172 1.189036 1.036008 1.077726</span></span>
-<span><span class="co">#&gt;      fn_isobands() 2.431146 2.447506 2.564741 2.463240 2.509162</span></span>
-<span><span class="co">#&gt;        max neval</span></span>
-<span><span class="co">#&gt;   6.190700   100</span></span>
-<span><span class="co">#&gt;  13.898991   100</span></span>
-<span><span class="co">#&gt;   8.172337   100</span></span></code></pre></div>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html" class="external-link">mark</a></span><span class="op">(</span><span class="fu">fn_contourLines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isolines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isobands</span><span class="op">(</span><span class="op">)</span>, check <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 6</span></span></span>
+<span><span class="co">#&gt;   expression             min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;bch:expr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;bch:tm&gt;</span> <span style="color: #949494; font-style: italic;">&lt;bch:tm&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;bch:byt&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fn_contourLines()   1.16ms    1.2ms      776.     811KB    25.2 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fn_isolines()       1.04ms   1.08ms      911.     187KB     2.04</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> fn_isobands()       2.48ms   2.51ms      394.     392KB     4.15</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

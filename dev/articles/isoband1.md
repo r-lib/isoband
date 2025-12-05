@@ -178,14 +178,11 @@ fn_isobands <- function() {
   isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(9:17), 10*(10:18))
 }
 
-microbenchmark::microbenchmark(fn_contourLines(), fn_isolines(), fn_isobands())
-#> Unit: milliseconds
-#>               expr      min       lq     mean   median       uq
-#>  fn_contourLines() 1.157970 1.190651 1.561081 1.208140 2.034516
-#>      fn_isolines() 1.000196 1.022172 1.189036 1.036008 1.077726
-#>      fn_isobands() 2.431146 2.447506 2.564741 2.463240 2.509162
-#>        max neval
-#>   6.190700   100
-#>  13.898991   100
-#>   8.172337   100
+bench::mark(fn_contourLines(), fn_isolines(), fn_isobands(), check = FALSE)
+#> # A tibble: 3 × 6
+#>   expression             min   median `itr/sec` mem_alloc `gc/sec`
+#>   <bch:expr>        <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
+#> 1 fn_contourLines()   1.16ms    1.2ms      776.     811KB    25.2 
+#> 2 fn_isolines()       1.04ms   1.08ms      911.     187KB     2.04
+#> 3 fn_isobands()       2.48ms   2.51ms      394.     392KB     4.15
 ```

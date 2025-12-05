@@ -2,6 +2,9 @@
 
 ## isoband (development version)
 
+- General upkeep
+- Rewrite implementation to use cpp11
+
 ## isoband 0.2.7
 
 CRAN release: 2022-12-20
