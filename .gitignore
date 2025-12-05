@@ -28,3 +28,5 @@ vignettes/*.pdf
 rsconnect/
 .Rproj.user
 docs
+compile_commands.json
+.cache

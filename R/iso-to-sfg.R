@@ -79,10 +79,7 @@ iso_to_sfg <- function(x) {
 
 #' @export
 iso_to_sfg.default <- function(x) {
-  stop(
-    "Cannot convert objects of type ", paste(class(x), collapse = "/"), " to sf.",
-    call. = FALSE
-  )
+  cli::cli_abort("Cannot convert objects of type {.cls {class(x)}} to sf.", )
 }
 
 #' @export
@@ -110,7 +107,10 @@ multipolygon <- function(object) {
 
 separate_polygons <- function(x, y, id) {
   .Call(
-    `separate_polygons_c`, as.numeric(x), as.numeric(y),
-    as.integer(id), PACKAGE = "isoband"
+    `separate_polygons_c`,
+    as.numeric(x),
+    as.numeric(y),
+    as.integer(id),
+    PACKAGE = "isoband"
   )
 }

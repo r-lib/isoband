@@ -19,8 +19,14 @@ clip_lines <- function(x, y, id, clip_boxes, asp = 1) {
   for (i in 1:nrow(clip_boxes)) {
     box <- clip_boxes[i, ]
     out <- clip_lines_impl(
-      out$x, out$y, out$id,
-      box$x, box$y, box$width, box$height, box$theta,
+      out$x,
+      out$y,
+      out$id,
+      box$x,
+      box$y,
+      box$width,
+      box$height,
+      box$theta,
       asp
     )
   }
@@ -28,10 +34,28 @@ clip_lines <- function(x, y, id, clip_boxes, asp = 1) {
   out
 }
 
-clip_lines_impl <- function(x, y, id, p_mid_x, p_mid_y, width, height, theta, asp = 1) {
+clip_lines_impl <- function(
+  x,
+  y,
+  id,
+  p_mid_x,
+  p_mid_y,
+  width,
+  height,
+  theta,
+  asp = 1
+) {
   .Call(
-    `clip_lines_impl_c`, as.numeric(x), as.numeric(y), as.integer(id),
-    as.numeric(p_mid_x), as.numeric(p_mid_y), as.numeric(width),
-    as.numeric(height), as.numeric(theta), as.numeric(asp), PACKAGE = "isoband"
+    `clip_lines_impl_c`,
+    as.numeric(x),
+    as.numeric(y),
+    as.integer(id),
+    as.numeric(p_mid_x),
+    as.numeric(p_mid_y),
+    as.numeric(width),
+    as.numeric(height),
+    as.numeric(theta),
+    as.numeric(asp),
+    PACKAGE = "isoband"
   )
 }

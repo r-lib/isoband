@@ -8,16 +8,20 @@ Authors@R: c(
     person("Claus O.", "Wilke", , "wilke@austin.utexas.edu", role = "aut",
            comment = c("Original author", ORCID = "0000-0002-7470-9261")),
     person("Thomas Lin", "Pedersen", , "thomasp85@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-5147-4711"))
+           comment = c(ORCID = "0000-0002-5147-4711")),
+    person("Posit, PBC", role = c("cph", "fnd"),
+           comment = c(ROR = "03wc8by49"))
   )
 Description: A fast C++ implementation to generate contour lines
     (isolines) and contour polygons (isobands) from regularly spaced grids
     containing elevation data.
 License: MIT + file LICENSE
-URL: https://isoband.r-lib.org
+URL: https://isoband.r-lib.org, https://github.com/r-lib/isoband
 BugReports: https://github.com/r-lib/isoband/issues
 Imports:
+    cli,
     grid,
+    rlang,
     utils
 Suggests:
     covr,
@@ -27,14 +31,15 @@ Suggests:
     microbenchmark,
     rmarkdown,
     sf,
-    testthat,
+    testthat (>= 3.0.0),
     xml2
 VignetteBuilder:
     knitr
 Config/Needs/website: tidyverse/tidytemplate
 Config/testthat/edition: 3
+Config/usethis/last-upkeep: 2025-12-05
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 SystemRequirements: C++11
-Config/usethis/last-upkeep: 2025-12-05
+Config/build/compilation-database: true
