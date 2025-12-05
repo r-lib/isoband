@@ -17,3 +17,5 @@
 ^pkgdown$
 ^[.]?air[.]toml$
 ^\.vscode$
+^compile_commands\.json$
+^\.cache$
