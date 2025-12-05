@@ -40,7 +40,7 @@ isolines(x, y, z, levels)
 
 ## See also
 
-[`plot_iso`](plot_iso.md)
+[`plot_iso`](http://isoband.r-lib.org/reference/plot_iso.md)
 
 ## Examples
 

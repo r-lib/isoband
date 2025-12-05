@@ -13,19 +13,22 @@
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Generating isolines and isobands">
+<script defer data-domain="https://isoband.r-lib.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
-    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
+    <a href="#container" class="visually-hidden-focusable">Skip to content</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-none" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">isoband</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.7.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +58,7 @@
 
 
   </div>
-</nav><div class="container template-article">
+</nav><div class="container template-article" id="container">
 
 
 
@@ -126,14 +129,14 @@ these two grid functions.</p>
 <span><span class="va">lines</span></span>
 <span><span class="co">#&gt; $`0.5`</span></span>
 <span><span class="co">#&gt; $`0.5`$x</span></span>
-<span><span class="co">#&gt;  [1] 0.6666667 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000 0.2500000</span></span>
-<span><span class="co">#&gt;  [8] 0.2500000 0.3333333 0.5000000 0.6666667 0.7500000 0.6666667 0.6250000</span></span>
-<span><span class="co">#&gt; [15] 0.6666667 0.7500000 0.6666667</span></span>
+<span><span class="co">#&gt;  [1] 0.6666667 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000</span></span>
+<span><span class="co">#&gt;  [7] 0.2500000 0.2500000 0.3333333 0.5000000 0.6666667 0.7500000</span></span>
+<span><span class="co">#&gt; [13] 0.6666667 0.6250000 0.6666667 0.7500000 0.6666667</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`0.5`$y</span></span>
-<span><span class="co">#&gt;  [1] 0.2500000 0.3333333 0.3750000 0.3333333 0.2500000 0.3333333 0.5000000</span></span>
-<span><span class="co">#&gt;  [8] 0.6666667 0.7500000 0.7916667 0.7500000 0.6666667 0.5833333 0.5000000</span></span>
-<span><span class="co">#&gt; [15] 0.4166667 0.3333333 0.2500000</span></span>
+<span><span class="co">#&gt;  [1] 0.2500000 0.3333333 0.3750000 0.3333333 0.2500000 0.3333333</span></span>
+<span><span class="co">#&gt;  [7] 0.5000000 0.6666667 0.7500000 0.7916667 0.7500000 0.6666667</span></span>
+<span><span class="co">#&gt; [13] 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`0.5`$id</span></span>
 <span><span class="co">#&gt;  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span></span>
@@ -150,16 +153,16 @@ these two grid functions.</p>
 <span><span class="va">bands</span></span>
 <span><span class="co">#&gt; $`0.5:1.5`</span></span>
 <span><span class="co">#&gt; $`0.5:1.5`$x</span></span>
-<span><span class="co">#&gt;  [1] 0.6666667 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000 0.2500000</span></span>
-<span><span class="co">#&gt;  [8] 0.2500000 0.3333333 0.5000000 0.6666667 0.7500000 0.6666667 0.6250000</span></span>
-<span><span class="co">#&gt; [15] 0.6666667 0.7500000 0.5000000 0.5416667 0.5833333 0.5000000 0.4166667</span></span>
-<span><span class="co">#&gt; [22] 0.4166667</span></span>
+<span><span class="co">#&gt;  [1] 0.6666667 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000</span></span>
+<span><span class="co">#&gt;  [7] 0.2500000 0.2500000 0.3333333 0.5000000 0.6666667 0.7500000</span></span>
+<span><span class="co">#&gt; [13] 0.6666667 0.6250000 0.6666667 0.7500000 0.5000000 0.5416667</span></span>
+<span><span class="co">#&gt; [19] 0.5833333 0.5000000 0.4166667 0.4166667</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`0.5:1.5`$y</span></span>
-<span><span class="co">#&gt;  [1] 0.2500000 0.3333333 0.3750000 0.3333333 0.2500000 0.3333333 0.5000000</span></span>
-<span><span class="co">#&gt;  [8] 0.6666667 0.7500000 0.7916667 0.7500000 0.6666667 0.5833333 0.5000000</span></span>
-<span><span class="co">#&gt; [15] 0.4166667 0.3333333 0.4583333 0.5000000 0.6666667 0.7083333 0.6666667</span></span>
-<span><span class="co">#&gt; [22] 0.5000000</span></span>
+<span><span class="co">#&gt;  [1] 0.2500000 0.3333333 0.3750000 0.3333333 0.2500000 0.3333333</span></span>
+<span><span class="co">#&gt;  [7] 0.5000000 0.6666667 0.7500000 0.7916667 0.7500000 0.6666667</span></span>
+<span><span class="co">#&gt; [13] 0.5833333 0.5000000 0.4166667 0.3333333 0.4583333 0.5000000</span></span>
+<span><span class="co">#&gt; [19] 0.6666667 0.7083333 0.6666667 0.5000000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`0.5:1.5`$id</span></span>
 <span><span class="co">#&gt;  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2</span></span>
@@ -227,12 +230,13 @@ isobanding is approximately 2.5 times slower.</p>
 <span>  <span class="fu"><a href="../reference/isobands.html">isobands</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span>, <span class="va">volcano</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">9</span><span class="op">:</span><span class="fl">17</span><span class="op">)</span>, <span class="fl">10</span><span class="op">*</span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html" class="external-link">microbenchmark</a></span><span class="op">(</span><span class="fu">fn_contourLines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isolines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isobands</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;               expr      min       lq     mean   median       uq       max neval</span></span>
-<span><span class="co">#&gt;  fn_contourLines() 1.147202 1.182348 1.533735 1.200211 2.027450  5.620334   100</span></span>
-<span><span class="co">#&gt;      fn_isolines() 1.000158 1.020831 1.177408 1.029292 1.064828 13.662882   100</span></span>
-<span><span class="co">#&gt;      fn_isobands() 2.422503 2.445451 2.553931 2.457574 2.498691  7.634105   100</span></span></code></pre></div>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html" class="external-link">mark</a></span><span class="op">(</span><span class="fu">fn_contourLines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isolines</span><span class="op">(</span><span class="op">)</span>, <span class="fu">fn_isobands</span><span class="op">(</span><span class="op">)</span>, check <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 6</span></span></span>
+<span><span class="co">#&gt;   expression             min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;bch:expr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;bch:tm&gt;</span> <span style="color: #949494; font-style: italic;">&lt;bch:tm&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;bch:byt&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fn_contourLines()   1.13ms   1.17ms      789.     811KB    25.7 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fn_isolines()       1.04ms   1.07ms      915.     187KB     2.03</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> fn_isobands()       2.48ms    2.5ms      395.     392KB     4.14</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -240,20 +244,16 @@ isobanding is approximately 2.5 times slower.</p>
 
 
 
-    <footer><div class="pkgdown-footer-left">
-  <p>Developed by Hadley Wickham, Claus O. Wilke, Thomas Lin Pedersen.</p>
+   </div>
+  <footer><div class="container">
+  <div class="pkgdown-footer-left">
+  <p>Developed by <a href="https://hadley.nz" class="external-link">Hadley Wickham</a>, Claus O. Wilke, <a href="https://data-imaginist.com" class="external-link">Thomas Lin Pedersen</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
   <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
-    </footer>
-</div>
-
-
-
-
-
-  </body>
+  </div></footer>
+</body>
 </html>

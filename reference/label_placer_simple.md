@@ -4,7 +4,7 @@ The simple label placer processes separate isolines independently and
 places labels for each line using a placer function that does the actual
 placement work. This label placer is not meant to be used by end users,
 but rather facilitates the development of new label placers, such as
-[`label_placer_minmax()`](label_placer.md).
+[`label_placer_minmax()`](http://isoband.r-lib.org/reference/label_placer.md).
 
 ## Usage
 

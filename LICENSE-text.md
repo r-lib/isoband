@@ -1,4 +1,4 @@
 # License
 
-    YEAR: 2019
-    COPYRIGHT HOLDER: Claus O. Wilke
+    YEAR: 2025
+    COPYRIGHT HOLDER: isoband authors

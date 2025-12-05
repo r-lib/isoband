@@ -22,14 +22,15 @@ pak::pak("r-lib/isoband")
 ## Examples
 
 The two main workhorses of the package are the functions
-[`isolines()`](reference/isobands.md) and
-[`isobands()`](reference/isobands.md), respectively. They return a list
-of isolines/isobands for each isolevel specified. Each isoline/isoband
-consists of vectors of x and y coordinates, as well as a vector of ids
-specifying which sets of coordinates should be connected. This format
-can be handed directly to `grid.polyline()`/`grid.path()` for drawing.
-However, we can also convert the output to spatial features and draw
-with ggplot2 (see below).
+[`isolines()`](http://isoband.r-lib.org/reference/isobands.md) and
+[`isobands()`](http://isoband.r-lib.org/reference/isobands.md),
+respectively. They return a list of isolines/isobands for each isolevel
+specified. Each isoline/isoband consists of vectors of x and y
+coordinates, as well as a vector of ids specifying which sets of
+coordinates should be connected. This format can be handed directly to
+`grid.polyline()`/`grid.path()` for drawing. However, we can also
+convert the output to spatial features and draw with ggplot2 (see
+below).
 
 ``` r
 library(isoband)
@@ -75,8 +76,9 @@ isobands(1:ncol(m), 1:nrow(m), m, 0.5, 1.5)
 #> [1] "isobands" "iso"
 ```
 
-The function [`plot_iso()`](reference/plot_iso.md) is a convenience
-function for debugging and testing.
+The function
+[`plot_iso()`](http://isoband.r-lib.org/reference/plot_iso.md) is a
+convenience function for debugging and testing.
 
 ``` r
 plot_iso(m, 0.5, 1.5)
@@ -91,7 +93,7 @@ convert to sf, and plot with ggplot2.
 ``` r
 library(ggplot2)
 suppressWarnings(library(sf))
-#> Linking to GEOS 3.10.2, GDAL 3.4.2, PROJ 8.2.1; sf_use_s2() is TRUE
+#> Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
 
 m <- volcano
 b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(9:19), 10*(10:20))

@@ -29,7 +29,7 @@ label_placer_middle(rot_adjuster = angle_halfcircle_bottom())
 - rot_adjuster:
 
   Function that standardizes the rotation angles of the labels. See e.g.
-  [`angle_halfcircle_bottom()`](angle_halfcircle_bottom.md).
+  [`angle_halfcircle_bottom()`](http://isoband.r-lib.org/reference/angle_halfcircle_bottom.md).
 
 - n:
 
@@ -39,7 +39,7 @@ label_placer_middle(rot_adjuster = angle_halfcircle_bottom())
 - breaks:
 
   Character vector specifying the isolines to be labeled, as in
-  [`isolines_grob()`](isolines_grob.md).
+  [`isolines_grob()`](http://isoband.r-lib.org/reference/isolines_grob.md).
 
 - x, y, theta:
 

@@ -1,6 +1,9 @@
 # Changelog
 
-## isoband (development version)
+## isoband 0.3.0
+
+- General upkeep
+- Rewrite implementation to use cpp11
 
 ## isoband 0.2.7
 
@@ -17,14 +20,14 @@ CRAN release: 2022-12-20
   clang 15.0.0.
 
 - Correct label angle for current aspect ratio in
-  [`isolines_grob()`](../reference/isolines_grob.md)
+  [`isolines_grob()`](http://isoband.r-lib.org/reference/isolines_grob.md)
   ([\#28](https://github.com/r-lib/isoband/issues/28),
   [@eliocamp](https://github.com/eliocamp)).
 
 ### isoband 0.2.5
 
 - Add a new label placer function
-  [`label_placer_middle()`](../reference/label_placer.md)
+  [`label_placer_middle()`](http://isoband.r-lib.org/reference/label_placer.md)
   ([\#24](https://github.com/r-lib/isoband/issues/24),
   [@jamarav](https://github.com/jamarav)).
 
@@ -49,15 +52,17 @@ CRAN release: 2022-12-20
 ### isoband 0.2.1
 
 - Improved clipping algorithm for
-  [`clip_lines()`](../reference/clip_lines.md), less likely to
-  experience numerical instabilities.
+  [`clip_lines()`](http://isoband.r-lib.org/reference/clip_lines.md),
+  less likely to experience numerical instabilities.
 
 ### isoband 0.2.0
 
-- Added [`isolines_grob()`](../reference/isolines_grob.md) for drawing
-  labeled isolines via the grid graphics system. A companion function
-  [`isobands_grob()`](../reference/isobands_grob.md) is provided for
-  convenience.
+- Added
+  [`isolines_grob()`](http://isoband.r-lib.org/reference/isolines_grob.md)
+  for drawing labeled isolines via the grid graphics system. A companion
+  function
+  [`isobands_grob()`](http://isoband.r-lib.org/reference/isobands_grob.md)
+  is provided for convenience.
 
 - Numerous minor fixes and improvements.
 

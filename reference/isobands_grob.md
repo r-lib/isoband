@@ -12,7 +12,9 @@ isobands_grob(bands, gp = gpar(), units = "npc")
 
 - bands:
 
-  Isobands, as produced by the [`isobands()`](isobands.md) function.
+  Isobands, as produced by the
+  [`isobands()`](http://isoband.r-lib.org/reference/isobands.md)
+  function.
 
 - gp:
 
@@ -26,7 +28,9 @@ isobands_grob(bands, gp = gpar(), units = "npc")
 
 ## See also
 
-See [`isolines_grob()`](isolines_grob.md) for drawing of isolines.
+See
+[`isolines_grob()`](http://isoband.r-lib.org/reference/isolines_grob.md)
+for drawing of isolines.
 
 ## Examples
 

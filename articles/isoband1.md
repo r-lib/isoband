@@ -19,15 +19,17 @@ will enable developers of other packages to integrate isolines and
 isobands into their feature set.
 
 The two main functions of the package are called
-[`isolines()`](../reference/isobands.md) and
-[`isobands()`](../reference/isobands.md), and they have similar user
-interfaces and return values. Both take a vector `x` specifying the x
-values corresponding to the columns of the elevation matrix, a vector
-`y` specifying the y values corresponding to the rows of the elevation
-matrix, and an elevation matrix `z`. The two functions differ in that
-[`isolines()`](../reference/isobands.md) takes a single argument
-`levels` specifying the elevation levels for which isolines should be
-calculated, whereas [`isobands()`](../reference/isobands.md) takes two
+[`isolines()`](http://isoband.r-lib.org/reference/isobands.md) and
+[`isobands()`](http://isoband.r-lib.org/reference/isobands.md), and they
+have similar user interfaces and return values. Both take a vector `x`
+specifying the x values corresponding to the columns of the elevation
+matrix, a vector `y` specifying the y values corresponding to the rows
+of the elevation matrix, and an elevation matrix `z`. The two functions
+differ in that
+[`isolines()`](http://isoband.r-lib.org/reference/isobands.md) takes a
+single argument `levels` specifying the elevation levels for which
+isolines should be calculated, whereas
+[`isobands()`](http://isoband.r-lib.org/reference/isobands.md) takes two
 arguments, `levels_low` and `levels_high`, specifying the lower and
 upper bounds for each isoband. The return value in both cases is a list
 of lists. The outer list contains one list element for each specified
@@ -55,14 +57,14 @@ lines <- isolines(x = 1:ncol(m)/6, y = nrow(m):1/6, z = m, levels = 0.5)
 lines
 #> $`0.5`
 #> $`0.5`$x
-#>  [1] 0.6666667 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000 0.2500000
-#>  [8] 0.2500000 0.3333333 0.5000000 0.6666667 0.7500000 0.6666667 0.6250000
-#> [15] 0.6666667 0.7500000 0.6666667
+#>  [1] 0.6666667 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000
+#>  [7] 0.2500000 0.2500000 0.3333333 0.5000000 0.6666667 0.7500000
+#> [13] 0.6666667 0.6250000 0.6666667 0.7500000 0.6666667
 #> 
 #> $`0.5`$y
-#>  [1] 0.2500000 0.3333333 0.3750000 0.3333333 0.2500000 0.3333333 0.5000000
-#>  [8] 0.6666667 0.7500000 0.7916667 0.7500000 0.6666667 0.5833333 0.5000000
-#> [15] 0.4166667 0.3333333 0.2500000
+#>  [1] 0.2500000 0.3333333 0.3750000 0.3333333 0.2500000 0.3333333
+#>  [7] 0.5000000 0.6666667 0.7500000 0.7916667 0.7500000 0.6666667
+#> [13] 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000
 #> 
 #> $`0.5`$id
 #>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
@@ -82,16 +84,16 @@ bands <- isobands(x = 1:ncol(m)/6, y = nrow(m):1/6, z = m, levels_low = 0.5, lev
 bands
 #> $`0.5:1.5`
 #> $`0.5:1.5`$x
-#>  [1] 0.6666667 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000 0.2500000
-#>  [8] 0.2500000 0.3333333 0.5000000 0.6666667 0.7500000 0.6666667 0.6250000
-#> [15] 0.6666667 0.7500000 0.5000000 0.5416667 0.5833333 0.5000000 0.4166667
-#> [22] 0.4166667
+#>  [1] 0.6666667 0.5833333 0.5000000 0.4166667 0.3333333 0.2500000
+#>  [7] 0.2500000 0.2500000 0.3333333 0.5000000 0.6666667 0.7500000
+#> [13] 0.6666667 0.6250000 0.6666667 0.7500000 0.5000000 0.5416667
+#> [19] 0.5833333 0.5000000 0.4166667 0.4166667
 #> 
 #> $`0.5:1.5`$y
-#>  [1] 0.2500000 0.3333333 0.3750000 0.3333333 0.2500000 0.3333333 0.5000000
-#>  [8] 0.6666667 0.7500000 0.7916667 0.7500000 0.6666667 0.5833333 0.5000000
-#> [15] 0.4166667 0.3333333 0.4583333 0.5000000 0.6666667 0.7083333 0.6666667
-#> [22] 0.5000000
+#>  [1] 0.2500000 0.3333333 0.3750000 0.3333333 0.2500000 0.3333333
+#>  [7] 0.5000000 0.6666667 0.7500000 0.7916667 0.7500000 0.6666667
+#> [13] 0.5833333 0.5000000 0.4166667 0.3333333 0.4583333 0.5000000
+#> [19] 0.6666667 0.7083333 0.6666667 0.5000000
 #> 
 #> $`0.5:1.5`$id
 #>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2
@@ -105,7 +107,8 @@ grid.draw(pathGrob(bands[[1]]$x, bands[[1]]$y, bands[[1]]$id, gp = gpar(fill = "
 
 ![](isoband1_files/figure-html/unnamed-chunk-1-2.png)
 
-A convenience function [`plot_iso()`](../reference/plot_iso.md) can be
+A convenience function
+[`plot_iso()`](http://isoband.r-lib.org/reference/plot_iso.md) can be
 used to inspect a single isoband and corresponding isolines for an
 elevation matrix. This function is mostly meant for debugging and
 illustration purposes. It draws a grid of matrix points colored by
@@ -175,10 +178,11 @@ fn_isobands <- function() {
   isobands(1:ncol(volcano), 1:nrow(volcano), volcano, 10*(9:17), 10*(10:18))
 }
 
-microbenchmark::microbenchmark(fn_contourLines(), fn_isolines(), fn_isobands())
-#> Unit: milliseconds
-#>               expr      min       lq     mean   median       uq       max neval
-#>  fn_contourLines() 1.147202 1.182348 1.533735 1.200211 2.027450  5.620334   100
-#>      fn_isolines() 1.000158 1.020831 1.177408 1.029292 1.064828 13.662882   100
-#>      fn_isobands() 2.422503 2.445451 2.553931 2.457574 2.498691  7.634105   100
+bench::mark(fn_contourLines(), fn_isolines(), fn_isobands(), check = FALSE)
+#> # A tibble: 3 × 6
+#>   expression             min   median `itr/sec` mem_alloc `gc/sec`
+#>   <bch:expr>        <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
+#> 1 fn_contourLines()   1.13ms   1.17ms      789.     811KB    25.7 
+#> 2 fn_isolines()       1.04ms   1.07ms      915.     187KB     2.03
+#> 3 fn_isobands()       2.48ms    2.5ms      395.     392KB     4.14
 ```

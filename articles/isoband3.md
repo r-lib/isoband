@@ -1,7 +1,8 @@
 # Labeled isolines
 
 Labeled isolines can be drawn in the grid graphics system via the
-[`isolines_grob()`](../reference/isolines_grob.md) function.
+[`isolines_grob()`](http://isoband.r-lib.org/reference/isolines_grob.md)
+function.
 
 ``` r
 library(isoband)
@@ -50,11 +51,12 @@ grid.draw(g)
 
 Where the labels are drawn can be controlled via the `label_placer`
 argument. A few different label placement strategies are provided. The
-default, [`label_placer_minmax()`](../reference/label_placer.md), places
-labels at the maximum and minimum y value for each isoline. However,
-this label placer can be further customized. For example, labels can be
-placed at maximum and minimum x values and at a fixed rotation angle of
-90 degrees.
+default,
+[`label_placer_minmax()`](http://isoband.r-lib.org/reference/label_placer.md),
+places labels at the maximum and minimum y value for each isoline.
+However, this label placer can be further customized. For example,
+labels can be placed at maximum and minimum x values and at a fixed
+rotation angle of 90 degrees.
 
 ``` r
 g <- isolines_grob(
@@ -76,7 +78,8 @@ grid.draw(g)
 
 ![](isoband3_files/figure-html/unnamed-chunk-3-1.png)
 
-The label placer [`label_placer_none()`](../reference/label_placer.md)
+The label placer
+[`label_placer_none()`](http://isoband.r-lib.org/reference/label_placer.md)
 doesn’t place any labels.
 
 ``` r
@@ -96,9 +99,9 @@ grid.draw(g)
 ![](isoband3_files/figure-html/unnamed-chunk-4-1.png)
 
 We can also place labels entirely manually by using
-[`label_placer_manual()`](../reference/label_placer.md). This label
-placer takes as arguments the breaks that should be labeled and the
-corresponding coordinates and label angles. Breaks for which no
+[`label_placer_manual()`](http://isoband.r-lib.org/reference/label_placer.md).
+This label placer takes as arguments the breaks that should be labeled
+and the corresponding coordinates and label angles. Breaks for which no
 coordinates are specified are ignored. If multiple coordinates are
 supplied for the same break then multiple labels are placed for that
 break.
@@ -129,8 +132,8 @@ grid.draw(g)
 Because isolines are cropped around the labels, the labeling strategy
 works even if the isolines are drawn on top of a colored background. For
 example, we could draw filled isobands using
-[`isobands_grob()`](../reference/isobands_grob.md) and then draw labeled
-lines on top.
+[`isobands_grob()`](http://isoband.r-lib.org/reference/isobands_grob.md)
+and then draw labeled lines on top.
 
 ``` r
 viridis_pal <- colorRampPalette(

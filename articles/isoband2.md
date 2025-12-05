@@ -2,10 +2,11 @@
 
 For geospatial applications, it may be convenient to convert isolines
 and isobands into simple features. This can be done with the function
-[`iso_to_sfg()`](../reference/iso_to_sfg.md), which converts an isolines
-or isobands object into an sf geometry collection. This converted object
-can then be further processed with functions from the `sf` package. For
-example, we can add them to an sf data frame and plot with ggplot2.
+[`iso_to_sfg()`](http://isoband.r-lib.org/reference/iso_to_sfg.md),
+which converts an isolines or isobands object into an sf geometry
+collection. This converted object can then be further processed with
+functions from the `sf` package. For example, we can add them to an sf
+data frame and plot with ggplot2.
 
 ``` r
 library(isoband)

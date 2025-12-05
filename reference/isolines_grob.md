@@ -22,7 +22,9 @@ isolines_grob(
 
 - lines:
 
-  Isolines, as produced by the [`isolines()`](isobands.md) function.
+  Isolines, as produced by the
+  [`isolines()`](http://isoband.r-lib.org/reference/isobands.md)
+  function.
 
 - gp:
 
@@ -65,7 +67,8 @@ isolines_grob(
 - label_placer:
 
   Function that controls how labels are placed along the isolines. Uses
-  [`label_placer_minmax()`](label_placer.md) by default.
+  [`label_placer_minmax()`](http://isoband.r-lib.org/reference/label_placer.md)
+  by default.
 
 - units:
 
@@ -74,9 +77,11 @@ isolines_grob(
 
 ## See also
 
-See [`isobands_grob()`](isobands_grob.md) for drawing of isobands. See
-[`label_placer_minmax()`](label_placer.md) for label placement
-strategies.
+See
+[`isobands_grob()`](http://isoband.r-lib.org/reference/isobands_grob.md)
+for drawing of isobands. See
+[`label_placer_minmax()`](http://isoband.r-lib.org/reference/label_placer.md)
+for label placement strategies.
 
 ## Examples
 

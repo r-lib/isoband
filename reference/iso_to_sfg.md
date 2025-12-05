@@ -19,15 +19,16 @@ iso_to_sfg(x)
 ## Details
 
 The function `iso_to_sfg()` is a generic that takes an object created by
-either [`isolines()`](isobands.md) or [`isobands()`](isobands.md) and
-turns it into a simple features (sf) geometry collection. Importantly,
-the isobanding algorithm can produce polygons that do not represent
-valid simple features. This happens usually when the lower limit of an
-isoband is exactly equal to some data values (see examples for a
-demonstration). This can be worked around either by slightly shifting
-the data or band limits (e.g., round all data values and then shift them
-by a value smaller than the rounding error) or by fixing the geometries
-using the function
+either [`isolines()`](http://isoband.r-lib.org/reference/isobands.md) or
+[`isobands()`](http://isoband.r-lib.org/reference/isobands.md) and turns
+it into a simple features (sf) geometry collection. Importantly, the
+isobanding algorithm can produce polygons that do not represent valid
+simple features. This happens usually when the lower limit of an isoband
+is exactly equal to some data values (see examples for a demonstration).
+This can be worked around either by slightly shifting the data or band
+limits (e.g., round all data values and then shift them by a value
+smaller than the rounding error) or by fixing the geometries using the
+function
 [`st_make_valid()`](https://r-spatial.github.io/sf/reference/valid.html).
 
 ## Examples

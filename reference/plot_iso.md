@@ -2,7 +2,8 @@
 
 This function visualizes a single isoband calculated from a matrix. It
 is mainly useful for debugging and visualizing the isobanding algorithm.
-See [`isobands()`](isobands.md) for more examples.
+See [`isobands()`](http://isoband.r-lib.org/reference/isobands.md) for
+more examples.
 
 ## Usage
 
