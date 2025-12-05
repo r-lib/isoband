@@ -71,13 +71,13 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
   if (is.null(labels)) {
     labels <- breaks
   } else if (length(labels) != length(breaks)) {
-    stop("Number of labels must match the number of breaks.", call. = FALSE)
+    cli::cli_abort("Number of labels must match the number of breaks.")
   } else {
     labels <- as.character(labels)
   }
 
   if (length(margin) != 4 || !is.unit(margin)) {
-    stop("The `margin` parameter must be a unit object of length four.", call. = FALSE)
+    cli::cli_abort("The {.arg margin} parameter must be a unit object of length four.")
   }
 
   # first set up a data frame with all the label info

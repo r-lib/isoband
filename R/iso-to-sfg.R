@@ -79,9 +79,7 @@ iso_to_sfg <- function(x) {
 
 #' @export
 iso_to_sfg.default <- function(x) {
-  stop(
-    "Cannot convert objects of type ", paste(class(x), collapse = "/"), " to sf.",
-    call. = FALSE
+  cli::cli_abort("Cannot convert objects of type {.cls {class(x)}} to sf.",
   )
 }
 

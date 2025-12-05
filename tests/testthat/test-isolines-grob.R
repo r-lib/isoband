@@ -8,19 +8,19 @@ test_that("basic functions", {
   l <- isolines((1:5)/6, (5:1)/6, m, c(.5, 1.5))
 
   # incorrect number of labels
-  expect_error(
+  expect_snapshot(
     isolines_grob(l, labels = c("a", "b", "c")),
-    "Number of labels must match the number of breaks."
+    error = TRUE
   )
 
   # incorrect margin specification
-  expect_error(
+  expect_snapshot(
     isolines_grob(l, margin = 1:4),
-    "must be a unit object of length four"
+    error = TRUE
   )
-  expect_error(
+  expect_snapshot(
     isolines_grob(l, margin = grid::unit(1:3, "pt")),
-    "must be a unit object of length four"
+    error = TRUE
   )
 
   # default settings create two labels per line for this dataset

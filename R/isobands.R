@@ -66,7 +66,7 @@ isobands <- function(x, y, z, levels_low, levels_high) {
   nmax <- max(nlow, nhigh)
 
   if ((nlow != nmax && nlow != 1) || (nhigh != nmax && nhigh != 1)) {
-    stop("Vectors specifying isoband levels must be of equal length or of length 1", call. = FALSE)
+    cli::cli_abort("Vectors specifying isoband levels must be of equal length or of length 1")
   }
   levels_low <- rep_len(levels_low, nmax)
   levels_high <- rep_len(levels_high, nmax)

@@ -138,16 +138,16 @@ test_that("empty or incorrect input", {
   expect_identical(out$y, numeric(0))
   expect_identical(out$id, integer(0))
 
-  expect_error(
+  expect_snapshot(
     clip_lines_impl(numeric(0), numeric(1), integer(0), 3, 2, .1, .1, 0),
-    "must match"
+    error = TRUE
   )
-  expect_error(
+  expect_snapshot(
     clip_lines_impl(numeric(0), numeric(0), integer(1), 3, 2, .1, .1, 0),
-    "must match"
+    error = TRUE
   )
-  expect_error(
+  expect_snapshot(
     clip_lines_impl(numeric(1), numeric(0), integer(0), 3, 2, .1, .1, 0),
-    "must match"
+    error = TRUE
   )
 })
