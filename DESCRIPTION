@@ -14,7 +14,7 @@ Description: A fast C++ implementation to generate contour lines
     (isolines) and contour polygons (isobands) from regularly spaced grids
     containing elevation data.
 License: MIT + file LICENSE
-URL: https://isoband.r-lib.org
+URL: https://isoband.r-lib.org, https://github.com/r-lib/isoband
 BugReports: https://github.com/r-lib/isoband/issues
 Imports:
     grid,
