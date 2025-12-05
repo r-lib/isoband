@@ -66,7 +66,9 @@ isobands <- function(x, y, z, levels_low, levels_high) {
   nmax <- max(nlow, nhigh)
 
   if ((nlow != nmax && nlow != 1) || (nhigh != nmax && nhigh != 1)) {
-    cli::cli_abort("Vectors specifying isoband levels must be of equal length or of length 1")
+    cli::cli_abort(
+      "Vectors specifying isoband levels must be of equal length or of length 1"
+    )
   }
   levels_low <- rep_len(levels_low, nmax)
   levels_high <- rep_len(levels_high, nmax)
@@ -100,15 +102,24 @@ isolines <- function(x, y, z, levels) {
 isobands_impl <- function(x, y, z, value_low, value_high) {
   mode(z) <- "numeric"
   .Call(
-    `isobands_impl_c`, as.numeric(x), as.numeric(y), z,
-    as.numeric(value_low), as.numeric(value_high), PACKAGE = "isoband"
+    `isobands_impl_c`,
+    as.numeric(x),
+    as.numeric(y),
+    z,
+    as.numeric(value_low),
+    as.numeric(value_high),
+    PACKAGE = "isoband"
   )
 }
 
 isolines_impl <- function(x, y, z, value) {
   mode(z) <- "numeric"
   .Call(
-    `isolines_impl_c`, as.numeric(x), as.numeric(y), z,
-    as.numeric(value), PACKAGE = "isoband"
+    `isolines_impl_c`,
+    as.numeric(x),
+    as.numeric(y),
+    z,
+    as.numeric(value),
+    PACKAGE = "isoband"
   )
 }

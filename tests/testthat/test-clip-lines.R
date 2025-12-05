@@ -72,17 +72,44 @@ test_that("rotated clip box", {
   y <- c(0, 1, 1, 0, 0)
   id <- rep(1L, 5)
 
-  out <- clip_lines_impl(x, y, id, .5, .5, 5, sin(2*pi*45/360), 2*pi*45/360)
+  out <- clip_lines_impl(
+    x,
+    y,
+    id,
+    .5,
+    .5,
+    5,
+    sin(2 * pi * 45 / 360),
+    2 * pi * 45 / 360
+  )
   expect_equal(out$x, c(0.0, 0.0, 0.5, 1.0, 1.0, 0.5))
   expect_equal(out$y, c(0.5, 1, 1, 0.5, 0, 0))
   expect_identical(out$id, c(rep(1L, 3), rep(2L, 3)))
 
-  out <- clip_lines_impl(x, y, id, .5, .5, 5, sin(2*pi*45/360), -2*pi*45/360)
+  out <- clip_lines_impl(
+    x,
+    y,
+    id,
+    .5,
+    .5,
+    5,
+    sin(2 * pi * 45 / 360),
+    -2 * pi * 45 / 360
+  )
   expect_equal(out$x, c(0.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0))
   expect_equal(out$y, c(0.0, 0.5, 1, 1, 0.5, 0, 0))
   expect_identical(out$id, c(rep(1L, 2), rep(2L, 3), rep(3L, 2)))
 
-  out <- clip_lines_impl(x, y, id, .5, .5, sin(2*pi*45/360), 5, 2*pi*45/360)
+  out <- clip_lines_impl(
+    x,
+    y,
+    id,
+    .5,
+    .5,
+    sin(2 * pi * 45 / 360),
+    5,
+    2 * pi * 45 / 360
+  )
   expect_equal(out$x, c(0.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0))
   expect_equal(out$y, c(0.0, 0.5, 1, 1, 0.5, 0, 0))
   expect_identical(out$id, c(rep(1L, 2), rep(2L, 3), rep(3L, 2)))

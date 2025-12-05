@@ -15,3 +15,5 @@
 ^CRAN-SUBMISSION$
 ^codecov\.yml$
 ^pkgdown$
+^[.]?air[.]toml$
+^\.vscode$
