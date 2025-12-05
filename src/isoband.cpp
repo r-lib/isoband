@@ -3,19 +3,22 @@
 // Includes merging of line segments and polygons.
 // Written by Claus O. Wilke
 
+#include "cpp11/data_frame.hpp"
+#include "cpp11/doubles.hpp"
+#include "cpp11/integers.hpp"
+#include "cpp11/list.hpp"
+#include "cpp11/matrix.hpp"
+#include "cpp11/protect.hpp"
 #define R_NO_REMAP
-
-#include <R.h>
-#include <Rinternals.h>
 
 #include <iostream>
 #include <vector>
 #include <unordered_map>
 
 using namespace std;
+using namespace cpp11::literals;
 
 #include "polygon.h" // for point
-#include "utils.h"
 
 // point in abstract grid space
 enum point_type {
@@ -79,7 +82,8 @@ ostream & operator<<(ostream &out, const point_connect &pc) {
 class isobander {
 protected:
   int nrow, ncol; // numbers of rows and columns
-  SEXP grid_x, grid_y, grid_z;
+  cpp11::doubles grid_x, grid_y;
+  cpp11::doubles_matrix<> grid_z;
   double *grid_x_p, *grid_y_p, *grid_z_p;
   double vlo, vhi; // low and high cutoff values
   grid_point tmp_poly[8]; // temp storage for elementary polygons; none has more than 8 vertices
@@ -217,7 +221,7 @@ protected:
             tmp_point_connect[i].altpoint = true;
             break;
           default:
-            Rf_error("undefined merging configuration: %i\n", score);
+            cpp11::stop("undefined merging configuration: %i\n", score);
           }
         }
       }
@@ -276,15 +280,15 @@ protected:
   }
 
 public:
-  isobander(SEXP x, SEXP y, SEXP z, double value_low = 0, double value_high = 0) :
+  isobander(cpp11::doubles x, cpp11::doubles y, cpp11::doubles_matrix<> z, double value_low = 0, double value_high = 0) :
     grid_x(x), grid_y(y), grid_z(z), grid_x_p(REAL(x)), grid_y_p(REAL(y)),
     grid_z_p(REAL(z)), vlo(value_low), vhi(value_high), interrupted(false)
   {
-    nrow = Rf_nrows(grid_z);
-    ncol = Rf_ncols(grid_z);
+    nrow = grid_z.nrow();
+    ncol = grid_z.ncol();
 
-    if (Rf_length(grid_x) != ncol) {Rf_error("Number of x coordinates must match number of columns in density matrix.");}
-    if (Rf_length(grid_y) != nrow) {Rf_error("Number of y coordinates must match number of rows in density matrix.");}
+    if (grid_x.size() != ncol) {cpp11::stop("Number of x coordinates must match number of columns in density matrix.");}
+    if (grid_y.size() != nrow) {cpp11::stop("Number of y coordinates must match number of rows in density matrix.");}
   }
 
   virtual ~isobander() {}
@@ -325,10 +329,7 @@ public:
       }
       //cout << endl;
     }
-    if (checkInterrupt()) {
-      interrupted = true;
-      return;
-    }
+    cpp11::check_user_interrupt();
 
     // all polygons must be drawn clockwise for proper merging
     for (int r = 0; r < nrow-1; r++) {
@@ -1226,14 +1227,9 @@ public:
     }
   }
 
-  virtual SEXP collect() {
-    // Early exit if calculate_contour was interrupted
-    if (was_interrupted()) {
-      return R_NilValue;
-    }
-
-    // make polygons
-    vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
+  virtual cpp11::writable::list collect() {// make polygons
+    cpp11::writable::doubles x_out, y_out;
+    cpp11::writable::integers id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for the polygon lines
 
     // iterate over all locations in the polygon grid
@@ -1278,36 +1274,17 @@ public:
           cur = newcur;
         }
         i++;
-        if (i % 100000 == 0 && checkInterrupt()) {
-          interrupted = true;
-          return R_NilValue;
+        if (i % 100000 == 0) {
+          cpp11::check_user_interrupt();
         }
       } while (!(cur == start)); // keep going until we reach the start point again
     }
-    // output variable
-    SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
-    SEXP names = PROTECT(Rf_allocVector(STRSXP, 3));
-    SET_STRING_ELT(names, 0, Rf_mkChar("x"));
-    SET_STRING_ELT(names, 1, Rf_mkChar("y"));
-    SET_STRING_ELT(names, 2, Rf_mkChar("id"));
-    Rf_setAttrib(res, Rf_install("names"), names);
 
-    int final_size = x_out.size();
-    SEXP x_final = SET_VECTOR_ELT(res, 0, Rf_allocVector(REALSXP, final_size));
-    double* x_final_p = REAL(x_final);
-    SEXP y_final = SET_VECTOR_ELT(res, 1, Rf_allocVector(REALSXP, final_size));
-    double* y_final_p = REAL(y_final);
-    SEXP id_final = SET_VECTOR_ELT(res, 2, Rf_allocVector(INTSXP, final_size));
-    int* id_final_p = INTEGER(id_final);
-
-    for (int i = 0; i < final_size; ++i) {
-      x_final_p[i] = x_out[i];
-      y_final_p[i] = y_out[i];
-      id_final_p[i] = id[i];
-    }
-
-    UNPROTECT(2);
-    return res;
+    return cpp11::writable::list({
+      "x"_nm = x_out,
+      "y"_nm = y_out,
+      "id"_nm = id
+    });
   }
 };
 
@@ -1350,7 +1327,7 @@ protected:
         polygon_grid[tmp_poly[1]].next = tmp_poly[0];
       } else {
         // should never go here
-        Rf_error("cannot merge line segment at interior of existing line segment");
+        cpp11::stop("cannot merge line segment at interior of existing line segment");
       }
       break;
     case 2: // only second point connects
@@ -1362,7 +1339,7 @@ protected:
         polygon_grid[tmp_poly[0]].next = tmp_poly[1];
       } else {
         // should never go here
-        Rf_error("cannot merge line segment at interior of existing line segment");
+        cpp11::stop("cannot merge line segment at interior of existing line segment");
       }
       break;
     case 3: // two-way merge
@@ -1398,9 +1375,8 @@ protected:
               polygon_grid[cur].next = tmp;
               cur = tmp;
               i++;
-              if (i % 100000 == 0 && checkInterrupt()) {
-                interrupted = true;
-                return;
+              if (i % 100000 == 0) {
+                cpp11::check_user_interrupt();
               }
             } while (!(cur == grid_point()));
           }
@@ -1419,20 +1395,19 @@ protected:
               polygon_grid[cur].prev = tmp;
               cur = tmp;
               i++;
-              if (i % 100000 == 0 && checkInterrupt()) {
-                interrupted = true;
-                return;
+              if (i % 100000 == 0) {
+                cpp11::check_user_interrupt();
               }
             } while (!(cur == grid_point()));
           }
           break;
         default:  // should never go here
-          Rf_error("cannot merge line segment at interior of existing line segment");
+          cpp11::stop("cannot merge line segment at interior of existing line segment");
         }
       }
     break;
     default:
-      Rf_error("unknown merge state");
+      cpp11::stop("unknown merge state");
     }
 
     //cout << "new grid:" << endl;
@@ -1440,7 +1415,7 @@ protected:
   }
 
 public:
-  isoliner(SEXP x, SEXP y, SEXP z, double value = 0) :
+  isoliner(cpp11::doubles x, cpp11::doubles y, cpp11::doubles_matrix<> z, double value = 0) :
     isobander(x, y, z, value, 0) {}
 
   void set_value(double value) {
@@ -1483,10 +1458,7 @@ public:
       }
     }
 
-    if (checkInterrupt()) {
-      interrupted = true;
-      return;
-    }
+    cpp11::check_user_interrupt();
 
     for (int r = 0; r < nrow-1; r++) {
       for (int c = 0; c < ncol-1; c++) {
@@ -1578,14 +1550,10 @@ public:
     }
   }
 
-  virtual SEXP collect() {
-    // Early exit if calculate_contour was interrupted
-    if (was_interrupted()) {
-      return R_NilValue;
-    }
-
+  virtual cpp11::writable::list collect() {
     // make line segments
-    vector<double> x_out, y_out; vector<int> id;  // vectors holding resulting polygon paths
+    cpp11::writable::doubles x_out, y_out;
+    cpp11::writable::integers id;  // vectors holding resulting polygon paths
     int cur_id = 0;           // id counter for individual line segments
 
     // iterate over all locations in the polygon grid
@@ -1607,9 +1575,8 @@ public:
         do {
           cur = polygon_grid[cur].prev;
           i++;
-          if (i % 100000 == 0 && checkInterrupt()) {
-            interrupted = true;
-            return R_NilValue;
+          if (i % 100000 == 0) {
+            cpp11::check_user_interrupt();
           }
         } while (!(cur == start || polygon_grid[cur].prev == grid_point()));
       }
@@ -1628,9 +1595,8 @@ public:
         polygon_grid[cur].collected = true;
         cur = polygon_grid[cur].next;
         i++;
-        if (i % 100000 == 0 && checkInterrupt()) {
-          interrupted = true;
-          return R_NilValue;
+        if (i % 100000 == 0) {
+          cpp11::check_user_interrupt();
         }
       } while (!(cur == start || cur == grid_point())); // keep going until we reach the start point again
       // if we're back to start, need to output that point one more time
@@ -1641,80 +1607,49 @@ public:
         id.push_back(cur_id);
       }
     }
-    // output variable
-    SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
-    SEXP names = PROTECT(Rf_allocVector(STRSXP, 3));
-    SET_STRING_ELT(names, 0, Rf_mkChar("x"));
-    SET_STRING_ELT(names, 1, Rf_mkChar("y"));
-    SET_STRING_ELT(names, 2, Rf_mkChar("id"));
-    Rf_setAttrib(res, Rf_install("names"), names);
-
-    int final_size = x_out.size();
-    SEXP x_final = SET_VECTOR_ELT(res, 0, Rf_allocVector(REALSXP, final_size));
-    double* x_final_p = REAL(x_final);
-    SEXP y_final = SET_VECTOR_ELT(res, 1, Rf_allocVector(REALSXP, final_size));
-    double* y_final_p = REAL(y_final);
-    SEXP id_final = SET_VECTOR_ELT(res, 2, Rf_allocVector(INTSXP, final_size));
-    int* id_final_p = INTEGER(id_final);
-
-    for (int i = 0; i < final_size; ++i) {
-      x_final_p[i] = x_out[i];
-      y_final_p[i] = y_out[i];
-      id_final_p[i] = id[i];
-    }
-
-    UNPROTECT(2);
-    return res;
+    return cpp11::writable::list({
+      "x"_nm = x_out,
+      "y"_nm = y_out,
+      "id"_nm = id
+    });
   }
 };
 
-extern "C" SEXP isobands_impl(SEXP x, SEXP y, SEXP z, SEXP value_low, SEXP value_high) {
-
-  BEGIN_CPP
+[[cpp11::register]]
+cpp11::writable::list isobands_impl(cpp11::doubles x, cpp11::doubles y, cpp11::doubles_matrix<> z, cpp11::doubles value_low, cpp11::doubles value_high) {
   isobander ib(x, y, z);
 
-  int n_bands = Rf_length(value_low);
-  if (n_bands != Rf_length(value_high)) {
-    Rf_error("Vectors of low and high values must have the same number of elements.");
+  int n_bands = value_low.size();
+  if (n_bands != value_high.size()) {
+    cpp11::stop("Vectors of low and high values must have the same number of elements.");
   }
 
   ib.calculate_contour();
-  SEXP out = PROTECT(Rf_allocVector(VECSXP, n_bands));
+  cpp11::writable::list out;
+  out.reserve(n_bands);
 
   for (int i = 0; i < n_bands; ++i) {
-    ib.set_value(REAL(value_low)[i], REAL(value_high)[i]);
+    ib.set_value(value_low[i], value_high[i]);
     ib.calculate_contour();
-    SET_VECTOR_ELT(out, i, ib.collect());
-    if (ib.was_interrupted()) {
-      longjump_interrupt();
-    }
+    out.push_back(ib.collect());
   }
 
-  UNPROTECT(1);
   return out;
-
-  END_CPP
 }
 
-extern "C" SEXP isolines_impl(SEXP x, SEXP y, SEXP z, SEXP value) {
-
-  BEGIN_CPP
+[[cpp11::register]]
+cpp11::writable::list isolines_impl(cpp11::doubles x, cpp11::doubles y, cpp11::doubles_matrix<> z, cpp11::doubles value) {
   isoliner il(x, y, z);
 
-  int n_lines = Rf_length(value);
-  SEXP out = PROTECT(Rf_allocVector(VECSXP, n_lines));
+  int n_lines = value.size();
+  cpp11::writable::list out;
+  out.reserve(n_lines);
 
   for (int i = 0; i < n_lines; ++i) {
     il.set_value(REAL(value)[i]);
     il.calculate_contour();
-    SET_VECTOR_ELT(out, i, il.collect());
-    if (il.was_interrupted()) {
-      longjump_interrupt();
-    }
+    out.push_back(il.collect());
   }
 
-  UNPROTECT(1);
   return out;
-
-  END_CPP
 }

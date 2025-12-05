@@ -1,8 +1,6 @@
-#ifndef POLYGON_H
-#define POLYGON_H
+#pragma once
 
 #include <vector>
-#include <unordered_map>
 #include <ostream>
 
 using namespace std;
@@ -24,5 +22,3 @@ enum in_polygon_type {
   outside,      // point is outside a polygon
   undetermined // point lies right on the boundary
 };
-
-#endif // POLYGON_H

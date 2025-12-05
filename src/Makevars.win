@@ -1,3 +1,2 @@
-CXX_STD = CXX11
 # Commented out to avoid compile-time testthat dependency
 #PKG_CPPFLAGS = -Itestthat

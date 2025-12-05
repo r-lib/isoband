@@ -81,9 +81,16 @@ isobands <- function(x, y, z, levels_low, levels_high) {
     levels_low[idx] <- levels_tmp[idx]
   }
 
-  out <- isobands_impl(x, y, z, levels_low, levels_high)
+  out <- isobands_impl(
+    as.double(x),
+    as.double(y),
+    z,
+    as.double(levels_low),
+    as.double(levels_high)
+  )
   structure(
-    stats::setNames(out, paste0(levels_low, ":", levels_high)),
+    out,
+    names = paste0(levels_low, ":", levels_high),
     class = c("isobands", "iso")
   )
 }
@@ -92,34 +99,10 @@ isobands <- function(x, y, z, levels_low, levels_high) {
 #' @param levels Numeric vector of z values for which isolines should be generated.
 #' @export
 isolines <- function(x, y, z, levels) {
-  out <- isolines_impl(x, y, z, levels)
+  out <- isolines_impl(as.double(x), as.double(y), z, as.double(levels))
   structure(
-    stats::setNames(out, levels),
+    out,
+    names = levels,
     class = c("isolines", "iso")
-  )
-}
-
-isobands_impl <- function(x, y, z, value_low, value_high) {
-  mode(z) <- "numeric"
-  .Call(
-    `isobands_impl_c`,
-    as.numeric(x),
-    as.numeric(y),
-    z,
-    as.numeric(value_low),
-    as.numeric(value_high),
-    PACKAGE = "isoband"
-  )
-}
-
-isolines_impl <- function(x, y, z, value) {
-  mode(z) <- "numeric"
-  .Call(
-    `isolines_impl_c`,
-    as.numeric(x),
-    as.numeric(y),
-    z,
-    as.numeric(value),
-    PACKAGE = "isoband"
   )
 }

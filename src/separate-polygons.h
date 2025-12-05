@@ -1,5 +1,4 @@
-#ifndef SEPARATE_POLYGONS_H
-#define SEPARATE_POLYGONS_H
+#pragma once
 
 #include "polygon.h"
 
@@ -29,5 +28,3 @@ in_polygon_type polygon_in_polygon(const polygon &query, const polygon &referenc
  * not all of which are the same).
  */
 bool is_valid_ring(const polygon &poly);
-
-#endif
