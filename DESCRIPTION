@@ -7,7 +7,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-4757-117X")),
     person("Claus O.", "Wilke", , "wilke@austin.utexas.edu", role = "aut",
            comment = c("Original author", ORCID = "0000-0002-7470-9261")),
-    person("Thomas Lin", "Pedersen", , "thomasp85@gmail.com", role = c("aut", "cre"),
+    person("Thomas Lin", "Pedersen", , "thomas.pedersen@posit.co", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5147-4711")),
     person("Posit, PBC", role = c("cph", "fnd"),
            comment = c(ROR = "03wc8by49"))
