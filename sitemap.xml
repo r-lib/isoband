@@ -1,66 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/isoband1.html</loc>
-  </url>
-  <url>
-    <loc>/articles/isoband2.html</loc>
-  </url>
-  <url>
-    <loc>/articles/isoband3.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/angle_halfcircle_bottom.html</loc>
-  </url>
-  <url>
-    <loc>/reference/clip_lines.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/iso_to_sfg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/isoband-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/isobands.html</loc>
-  </url>
-  <url>
-    <loc>/reference/isobands_grob.html</loc>
-  </url>
-  <url>
-    <loc>/reference/isolines_grob.html</loc>
-  </url>
-  <url>
-    <loc>/reference/label_placer.html</loc>
-  </url>
-  <url>
-    <loc>/reference/label_placer_simple.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot_iso.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/isoband1.html</loc></url>
+<url><loc>/articles/isoband2.html</loc></url>
+<url><loc>/articles/isoband3.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/angle_halfcircle_bottom.html</loc></url>
+<url><loc>/reference/clip_lines.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/iso_to_sfg.html</loc></url>
+<url><loc>/reference/isoband-package.html</loc></url>
+<url><loc>/reference/isobands.html</loc></url>
+<url><loc>/reference/isobands_grob.html</loc></url>
+<url><loc>/reference/isolines_grob.html</loc></url>
+<url><loc>/reference/label_placer.html</loc></url>
+<url><loc>/reference/label_placer_simple.html</loc></url>
+<url><loc>/reference/plot_iso.html</loc></url>
 </urlset>
+
