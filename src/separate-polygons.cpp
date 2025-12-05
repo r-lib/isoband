@@ -289,7 +289,8 @@ cpp11::writable::doubles_matrix<> polygon_as_matrix(polygon p, bool reverse = fa
 [[cpp11::register]]
 cpp11::writable::list separate_polygons(cpp11::doubles x, cpp11::doubles y, cpp11::integers id) {
   cpp11::writable::list out; // final result
-
+  out.reserve(1); // force list so attributes can be set
+  out.attr("class") = {"XY", "MULTIPOLYGON", "sfg"};
   int n = x.size();
   if (n == 0) {
     return out;
@@ -379,7 +380,6 @@ cpp11::writable::list separate_polygons(cpp11::doubles x, cpp11::doubles y, cpp1
     next_poly = hi.top_level_poly();
   }
 
-  out.attr("class") = {"XY", "MULTIPOLYGON", "sfg"};
   return(out);
 }
 
