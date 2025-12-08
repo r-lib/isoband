@@ -19,7 +19,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/r-lib/isoband/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/r-lib/isoband/blob/v0.3.0/DESCRIPTION)
 
 Wickham H, Wilke C, Pedersen T (2025). *isoband: Generate Isolines and
 Isobands from Regularly Spaced Elevation Grids*. R package version

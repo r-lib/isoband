@@ -182,7 +182,7 @@ bench::mark(fn_contourLines(), fn_isolines(), fn_isobands(), check = FALSE)
 #> # A tibble: 3 × 6
 #>   expression             min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr>        <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 fn_contourLines()   1.13ms   1.17ms      789.     811KB    25.7 
-#> 2 fn_isolines()       1.04ms   1.07ms      915.     187KB     2.03
-#> 3 fn_isobands()       2.48ms    2.5ms      395.     392KB     4.14
+#> 1 fn_contourLines()   1.15ms   1.18ms      787.     811KB    25.6 
+#> 2 fn_isolines()       1.06ms   1.08ms      905.     187KB     2.03
+#> 3 fn_isobands()       2.48ms   2.52ms      394.     392KB     4.14
 ```
