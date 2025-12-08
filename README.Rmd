@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/isoband)](https://CRAN.R-project.org/package=isoband)
 [![R-CMD-check](https://github.com/r-lib/isoband/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/isoband/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/r-lib/isoband/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/isoband?branch=main)
+[![Codecov test coverage](https://codecov.io/gh/r-lib/isoband/graph/badge.svg)](https://app.codecov.io/gh/r-lib/isoband)
 <!-- badges: end -->
 
 Generate contour lines (isolines) and contour polygons (isobands) from regularly spaced grids containing elevation data. Package originally written by Claus Wilke and donated to r-lib in 2022.

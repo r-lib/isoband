@@ -1,7 +1,9 @@
+#include "cpp11/doubles.hpp"
+#include "cpp11/list.hpp"
+#include "cpp11/matrix.hpp"
+#include "cpp11/protect.hpp"
 #define R_NO_REMAP
 
-#include <R.h>
-#include <Rinternals.h>
 //#include <testthat.h>
 
 #include <iostream>
@@ -12,7 +14,6 @@ using namespace std;
 
 #include "polygon.h"
 #include "separate-polygons.h"
-#include "utils.h"
 
 /* Calculate the number of times a ray extending from point P to the right
  * intersects with the line segment defined by p0, p1. This number is
@@ -210,7 +211,7 @@ public:
   int top_level_poly() {
     unsigned int i = 0;
     do {
-      if (active_polygons[i] && ext_polygons[i].size() == 0) {
+      if (active_polygons[i] && ext_polygons[i].empty()) {
         active_polygons[i] = false;
         break;
       }
@@ -264,10 +265,10 @@ bool is_valid_ring(const polygon &poly) {
   return false; // degenerate polygon; we ignore it
 }
 
-SEXP polygon_as_matrix(polygon p, bool reverse = false) {
+cpp11::writable::doubles_matrix<> polygon_as_matrix(polygon p, bool reverse = false) {
   int n = p.size();
 
-  SEXP m = PROTECT(Rf_allocMatrix(REALSXP, n, 2));
+  cpp11::writable::doubles_matrix<> m(n, 2);;
   double* m_p = REAL(m);
 
   if (reverse) {
@@ -282,29 +283,20 @@ SEXP polygon_as_matrix(polygon p, bool reverse = false) {
     }
   }
 
-  UNPROTECT(1);
   return m;
 }
 
-extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
-
-  BEGIN_CPP
-  SEXP out; // final result
-  SEXP cl = PROTECT(Rf_allocVector(STRSXP, 3));
-  SET_STRING_ELT(cl, 0, Rf_mkChar("XY"));
-  SET_STRING_ELT(cl, 1, Rf_mkChar("MULTIPOLYGON"));
-  SET_STRING_ELT(cl, 2, Rf_mkChar("sfg"));
-
-  int n = Rf_length(x);
+[[cpp11::register]]
+cpp11::writable::list separate_polygons(cpp11::doubles x, cpp11::doubles y, cpp11::integers id) {
+  cpp11::writable::list out; // final result
+  out.reserve(1); // force list so attributes can be set
+  out.attr("class") = {"XY", "MULTIPOLYGON", "sfg"};
+  int n = x.size();
   if (n == 0) {
-    // set sf classes
-    out = PROTECT(Rf_allocVector(VECSXP, 0));
-    Rf_classgets(out, cl);
-    UNPROTECT(2);
     return out;
   }
-  if (Rf_length(y) != n || Rf_length(id) != n) {
-    Rf_error("Inputs x, y, and id must be of the same length.");
+  if (y.size() != n || id.size() != n) {
+    cpp11::stop("Inputs x, y, and id must be of the same length.");
   }
 
   double* x_p = REAL(x);
@@ -335,9 +327,7 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
   // set up polygon hierarchy
   polygon_hierarchy hi(polys.size());
   for (unsigned int i = 0; i < polys.size(); i++) {
-    if (checkInterrupt())  {
-      longjump_interrupt();
-    }
+    cpp11::check_user_interrupt();
 
     for (unsigned int j = 0; j < polys.size(); j++ ) {
       if (i == j) continue;
@@ -349,17 +339,16 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
         hi.set_exterior(i, j);
       }
       else if (result == undetermined){
-        Rf_error("Found polygons without undefined interior/exterior relationship.");
+        cpp11::stop("Found polygons without undefined interior/exterior relationship.");
       }
     }
   }
 
   int next_poly = hi.top_level_poly();
   int i = 0;
-  CollectorList all_rings;
   while(next_poly >= 0) {
-    if (i % 1000 == 0 && checkInterrupt()) {
-      longjump_interrupt();
+    if (i % 1000 == 0) {
+      cpp11::check_user_interrupt();
     }
     i++;
 
@@ -374,36 +363,24 @@ extern "C" SEXP separate_polygons(SEXP x, SEXP y, SEXP id) {
     // record the polygon if valid
     if (valid_poly) {
       // collect all the rings belonging to this polygon
-      SEXP rings = PROTECT(Rf_allocVector(VECSXP, holes.size() + 1));
+      cpp11::writable::list rings;
+      rings.reserve(holes.size() + 1);
 
       // collect the outer ring
-      SET_VECTOR_ELT(rings, 0, polygon_as_matrix(polys[next_poly]));
-
-      int k = 1;
+      rings.push_back(polygon_as_matrix(polys[next_poly]));
 
       for (auto it = holes.begin(); it != holes.end(); it++) {
         if (is_valid_ring(polys[*it])) {
           // we reverse holes so they run in the same direction as outer polygons
-          SET_VECTOR_ELT(rings, k, polygon_as_matrix(polys[*it], true));
-          k++;
+          rings.push_back(polygon_as_matrix(polys[*it], true));
         }
       }
-
-      // Shrink list to actual size because some holes may have been invalid
-      rings = PROTECT(Rf_lengthgets(rings, k));
-      all_rings.push_back(rings);
-      UNPROTECT(2);
+      out.push_back(rings);
     }
     next_poly = hi.top_level_poly();
   }
 
-  out = all_rings;
-  Rf_classgets(out, cl);
-
-  UNPROTECT(1);
   return(out);
-
-  END_CPP
 }
 
 // testing code

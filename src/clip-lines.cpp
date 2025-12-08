@@ -1,16 +1,15 @@
+#include "cpp11/doubles.hpp"
+#include "cpp11/integers.hpp"
+#include "cpp11/list.hpp"
 #define R_NO_REMAP
 
-#include <R.h>
-#include <Rinternals.h>
-
-#include <iostream>
 #include <cmath>
 #include <cstddef>  // for size_t
 using namespace std;
 
 #include "clip-lines.h"
-#include "utils.h"
 
+using namespace cpp11::literals;
 
 // calculates the intersection point of a line segment and
 // the unit box, assuming p1 is outside and p2 is inside.
@@ -249,7 +248,7 @@ bool in_unit_box(const point &p) {
 }
 
 // helper function for crop_lines()
-void record_points(vector<double> &x_out, vector<double> &y_out, vector<int> &id_out,
+void record_points(cpp11::writable::doubles &x_out, cpp11::writable::doubles &y_out, cpp11::writable::integers &id_out,
                    const point &p1, const point &p2, int &cur_id_out,
                    bool &p1_recorded, bool &p2_recorded, bool &new_line_segment) {
   if (new_line_segment) {
@@ -292,47 +291,49 @@ void record_points(vector<double> &x_out, vector<double> &y_out, vector<int> &id
 // @param asp Aspect ratio (width/height) of the target canvas. This is used to convert widths
 //  to heights and vice versa for rotated boxes
 // @export
-extern "C" SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_mid_y,
-                     SEXP _width, SEXP _height, SEXP _theta, SEXP _asp) {
-
-  BEGIN_CPP
+[[cpp11::register]]
+cpp11::writable::list clip_lines_impl(
+  cpp11::doubles x,
+  cpp11::doubles y,
+  cpp11::integers id,
+  double p_mid_x,
+  double p_mid_y,
+  double width,
+  double height,
+  double theta,
+  double asp
+) {
   // input
-  int n = Rf_length(x);
+  int n = x.size();
   double* x_p = REAL(x);
   double* y_p = REAL(y);
   int* id_p = INTEGER(id);
-  double p_mid_x = REAL(_p_mid_x)[0];
-  double p_mid_y = REAL(_p_mid_y)[0];
-  double width = REAL(_width)[0];
-  double height = REAL(_height)[0];
-  double theta = REAL(_theta)[0];
-  double asp = REAL(_asp)[0];
 
   // output variable
-  SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
-  SEXP names = PROTECT(Rf_allocVector(STRSXP, 3));
-  SET_STRING_ELT(names, 0, Rf_mkChar("x"));
-  SET_STRING_ELT(names, 1, Rf_mkChar("y"));
-  SET_STRING_ELT(names, 2, Rf_mkChar("id"));
-  Rf_setAttrib(res, Rf_install("names"), names);
+  //SEXP res = PROTECT(Rf_allocVector(VECSXP, 3));
+  //SEXP names = PROTECT(Rf_allocVector(STRSXP, 3));
+  //SET_STRING_ELT(names, 0, Rf_mkChar("x"));
+  //SET_STRING_ELT(names, 1, Rf_mkChar("y"));
+  //SET_STRING_ELT(names, 2, Rf_mkChar("id"));
+  //Rf_setAttrib(res, Rf_install("names"), names);
 
-  vector<double> x_out, y_out;
-  vector<int> id_out;
+  cpp11::writable::doubles x_out, y_out;
+  cpp11::writable::integers id_out;
 
   // input checks
-  if (n != Rf_length(y)) {
-    Rf_error("Number of x and y coordinates must match.");
+  if (n != y.size()) {
+    cpp11::stop("Number of x and y coordinates must match.");
   }
-  if (n != Rf_length(id)) {
-    Rf_error("Number of x coordinates and id values must match.");
+  if (n != id.size()) {
+    cpp11::stop("Number of x coordinates and id values must match.");
   }
   if (n == 0) {
     // empty input, return empty output
-    SET_VECTOR_ELT(res, 0, Rf_allocVector(REALSXP, 0));
-    SET_VECTOR_ELT(res, 1, Rf_allocVector(REALSXP, 0));
-    SET_VECTOR_ELT(res, 2, Rf_allocVector(INTSXP, 0));
-    UNPROTECT(2);
-    return res;
+    return cpp11::writable::list({
+      "x"_nm = x_out,
+      "y"_nm = y_out,
+      "id"_nm = id_out
+    });
   }
 
   // set up transformation
@@ -423,24 +424,11 @@ extern "C" SEXP clip_lines_impl(SEXP x, SEXP y, SEXP id, SEXP _p_mid_x, SEXP _p_
   record_points(x_out, y_out, id_out, p1, p2, cur_id_out,
                 p1_recorded, p2_recorded, new_line_segment);
 
-  int final_size = x_out.size();
-  SEXP x_final = SET_VECTOR_ELT(res, 0, Rf_allocVector(REALSXP, final_size));
-  double* x_final_p = REAL(x_final);
-  SEXP y_final = SET_VECTOR_ELT(res, 1, Rf_allocVector(REALSXP, final_size));
-  double* y_final_p = REAL(y_final);
-  SEXP id_final = SET_VECTOR_ELT(res, 2, Rf_allocVector(INTSXP, final_size));
-  int* id_final_p = INTEGER(id_final);
-
-  for (int i = 0; i < final_size; ++i) {
-    x_final_p[i] = x_out[i];
-    y_final_p[i] = y_out[i];
-    id_final_p[i] = id_out[i];
-  }
-
-  UNPROTECT(2);
-  return res;
-
-  END_CPP
+  return cpp11::writable::list({
+    "x"_nm = x_out,
+    "y"_nm = y_out,
+    "id"_nm = id_out
+  });
 }
 
 

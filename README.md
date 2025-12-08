@@ -9,7 +9,7 @@
 status](https://www.r-pkg.org/badges/version/isoband)](https://CRAN.R-project.org/package=isoband)
 [![R-CMD-check](https://github.com/r-lib/isoband/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/isoband/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/r-lib/isoband/branch/main/graph/badge.svg)](https://app.codecov.io/gh/r-lib/isoband?branch=main)
+coverage](https://codecov.io/gh/r-lib/isoband/graph/badge.svg)](https://app.codecov.io/gh/r-lib/isoband)
 <!-- badges: end -->
 
 Generate contour lines (isolines) and contour polygons (isobands) from
@@ -102,7 +102,7 @@ convert to sf, and plot with ggplot2.
 ``` r
 library(ggplot2)
 suppressWarnings(library(sf))
-#> Linking to GEOS 3.10.2, GDAL 3.4.2, PROJ 8.2.1; sf_use_s2() is TRUE
+#> Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
 
 m <- volcano
 b <- isobands((1:ncol(m))/(ncol(m)+1), (nrow(m):1)/(nrow(m)+1), m, 10*(9:19), 10*(10:20))

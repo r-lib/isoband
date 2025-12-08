@@ -21,15 +21,25 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
   # The line data is specified as a list of x, y, id. The parameters `index`, `break_index`,
   # `break_id`, and `label` are provided simply so they can be added to the resulting data
   # frame holding label positions
-  place_labels_impl <- function(line_data, index, break_index, break_id, label, placer_fun) {
+  place_labels_impl <- function(
+    line_data,
+    index,
+    break_index,
+    break_id,
+    label,
+    placer_fun
+  ) {
     # return empty row if either missing line data or missing label
     if (length(line_data$x) == 0 || is.na(label)) {
       return(
         data.frame(
           index = integer(0),
           break_index = integer(0),
-          break_id = character(0), label = character(0),
-          x = numeric(0), y = numeric(0), theta = numeric(0),
+          break_id = character(0),
+          label = character(0),
+          x = numeric(0),
+          y = numeric(0),
+          theta = numeric(0),
           stringsAsFactors = FALSE
         )
       )
@@ -45,7 +55,9 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
         break_index = break_index,
         break_id = break_id,
         label = label,
-        x = pos$x, y = pos$y, theta = pos$theta,
+        x = pos$x,
+        y = pos$y,
+        theta = pos$theta,
         stringsAsFactors = FALSE
       )
     } else {
@@ -54,7 +66,9 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
         break_index = integer(0),
         break_id = character(0),
         label = character(0),
-        x = numeric(0), y = numeric(0), theta = numeric(0),
+        x = numeric(0),
+        y = numeric(0),
+        theta = numeric(0),
         stringsAsFactors = FALSE
       )
     }
@@ -74,7 +88,6 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
 }
 
 
-
 #' Set up a label placement strategy
 #'
 #' These functions set up various label placement strategies.
@@ -85,7 +98,7 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
 #' `label_placer_none()` places no labels at all.
 #'
 #' `label_placer_manual()` places labels at manually defined locations.
-#' 
+#'
 #' `label_placer_middle()` places labels at the middle of each isoline.
 #'
 #' @param placement String consisting of any combination of the letters
@@ -97,24 +110,36 @@ label_placer_simple <- function(lines, labels_data, placer_fun) {
 #'   calculated.
 #' @rdname label_placer
 #' @export
-label_placer_minmax <- function(placement = "tb", rot_adjuster = angle_halfcircle_bottom(), n = 2) {
+label_placer_minmax <- function(
+  placement = "tb",
+  rot_adjuster = angle_halfcircle_bottom(),
+  n = 2
+) {
   force_all(placement, rot_adjuster, n)
 
   placer_fun <- function(line_data, ...) {
     # find location for labels
     idx <- stats::na.omit(
       c(
-        which( # placement "top"
-          isTRUE(grepl("t", placement, fixed = TRUE)) & line_data$y == max(line_data$y)
+        which(
+          # placement "top"
+          isTRUE(grepl("t", placement, fixed = TRUE)) &
+            line_data$y == max(line_data$y)
         )[1],
-        which( # placement "bottom"
-          isTRUE(grepl("b", placement, fixed = TRUE)) & line_data$y == min(line_data$y)
+        which(
+          # placement "bottom"
+          isTRUE(grepl("b", placement, fixed = TRUE)) &
+            line_data$y == min(line_data$y)
         )[1],
-        which( # placement "left"
-          isTRUE(grepl("l", placement, fixed = TRUE)) & line_data$x == min(line_data$x)
+        which(
+          # placement "left"
+          isTRUE(grepl("l", placement, fixed = TRUE)) &
+            line_data$x == min(line_data$x)
         )[1],
-        which( # placement "right"
-          isTRUE(grepl("r", placement, fixed = TRUE)) & line_data$x == max(line_data$x)
+        which(
+          # placement "right"
+          isTRUE(grepl("r", placement, fixed = TRUE)) &
+            line_data$x == max(line_data$x)
         )[1]
       )
     )
@@ -146,9 +171,11 @@ minmax_impl <- function(data, idx, n) {
   idx_max <- max(idx_set)
 
   # if the first and the last point are the same we wrap, otherwise we truncate
-  if (data$x[idx_min] == data$x[idx_max] && data$y[idx_min] == data$y[idx_max]) {
+  if (
+    data$x[idx_min] == data$x[idx_max] && data$y[idx_min] == data$y[idx_max]
+  ) {
     idx_range <- (idx_max - idx_min)
-    i <- ((idx - n):(idx + n)-idx_min) %% idx_range + idx_min
+    i <- ((idx - n):(idx + n) - idx_min) %% idx_range + idx_min
   } else {
     i <- (max(idx - n, idx_min):min(idx + n, idx_max))
   }
@@ -169,8 +196,11 @@ label_placer_none <- function() {
     data.frame(
       index = integer(0),
       break_index = integer(0),
-      break_id = character(0), label = character(0),
-      x = numeric(0), y = numeric(0), theta = numeric(0),
+      break_id = character(0),
+      label = character(0),
+      x = numeric(0),
+      y = numeric(0),
+      theta = numeric(0),
       stringsAsFactors = FALSE
     )
   }
@@ -257,10 +287,10 @@ label_placer_middle <- function(rot_adjuster = angle_halfcircle_bottom()) {
 angle_halfcircle_bottom <- function() {
   function(theta) {
     ifelse(
-      theta <= -pi/2,
+      theta <= -pi / 2,
       theta + pi,
       ifelse(
-        theta > pi/2,
+        theta > pi / 2,
         theta - pi,
         theta
       )

@@ -40,16 +40,36 @@ isobands_grob <- function(bands, gp = gpar(), units = "npc") {
 
 #' @export
 makeContent.isobands_grob <- function(x) {
-  make_bands_grobs <- function(data, col, fill, alpha, lty, lwd, lex, lineend, linejoin, linemitre) {
+  make_bands_grobs <- function(
+    data,
+    col,
+    fill,
+    alpha,
+    lty,
+    lwd,
+    lex,
+    lineend,
+    linejoin,
+    linemitre
+  ) {
     if (length(data$x) == 0) {
       return(NULL)
     }
     pathGrob(
-      data$x, data$y, data$id,
+      data$x,
+      data$y,
+      data$id,
       default.units = x$units,
       gp = gpar(
-        col = col, fill = fill, alpha = alpha, lty = lty, lwd = lwd, lex = lex,
-        lineend = lineend, linejoin = linejoin, linemitre = linemitre
+        col = col,
+        fill = fill,
+        alpha = alpha,
+        lty = lty,
+        lwd = lwd,
+        lex = lex,
+        lineend = lineend,
+        linejoin = linejoin,
+        linemitre = linemitre
       )
     )
   }

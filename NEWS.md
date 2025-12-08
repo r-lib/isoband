@@ -1,10 +1,15 @@
 # isoband (development version)
 
+# isoband 0.3.0
+
+- General upkeep
+- Rewrite implementation to use cpp11
+
 # isoband 0.2.7
 
 - Remove compile-time dependency on testthat.
 
-- Changed maintainer after the original author (Claus Wilke) donated codebase 
+- Changed maintainer after the original author (Claus Wilke) donated codebase
   to r-lib.
 
 isoband 0.2.6
@@ -22,7 +27,7 @@ isoband 0.2.5
   (#24, @jamarav).
 
 - The vendored testthat/catch code now uses a constant
-  value for the stack size rather than relying on `SIGSTKSZ`. 
+  value for the stack size rather than relying on `SIGSTKSZ`.
   See: https://github.com/r-lib/testthat/issues/1373
 
 isoband 0.2.4
@@ -46,7 +51,7 @@ isoband 0.2.0
 ----------------------------------------
 - Added `isolines_grob()` for drawing labeled isolines via the grid graphics system.
   A companion function `isobands_grob()` is provided for convenience.
-  
+
 - Numerous minor fixes and improvements.
 
 isoband 0.1.0

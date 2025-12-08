@@ -59,9 +59,17 @@
 #' grid.draw(b)
 #' grid.draw(l)
 #' @export
-isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
-                          margin = unit(c(1, 1, 1, 1), "pt"), label_col = NULL, label_alpha = NULL,
-                          label_placer = label_placer_minmax(), units = "npc") {
+isolines_grob <- function(
+  lines,
+  gp = gpar(),
+  breaks = NULL,
+  labels = NULL,
+  margin = unit(c(1, 1, 1, 1), "pt"),
+  label_col = NULL,
+  label_alpha = NULL,
+  label_placer = label_placer_minmax(),
+  units = "npc"
+) {
   if (is.null(breaks)) {
     breaks <- names(lines)
   } else {
@@ -71,13 +79,15 @@ isolines_grob <- function(lines, gp = gpar(), breaks = NULL, labels = NULL,
   if (is.null(labels)) {
     labels <- breaks
   } else if (length(labels) != length(breaks)) {
-    stop("Number of labels must match the number of breaks.", call. = FALSE)
+    cli::cli_abort("Number of labels must match the number of breaks.")
   } else {
     labels <- as.character(labels)
   }
 
   if (length(margin) != 4 || !is.unit(margin)) {
-    stop("The `margin` parameter must be a unit object of length four.", call. = FALSE)
+    cli::cli_abort(
+      "The {.arg margin} parameter must be a unit object of length four."
+    )
   }
 
   # first set up a data frame with all the label info
@@ -135,16 +145,22 @@ makeContext.isolines_grob <- function(x) {
     font <- rep_len(gp$font, n)[x$labels_data$break_index]
 
     x$gp <- gpar(
-      cex = cex, fontsize = fontsize, lineheight = lineheight,
-      fontfamily = fontfamily, font = font
+      cex = cex,
+      fontsize = fontsize,
+      lineheight = lineheight,
+      fontfamily = fontfamily,
+      font = font
     )
   } else {
     # we work with fontface
     fontface <- rep_len(gp$fontface, n)[x$labels_data$break_index]
 
     x$gp <- gpar(
-      cex = cex, fontsize = fontsize, lineheight = lineheight,
-      fontfamily = fontfamily, fontface = fontface
+      cex = cex,
+      fontsize = fontsize,
+      lineheight = lineheight,
+      fontfamily = fontfamily,
+      fontface = fontface
     )
   }
 
@@ -163,18 +179,24 @@ makeContent.isolines_grob <- function(x) {
   # need to correct angle for current aspect ratio
   Sy <- convertHeight(unit(1, "npc"), "mm", valueOnly = TRUE)
   Sx <- convertWidth(unit(1, "npc"), "mm", valueOnly = TRUE)
-  theta <- atan(tan(labels_data$theta)*Sy/Sx)
+  theta <- atan(tan(labels_data$theta) * Sy / Sx)
   labels_data$theta <- ifelse(is.finite(theta), theta, 0)
 
   # calculate label widths and heights in npc units
-  label_widths <- convertWidth(stringWidth(labels_data$label), x$units, valueOnly = TRUE)
+  label_widths <- convertWidth(
+    stringWidth(labels_data$label),
+    x$units,
+    valueOnly = TRUE
+  )
   label_heights <- convertHeight(
     stringHeight(labels_data$label) + stringDescent(labels_data$label),
-    x$units, valueOnly = TRUE
+    x$units,
+    valueOnly = TRUE
   )
 
   # get viewport aspect ratio to correct clipping for rotated labels
-  asp <- convertHeight(unit(1, "pt"), x$units, valueOnly = TRUE) / convertWidth(unit(1, "pt"), x$units, valueOnly = TRUE)
+  asp <- convertHeight(unit(1, "pt"), x$units, valueOnly = TRUE) /
+    convertWidth(unit(1, "pt"), x$units, valueOnly = TRUE)
   #print(asp)
 
   # calculate margins in npc units
@@ -187,16 +209,34 @@ makeContent.isolines_grob <- function(x) {
 
   # calculate the clip box for each label
   # xoff and yoff are needed to correct for uneven label margins
-  xoff <- -margin_wdiff*cos(labels_data$theta)/2 + (margin_hdiff/asp)*sin(labels_data$theta)/2
-  yoff <- -margin_wdiff*sin(labels_data$theta)/2 - margin_hdiff*cos(labels_data$theta)/2
+  xoff <- -margin_wdiff *
+    cos(labels_data$theta) /
+    2 +
+    (margin_hdiff / asp) * sin(labels_data$theta) / 2
+  yoff <- -margin_wdiff *
+    sin(labels_data$theta) /
+    2 -
+    margin_hdiff * cos(labels_data$theta) / 2
 
   clip_boxes <- data.frame(
-    x = labels_data$x + xoff, y = labels_data$y + yoff,
-    width = label_widths + margin_w, height = label_heights + margin_h,
+    x = labels_data$x + xoff,
+    y = labels_data$y + yoff,
+    width = label_widths + margin_w,
+    height = label_heights + margin_h,
     theta = labels_data$theta
   )
 
-  make_lines_grobs <- function(data, col, alpha, lty, lwd, lex, lineend, linejoin, linemitre) {
+  make_lines_grobs <- function(
+    data,
+    col,
+    alpha,
+    lty,
+    lwd,
+    lex,
+    lineend,
+    linejoin,
+    linemitre
+  ) {
     if (length(data$x) == 0) {
       return(NULL)
     }
@@ -205,11 +245,19 @@ makeContent.isolines_grob <- function(x) {
       return(NULL)
     }
     polylineGrob(
-      clipped$x, clipped$y, clipped$id,
+      clipped$x,
+      clipped$y,
+      clipped$id,
       default.units = x$units,
       gp = gpar(
-        col = col, alpha = alpha, lty = lty, lwd = lwd, lex = lex,
-        lineend = lineend, linejoin = linejoin, linemitre = linemitre
+        col = col,
+        alpha = alpha,
+        lty = lty,
+        lwd = lwd,
+        lex = lex,
+        lineend = lineend,
+        linejoin = linejoin,
+        linemitre = linemitre
       )
     )
   }
@@ -240,13 +288,18 @@ makeContent.isolines_grob <- function(x) {
   }
   if (is.null(x$label_alpha)) {
     # alpha is cumulative, so we don't take it from the current viewport
-    alpha <- rep_len(x$gp_combined$alpha %||% 1, length(x$lines))[x$labels_data$index]
+    alpha <- rep_len(x$gp_combined$alpha %||% 1, length(x$lines))[
+      x$labels_data$index
+    ]
   } else {
     alpha <- rep_len(x$label_alpha, n)[x$labels_data$break_index]
   }
 
   labels_grob <- textGrob(
-    labels_data$label, labels_data$x, labels_data$y, rot = 360*labels_data$theta/(2*pi),
+    labels_data$label,
+    labels_data$x,
+    labels_data$y,
+    rot = 360 * labels_data$theta / (2 * pi),
     default.units = x$units,
     gp = gpar(col = col, alpha = alpha)
   )
@@ -256,17 +309,35 @@ makeContent.isolines_grob <- function(x) {
 }
 
 isolines_grob_makeContent_nolabels <- function(x) {
-  make_lines_grobs <- function(data, col, alpha, lty, lwd, lex, lineend, linejoin, linemitre) {
+  make_lines_grobs <- function(
+    data,
+    col,
+    alpha,
+    lty,
+    lwd,
+    lex,
+    lineend,
+    linejoin,
+    linemitre
+  ) {
     if (length(data$x) == 0) {
       return(NULL)
     }
 
     polylineGrob(
-      data$x, data$y, data$id,
+      data$x,
+      data$y,
+      data$id,
       default.units = x$units,
       gp = gpar(
-        col = col, alpha = alpha, lty = lty, lwd = lwd, lex = lex,
-        lineend = lineend, linejoin = linejoin, linemitre = linemitre
+        col = col,
+        alpha = alpha,
+        lty = lty,
+        lwd = lwd,
+        lex = lex,
+        lineend = lineend,
+        linejoin = linejoin,
+        linemitre = linemitre
       )
     )
   }
@@ -292,4 +363,3 @@ isolines_grob_makeContent_nolabels <- function(x) {
   children <- do.call(gList, lines_grobs)
   setChildren(x, children)
 }
-
