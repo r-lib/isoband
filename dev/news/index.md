@@ -2,6 +2,8 @@
 
 ## isoband (development version)
 
+## isoband 0.3.0
+
 - General upkeep
 - Rewrite implementation to use cpp11
 

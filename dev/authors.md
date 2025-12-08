@@ -23,12 +23,12 @@ Source:
 
 Wickham H, Wilke C, Pedersen T (2025). *isoband: Generate Isolines and
 Isobands from Regularly Spaced Elevation Grids*. R package version
-0.2.7.9000, <https://isoband.r-lib.org>.
+0.3.0.9000, <https://isoband.r-lib.org>.
 
     @Manual{,
       title = {isoband: Generate Isolines and Isobands from Regularly Spaced Elevation Grids},
       author = {Hadley Wickham and Claus O. Wilke and Thomas Lin Pedersen},
       year = {2025},
-      note = {R package version 0.2.7.9000},
+      note = {R package version 0.3.0.9000},
       url = {https://isoband.r-lib.org},
     }
